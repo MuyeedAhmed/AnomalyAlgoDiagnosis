@@ -118,7 +118,8 @@ def calculate_draw_score(allFiles, Tool, Algo, parameter, parameter_values):
     
     mwu_df_f1_range = pd.DataFrame(mwu, columns = parameter_values)
     mwu_df_f1_range.index = parameter_values
-    print(mwu_df_f1_range)
+    mwu_df_f1_range.to_csv("Stats/MWU_SkIF_F1_Range_"+parameter+".csv")
+    # print(mwu_df_f1_range)
     
     friedman_test_f1_r = pg.friedman(data=df_f1_r, dv="F1Score_Range", within=parameter, subject="Filename")
     pvalue_friedman_f1_r = friedman_test_f1_r['p-unc']

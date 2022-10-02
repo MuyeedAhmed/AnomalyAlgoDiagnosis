@@ -14,14 +14,12 @@ from scipy.io import loadmat
 from sklearn.ensemble import IsolationForest
 import numpy as np
 from sklearn import metrics
-import seaborn as sns
-sns.set_theme(style="whitegrid")
 
 from sklearn.metrics.cluster import adjusted_rand_score
 
-datasetFolderDir = '/Users/muyeedahmed/Desktop/Research/Dataset/Dataset_Anomaly/'
+# datasetFolderDir = '/Users/muyeedahmed/Desktop/Research/Dataset/Dataset_Anomaly/'
 # datasetFolderDir = '/home/neamtiu/Desktop/ma234/AnomalyDetection/Dataset/'
-# datasetFolderDir = '/jimmy/hdd/ma234/AnomalyDetection/Dataset_Combined'
+datasetFolderDir = '/jimmy/hdd/ma234/AnomalyDetection/Dataset_Combined'
 
 
 def isolationforest(filename):
@@ -64,20 +62,20 @@ def isolationforest(filename):
     n_jobs = [1, None] 
     warm_start = [True, False]
     
-    print("n_estimators : ", end='')
-    for ne in n_estimators:
-        runIF(filename, X, gt, i_n_estimators=ne)
-        print(ne, end = ', ')
+    # print("n_estimators : ", end='')
+    # for ne in n_estimators:
+    #     runIF(filename, X, gt, i_n_estimators=ne)
+    #     print(ne, end = ', ')
     
-    print("\nmax_samples : ", end='')
-    for ms in max_samples:
-        runIF(filename, X, gt, i_max_samples=ms)
-        print(ms, end = ', ')
+    # print("\nmax_samples : ", end='')
+    # for ms in max_samples:
+    #     runIF(filename, X, gt, i_max_samples=ms)
+    #     print(ms, end = ', ')
     
-    print("\nmax_features : ", end='')
-    for mf in max_features:
-        runIF(filename, X, gt, i_max_features=mf)
-        print(mf, end = ', ')
+    # print("\nmax_features : ", end='')
+    # for mf in max_features:
+    #     runIF(filename, X, gt, i_max_features=mf)
+    #     print(mf, end = ', ')
         
     print("\nbootstrap : ", end='')
     for bs in bootstrap:

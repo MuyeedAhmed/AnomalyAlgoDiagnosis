@@ -13,6 +13,7 @@ sns.set_theme(style="whitegrid")
 import matplotlib.pyplot as plt
 import datetime
 from sklearn.metrics.cluster import adjusted_rand_score
+from scipy import stats
 
 datasetFolderDir = '/Users/muyeedahmed/Desktop/Research/Dataset/Dataset_Anomaly/'
 
@@ -61,8 +62,8 @@ def isolationforest(filename):
     #                         for ws in warm_start:
     #                             runIF(filename, X, gt, ne, ms, cont, mf, bs, nj, ws)
     
-    for mf in max_features:
-        runIF(filename, X, gt, i_max_features=mf)
+    # for mf in max_features:
+    #     runIF(filename, X, gt, i_max_features=mf)
     
     
     # for ws in warm_start:
@@ -141,35 +142,38 @@ def calculateF1Score_WS(allFiles):
             f1_med_all.append([i_warm_start, np.percentile(f1, 50)])
         # if filename=='ionosphere':
         #     break
+    
+    
+        
     df_acc_r = pd.DataFrame(accuracy_range_all, columns = ['warm_start', 'Accuracy_Range'])
     df_acc_m = pd.DataFrame(accuracy_med_all, columns = ['warm_start', 'Accuracy_Median'])
     df_f1_r = pd.DataFrame(f1_range_all, columns = ['warm_start', 'F1Score_Range'])
     df_f1_m = pd.DataFrame(f1_med_all, columns = ['warm_start', 'F1Score_Median'])
     
     
-    fig = plt.Figure()
-    axf = sns.boxplot(x="warm_start", y="Accuracy_Range", data=df_acc_r)
-    # axf.set(xlabel=None)
-    plt.savefig("Fig/IF_SK_warm_start_Accuracy_Range.pdf", bbox_inches="tight", pad_inches=0)
-    plt.clf()
+    # fig = plt.Figure()
+    # axf = sns.boxplot(x="warm_start", y="Accuracy_Range", data=df_acc_r)
+    # # axf.set(xlabel=None)
+    # plt.savefig("Fig/IF_SK_warm_start_Accuracy_Range.pdf", bbox_inches="tight", pad_inches=0)
+    # plt.clf()
     
-    fig = plt.Figure()
-    axf = sns.boxplot(x="warm_start", y="Accuracy_Median", data=df_acc_m)
-    # axf.set(xlabel=None)
-    plt.savefig("Fig/IF_SK_warm_start_Accuracy_Median.pdf", bbox_inches="tight", pad_inches=0)
-    plt.clf()
+    # fig = plt.Figure()
+    # axf = sns.boxplot(x="warm_start", y="Accuracy_Median", data=df_acc_m)
+    # # axf.set(xlabel=None)
+    # plt.savefig("Fig/IF_SK_warm_start_Accuracy_Median.pdf", bbox_inches="tight", pad_inches=0)
+    # plt.clf()
     
-    fig = plt.Figure()
-    axf = sns.boxplot(x="warm_start", y="F1Score_Range", data=df_f1_r)
-    # axf.set(xlabel=None)
-    plt.savefig("Fig/IF_SK_warm_start_F1Score_Range.pdf", bbox_inches="tight", pad_inches=0)
-    plt.clf()
+    # fig = plt.Figure()
+    # axf = sns.boxplot(x="warm_start", y="F1Score_Range", data=df_f1_r)
+    # # axf.set(xlabel=None)
+    # plt.savefig("Fig/IF_SK_warm_start_F1Score_Range.pdf", bbox_inches="tight", pad_inches=0)
+    # plt.clf()
     
-    fig = plt.Figure()
-    axf = sns.boxplot(x="warm_start", y="F1Score_Median", data=df_f1_m)
-    # axf.set(xlabel=None)
-    plt.savefig("Fig/IF_SK_warm_start_F1Score_Median.pdf", bbox_inches="tight", pad_inches=0)
-    plt.clf()
+    # fig = plt.Figure()
+    # axf = sns.boxplot(x="warm_start", y="F1Score_Median", data=df_f1_m)
+    # # axf.set(xlabel=None)
+    # plt.savefig("Fig/IF_SK_warm_start_F1Score_Median.pdf", bbox_inches="tight", pad_inches=0)
+    # plt.clf()
 
 
 def calculateF1Score_MF(allFiles):
@@ -227,35 +231,107 @@ def calculateF1Score_MF(allFiles):
             f1_med_all.append([i_max_features, np.percentile(f1, 50)])
         # if filename=='ionosphere':
         #     break
-    df_acc_r = pd.DataFrame(accuracy_range_all, columns = ['max_features', 'Accuracy_Range'])
-    df_acc_m = pd.DataFrame(accuracy_med_all, columns = ['max_features', 'Accuracy_Median'])
-    df_f1_r = pd.DataFrame(f1_range_all, columns = ['max_features', 'F1Score_Range'])
-    df_f1_m = pd.DataFrame(f1_med_all, columns = ['max_features', 'F1Score_Median'])
     
     
-    fig = plt.Figure()
-    axf = sns.boxplot(x="max_features", y="Accuracy_Range", data=df_acc_r)
-    # axf.set(xlabel=None)
-    plt.savefig("Fig/IF_SK_max_features_Accuracy_Range.pdf", bbox_inches="tight", pad_inches=0)
-    plt.clf()
+    mf1 = []
+    mf2 = []
+    mf3 = []
+    mf4 = []
+    mf5 = []
+    mf6 = []
+    mf7 = []
+    mf8 = []
+    mf9 = []
+    mf10 = []
+    for i in f1_range_all:
+        if i[0] == 0.1:
+            mf1.append(i[1])
+        elif i[0] == 0.2:
+            mf2.append(i[1])
+        elif i[0] == 0.3:
+            mf3.append(i[1])
+        elif i[0] == 0.4:
+            mf4.append(i[1])
+        elif i[0] == 0.5:
+            mf5.append(i[1])
+        elif i[0] == 0.6:
+            mf6.append(i[1])
+        elif i[0] == 0.7:
+            mf7.append(i[1])
+        elif i[0] == 0.8:
+            mf8.append(i[1])
+        elif i[0] == 0.9:
+            mf9.append(i[1])
+        elif i[0] == 1.0:
+            mf10.append(i[1])
+    print("F1 Range")
+    print(stats.friedmanchisquare(mf1, mf2, mf3, mf4, mf5, mf6, mf7, mf8, mf9, mf10))
     
-    fig = plt.Figure()
-    axf = sns.boxplot(x="max_features", y="Accuracy_Median", data=df_acc_m)
-    # axf.set(xlabel=None)
-    plt.savefig("Fig/IF_SK_max_features_Accuracy_Median.pdf", bbox_inches="tight", pad_inches=0)
-    plt.clf()
     
-    fig = plt.Figure()
-    axf = sns.boxplot(x="max_features", y="F1Score_Range", data=df_f1_r)
-    # axf.set(xlabel=None)
-    plt.savefig("Fig/IF_SK_max_features_F1Score_Range.pdf", bbox_inches="tight", pad_inches=0)
-    plt.clf()
+    mf1 = []
+    mf2 = []
+    mf3 = []
+    mf4 = []
+    mf5 = []
+    mf6 = []
+    mf7 = []
+    mf8 = []
+    mf9 = []
+    mf10 = []
+    for i in f1_med_all:
+        if i[0] == 0.1:
+            mf1.append(i[1])
+        elif i[0] == 0.2:
+            mf2.append(i[1])
+        elif i[0] == 0.3:
+            mf3.append(i[1])
+        elif i[0] == 0.4:
+            mf4.append(i[1])
+        elif i[0] == 0.5:
+            mf5.append(i[1])
+        elif i[0] == 0.6:
+            mf6.append(i[1])
+        elif i[0] == 0.7:
+            mf7.append(i[1])
+        elif i[0] == 0.8:
+            mf8.append(i[1])
+        elif i[0] == 0.9:
+            mf9.append(i[1])
+        elif i[0] == 1.0:
+            mf10.append(i[1])
+    print("F1 Median")
+    print(stats.friedmanchisquare(mf1, mf2, mf3, mf4, mf5, mf6, mf7, mf8, mf9, mf10))
     
-    fig = plt.Figure()
-    axf = sns.boxplot(x="max_features", y="F1Score_Median", data=df_f1_m)
-    # axf.set(xlabel=None)
-    plt.savefig("Fig/IF_SK_max_features_F1Score_Median.pdf", bbox_inches="tight", pad_inches=0)
-    plt.clf()
+    
+    # df_acc_r = pd.DataFrame(accuracy_range_all, columns = ['max_features', 'Accuracy_Range'])
+    # df_acc_m = pd.DataFrame(accuracy_med_all, columns = ['max_features', 'Accuracy_Median'])
+    # df_f1_r = pd.DataFrame(f1_range_all, columns = ['max_features', 'F1Score_Range'])
+    # df_f1_m = pd.DataFrame(f1_med_all, columns = ['max_features', 'F1Score_Median'])
+    
+    
+    # fig = plt.Figure()
+    # axf = sns.boxplot(x="max_features", y="Accuracy_Range", data=df_acc_r)
+    # # axf.set(xlabel=None)
+    # plt.savefig("Fig/IF_SK_max_features_Accuracy_Range.pdf", bbox_inches="tight", pad_inches=0)
+    # plt.clf()
+    
+    # fig = plt.Figure()
+    # axf = sns.boxplot(x="max_features", y="Accuracy_Median", data=df_acc_m)
+    # # axf.set(xlabel=None)
+    # plt.savefig("Fig/IF_SK_max_features_Accuracy_Median.pdf", bbox_inches="tight", pad_inches=0)
+    # plt.clf()
+    
+    # fig = plt.Figure()
+    # axf = sns.boxplot(x="max_features", y="F1Score_Range", data=df_f1_r)
+    # # axf.set(xlabel=None)
+    # plt.savefig("Fig/IF_SK_max_features_F1Score_Range.pdf", bbox_inches="tight", pad_inches=0)
+    # plt.clf()
+    
+    # fig = plt.Figure()
+    # axf = sns.boxplot(x="max_features", y="F1Score_Median", data=df_f1_m)
+    # # axf.set(xlabel=None)
+    # plt.savefig("Fig/IF_SK_max_features_F1Score_Median.pdf", bbox_inches="tight", pad_inches=0)
+    # plt.clf()
 
 
 
@@ -272,8 +348,8 @@ if __name__ == '__main__':
     
     # for FileNumber in range(len(master_files)):
     #     isolationforest(master_files[FileNumber])
-    calculateF1Score_WS(master_files)
-    # calculateF1Score_MF(master_files)
+    # calculateF1Score_WS(master_files)
+    calculateF1Score_MF(master_files)
     
     
     

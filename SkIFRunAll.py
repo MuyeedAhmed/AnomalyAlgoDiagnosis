@@ -62,20 +62,20 @@ def isolationforest(filename):
     n_jobs = [1, None] 
     warm_start = [True, False]
     
-    # print("n_estimators : ", end='')
-    # for ne in n_estimators:
-    #     runIF(filename, X, gt, i_n_estimators=ne)
-    #     print(ne, end = ', ')
+    print("n_estimators : ", end='')
+    for ne in n_estimators:
+        runIF(filename, X, gt, i_n_estimators=ne)
+        print(ne, end = ', ')
     
-    # print("\nmax_samples : ", end='')
-    # for ms in max_samples:
-    #     runIF(filename, X, gt, i_max_samples=ms)
-    #     print(ms, end = ', ')
+    print("\nmax_samples : ", end='')
+    for ms in max_samples:
+        runIF(filename, X, gt, i_max_samples=ms)
+        print(ms, end = ', ')
     
-    # print("\nmax_features : ", end='')
-    # for mf in max_features:
-    #     runIF(filename, X, gt, i_max_features=mf)
-    #     print(mf, end = ', ')
+    print("\nmax_features : ", end='')
+    for mf in max_features:
+        runIF(filename, X, gt, i_max_features=mf)
+        print(mf, end = ', ')
         
     print("\nbootstrap : ", end='')
     for bs in bootstrap:
@@ -152,29 +152,31 @@ if __name__ == '__main__':
     
     master_files.sort()
     
+    
     R = ""
     for i in range(29):
         R += "R"+str(i)+","
     R+="R29"
-    
-    fstat_acc=open("Stats/SkIF_Accuracy.csv", "w")
-    fstat_acc.write('Filename,n_estimators,max_samples,contamination,max_features,bootstrap,n_jobs,warm_start,'+R+"\n")
-    
-    fstat_f1=open("Stats/SkIF_F1.csv", "w")
-    fstat_f1.write('Filename,n_estimators,max_samples,contamination,max_features,bootstrap,n_jobs,warm_start,'+R+"\n")
-    
-    fstat_ari=open("Stats/SkIF_ARI.csv", "w")
-    fstat_ari.write('Filename,n_estimators,max_samples,contamination,max_features,bootstrap,n_jobs,warm_start,'+R+"\n")
-    
-    fstat_f1.close()
-    fstat_acc.close()
-    fstat_ari.close()
+    if os.path.exists("Stats/SkIF_Accuracy.csv") == 0:
+        fstat_acc=open("Stats/SkIF_Accuracy.csv", "w")
+        fstat_acc.write('Filename,n_estimators,max_samples,contamination,max_features,bootstrap,n_jobs,warm_start,'+R+"\n")
+        fstat_acc.close()
+        
+    if os.path.exists("Stats/SkIF_F1.csv") == 0: 
+        fstat_f1=open("Stats/SkIF_F1.csv", "w")
+        fstat_f1.write('Filename,n_estimators,max_samples,contamination,max_features,bootstrap,n_jobs,warm_start,'+R+"\n")
+        fstat_f1.close()
+
+    if os.path.exists("Stats/SkIF_ARI.csv") == 0:    
+        fstat_ari=open("Stats/SkIF_ARI.csv", "w")
+        fstat_ari.write('Filename,n_estimators,max_samples,contamination,max_features,bootstrap,n_jobs,warm_start,'+R+"\n")
+        fstat_ari.close()
+
     
     for FileNumber in range(len(master_files)):
         print(FileNumber, end=' ')
         isolationforest(master_files[FileNumber])
-        if FileNumber == 3:
-            break
+
     
     
     

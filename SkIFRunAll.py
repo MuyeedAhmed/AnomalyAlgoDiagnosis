@@ -6,24 +6,22 @@ Created on Sat Oct  1 20:44:46 2022
 @author: muyeedahmed
 """
 
-from datetime import datetime
 import os
 import glob
 import pandas as pd
 import mat73
 from scipy.io import loadmat
-import collections
 from sklearn.ensemble import IsolationForest
 import numpy as np
 from sklearn import metrics
 import seaborn as sns
 sns.set_theme(style="whitegrid")
-import matplotlib.pyplot as plt
-import datetime
+
 from sklearn.metrics.cluster import adjusted_rand_score
 
 datasetFolderDir = '/Users/muyeedahmed/Desktop/Research/Dataset/Dataset_Anomaly/'
 # datasetFolderDir = '/home/neamtiu/Desktop/ma234/AnomalyDetection/Dataset/'
+# datasetFolderDir = '/jimmy/hdd/ma234/AnomalyDetection/Dataset_Combined'
 
 
 def isolationforest(filename):
@@ -57,51 +55,62 @@ def isolationforest(filename):
     else:
         print("File doesn't exist")
         return
-    
+
     n_estimators = [2, 4, 8, 16, 32, 64, 100, 128, 256, 512, 1024]
     max_samples = ['auto', 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
     contamination = ['auto'] 
     max_features = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
     bootstrap = [True, False]
-    n_jobs = [1, -1] 
+    n_jobs = [1, None] 
     warm_start = [True, False]
     
-    # for ne in n_estimators:
-    #     for ms in max_samples:
-    #         for cont in contamination:    
-    #             for mf in max_features:
-    #                 for bs in bootstrap:
-    #                     for nj in n_jobs:
-    #                         for ws in warm_start:
-    #                             runIF(filename, X, gt, ne, ms, cont, mf, bs, nj, ws)
-    
-    
+    print("n_estimators : ", end='')
     for ne in n_estimators:
         runIF(filename, X, gt, i_n_estimators=ne)
-        
+        print(ne, end = ', ')
+    
+    print("\nmax_samples : ", end='')
     for ms in max_samples:
         runIF(filename, X, gt, i_max_samples=ms)
+        print(ms, end = ', ')
     
-    # for mf in max_features:
-    #     runIF(filename, X, gt, i_max_features=mf)
-    
-    # for bs in bootstrap:
-    #     runIF(filename, X, gt, i_bootstrap=bs)
-    
+    print("\nmax_features : ", end='')
+    for mf in max_features:
+        runIF(filename, X, gt, i_max_features=mf)
+        print(mf, end = ', ')
+        
+    print("\nbootstrap : ", end='')
+    for bs in bootstrap:
+        runIF(filename, X, gt, i_bootstrap=bs)
+        print(bs, end = ', ')
+        
+    print("\nn_jobs : ", end='')
     for nj in n_jobs:
         runIF(filename, X, gt, i_n_jobs=nj)
+        print(nj, end = ', ')
     
-    # for ws in warm_start:
-    #     runIF(filename, X, gt, i_warm_start=ws)
-    
+    print("\nwarm_start : ", end='')
+    for ws in warm_start:
+        runIF(filename, X, gt, i_warm_start=ws)
+        print(ws, end = ', ')
+    print()
     
 def runIF(filename, X, gt, i_n_estimators=100, i_max_samples='auto', i_contamination='auto', 
           i_max_features=1.0, i_bootstrap=False, i_n_jobs=None, i_warm_start=False):
     labelFile = filename + "_" + str(i_n_estimators) + "_" + str(i_max_samples) + "_" + str(i_contamination) + "_" + str(i_max_features) + "_" + str(i_bootstrap) + "_" + str(i_n_jobs) + "_" + str(i_warm_start)
     if os.path.exists("IF/Labels_"+labelFile+".csv") == 1:
-        print("The Labels Already Exist")
-        print("IF/Labels_"+labelFile+".csv")
+        # print("The Labels Already Exist")
+        # print("IF/Labels_"+labelFile+".csv")
         return
+    fstat_acc=open("Stats/SkIF_Accuracy.csv", "a")
+    fstat_acc.write(filename+','+ str(i_n_estimators) + ','+ str(i_max_samples) + ',' + str(i_contamination) + ',' + str(i_max_features) + ',' + str(i_bootstrap) + ',' + str(i_n_jobs) + ',' + str(i_warm_start))
+    
+    fstat_f1=open("Stats/SkIF_F1.csv", "a")
+    fstat_f1.write(filename+','+ str(i_n_estimators) + ','+ str(i_max_samples) + ',' + str(i_contamination) + ',' + str(i_max_features) + ',' + str(i_bootstrap) + ',' + str(i_n_jobs) + ',' + str(i_warm_start))
+    
+    fstat_ari=open("Stats/SkIF_ARI.csv", "a")
+    fstat_ari.write(filename+','+ str(i_n_estimators) + ','+ str(i_max_samples) + ',' + str(i_contamination) + ',' + str(i_max_features) + ',' + str(i_bootstrap) + ',' + str(i_n_jobs) + ',' + str(i_warm_start))
+    
     
     for i in range(30):
         clustering = IsolationForest(n_estimators=i_n_estimators, max_samples=i_max_samples, 
@@ -114,104 +123,24 @@ def runIF(filename, X, gt, i_n_estimators=100, i_max_samples='auto', i_contamina
         flabel=open("IF/Labels_"+labelFile+".csv", 'a')
         flabel.write(','.join(str(s) for s in l) + '\n')
         flabel.close()
-
-def calculate_draw_score(allFiles, parameter, parameter_values):
-    i_n_estimators=100
-    i_max_samples='auto'
-    i_contamination='auto' 
-    i_max_features=1.0
-    i_bootstrap=False
-    i_n_jobs=None
-    i_warm_start = False
+        
+        accuracy = metrics.accuracy_score(gt, l)
+        fstat_acc.write(','+str(accuracy))
+        
+        f1 = metrics.f1_score(gt, l)
+        fstat_f1.write(','+str(f1))
+        
+        ari = adjusted_rand_score(gt, l)
+        fstat_ari.write(','+str(ari))
+        
+     
+    fstat_acc.write('\n')
+    fstat_f1.write('\n')
+    fstat_ari.write('\n')
     
-    
-    
-    accuracy_range_all = []
-    accuracy_med_all = []
-    f1_range_all = []
-    f1_med_all = []
-
-    for filename in allFiles:
-        print(filename)
-        folderpath = datasetFolderDir
-    
-        if os.path.exists(folderpath+filename+".mat") == 0:
-            print("File doesn't exist")
-            return
-        try:
-            df = loadmat(folderpath+filename+".mat")
-        except NotImplementedError:
-            df = mat73.loadmat(folderpath+filename+".mat")
-
-        gt=df["y"]
-        gt = gt.reshape((len(gt)))
-        X=df['X']
-        if np.isnan(X).any():
-            print("Didn\'t run -> NaN")
-            continue
-        for p in parameter_values:
-            if parameter == 'n_estimators':
-                i_n_estimators = p
-            elif parameter == 'max_samples':
-                i_max_samples = p
-            elif parameter == 'max_features':
-                i_max_features = p
-            elif parameter == 'bootstrap':
-                i_bootstrap = p
-            elif parameter == 'n_jobs':
-                i_n_jobs = p
-            elif parameter == 'warm_start':
-                i_warm_start = p
-            labelFile = "IF/Labels_"+filename + "_" + str(i_n_estimators) + "_" + str(i_max_samples) + "_" + str(i_contamination) + "_" + str(i_max_features) + "_" + str(i_bootstrap) + "_" + str(i_n_jobs) + "_" + str(i_warm_start)
-            labels = pd.read_csv(labelFile+'.csv', header=None).to_numpy()
-    
-            accuracy = [0] * 30
-            f1 = [0] * 30
-            ari = [0] * 30
-            for run in range(30):
-                l = labels[run]
-                accuracy[run] = metrics.accuracy_score(gt, l)
-                f1[run] = metrics.f1_score(gt, l)
-                # ari[run] = adjusted_rand_score(gt, l)
-                
-            accDiff = np.percentile(accuracy, 75) - np.percentile(accuracy, 25)
-            accuracy_range_all.append([p, accDiff])
-            accuracy_med_all.append([p, np.percentile(accuracy, 50)])
-            
-            f1Diff = np.percentile(f1, 75) - np.percentile(f1, 25)
-            f1_range_all.append([p, f1Diff])
-            f1_med_all.append([p, np.percentile(f1, 50)])
-
-    df_acc_r = pd.DataFrame(accuracy_range_all, columns = [parameter, 'Accuracy_Range'])
-    df_acc_m = pd.DataFrame(accuracy_med_all, columns = [parameter, 'Accuracy_Median'])
-    df_f1_r = pd.DataFrame(f1_range_all, columns = [parameter, 'F1Score_Range'])
-    df_f1_m = pd.DataFrame(f1_med_all, columns = [parameter, 'F1Score_Median'])
-    
-    
-    fig = plt.Figure()
-    axf = sns.boxplot(x=parameter, y="Accuracy_Range", data=df_acc_r)
-    # axf.set(xlabel=None)
-    plt.savefig("Fig/IF_SK_"+parameter+"_Accuracy_Range.pdf", bbox_inches="tight", pad_inches=0)
-    plt.clf()
-    
-    fig = plt.Figure()
-    axf = sns.boxplot(x=parameter, y="Accuracy_Median", data=df_acc_m)
-    # axf.set(xlabel=None)
-    plt.savefig("Fig/IF_SK_"+parameter+"_Accuracy_Median.pdf", bbox_inches="tight", pad_inches=0)
-    plt.clf()
-    
-    fig = plt.Figure()
-    axf = sns.boxplot(x=parameter, y="F1Score_Range", data=df_f1_r)
-    # axf.set(xlabel=None)
-    plt.savefig("Fig/IF_SK_"+parameter+"_F1Score_Range.pdf", bbox_inches="tight", pad_inches=0)
-    plt.clf()
-    
-    fig = plt.Figure()
-    axf = sns.boxplot(x=parameter, y="F1Score_Median", data=df_f1_m)
-    # axf.set(xlabel=None)
-    plt.savefig("Fig/IF_SK_"+parameter+"_F1Score_Median.pdf", bbox_inches="tight", pad_inches=0)
-    plt.clf()
-    
+    fstat_f1.close()
+    fstat_acc.close()
+    fstat_ari.close()
 
 
 
@@ -225,10 +154,29 @@ if __name__ == '__main__':
     
     master_files.sort()
     
+    R = ""
+    for i in range(29):
+        R += "R"+str(i)+","
+    R+="R29"
+    
+    fstat_acc=open("Stats/SkIF_Accuracy.csv", "w")
+    fstat_acc.write('Filename,n_estimators,max_samples,contamination,max_features,bootstrap,n_jobs,warm_start,'+R+"\n")
+    
+    fstat_f1=open("Stats/SkIF_F1.csv", "w")
+    fstat_f1.write('Filename,n_estimators,max_samples,contamination,max_features,bootstrap,n_jobs,warm_start,'+R+"\n")
+    
+    fstat_ari=open("Stats/SkIF_ARI.csv", "w")
+    fstat_ari.write('Filename,n_estimators,max_samples,contamination,max_features,bootstrap,n_jobs,warm_start,'+R+"\n")
+    
+    fstat_f1.close()
+    fstat_acc.close()
+    fstat_ari.close()
     
     for FileNumber in range(len(master_files)):
+        print(FileNumber, end=' ')
         isolationforest(master_files[FileNumber])
-
+        if FileNumber == 3:
+            break
     
     
     

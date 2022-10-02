@@ -19,7 +19,7 @@ from sklearn.metrics.cluster import adjusted_rand_score
 
 # datasetFolderDir = '/Users/muyeedahmed/Desktop/Research/Dataset/Dataset_Anomaly/'
 # datasetFolderDir = '/home/neamtiu/Desktop/ma234/AnomalyDetection/Dataset/'
-datasetFolderDir = '/jimmy/hdd/ma234/AnomalyDetection/Dataset_Combined'
+datasetFolderDir = '../Dataset_Combined/'
 
 
 def isolationforest(filename):

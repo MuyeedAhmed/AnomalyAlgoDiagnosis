@@ -19,6 +19,7 @@ sns.set_theme(style="whitegrid")
 from sklearn.metrics.cluster import adjusted_rand_score
 import pingouin as pg
 import scikit_posthocs as sp
+import scipy.stats as stats
 
 datasetFolderDir = '/Users/muyeedahmed/Desktop/Research/Dataset/Dataset_Combined/'
 # datasetFolderDir = '/home/neamtiu/Desktop/ma234/AnomalyDetection/Dataset/'
@@ -36,7 +37,6 @@ def calculate_draw_score(allFiles, Tool, Algo, parameter, parameter_values):
     
     dfacc = pd.read_csv("Stats/SkIF_Accuracy.csv")
     dff1 = pd.read_csv("Stats/SkIF_F1.csv")
-    
     runs = []
     for i in range(30):
         runs.append(('R'+str(i)))
@@ -60,22 +60,22 @@ def calculate_draw_score(allFiles, Tool, Algo, parameter, parameter_values):
                 i_n_jobs = p
             elif parameter == 'warm_start':
                 i_warm_start = p
-            
+                        
             accuracy = dfacc[(dfacc['Filename']==filename)&
                             (dfacc['n_estimators']==i_n_estimators)&
-                            (dfacc['max_samples']==i_max_samples)&
+                            (dfacc['max_samples']==str(i_max_samples))&
                             (dfacc['max_features']==i_max_features)&
                             (dfacc['bootstrap']==i_bootstrap)&
-                            (dfacc['n_jobs']==i_n_jobs)&
+                            (dfacc['n_jobs']==str(i_n_jobs))&
                             (dfacc['warm_start']==i_warm_start)]
                 
 
             f1 = dff1[(dff1['Filename']==filename)&
                             (dff1['n_estimators']==i_n_estimators)&
-                            (dff1['max_samples']==i_max_samples)&
+                            (dff1['max_samples']==str(i_max_samples))&
                             (dff1['max_features']==i_max_features)&
                             (dff1['bootstrap']==i_bootstrap)&
-                            (dff1['n_jobs']==i_n_jobs)&
+                            (dff1['n_jobs']==str(i_n_jobs))&
                             (dff1['warm_start']==i_warm_start)]
             if f1.empty:
                 continue
@@ -85,7 +85,7 @@ def calculate_draw_score(allFiles, Tool, Algo, parameter, parameter_values):
             f1_values = f1[runs].to_numpy()[0]
 
             # ari[run] = adjusted_rand_score(gt, l)
-                
+            
             accDiff = (np.percentile(accuracy_values, 75) - np.percentile(accuracy_values, 25))/(np.percentile(accuracy_values, 75) + np.percentile(accuracy_values, 25))
             accuracy_range_all.append([filename, p, accDiff])
             accuracy_med_all.append([filename, p, np.percentile(accuracy_values, 50)])
@@ -100,9 +100,29 @@ def calculate_draw_score(allFiles, Tool, Algo, parameter, parameter_values):
     df_f1_m = pd.DataFrame(f1_med_all, columns = ['Filename', parameter, 'F1Score_Median'])
     
     
-    print(df_f1_r)
-    friedman_test = pg.friedman(data=df_f1_r, dv="F1Score_Range", within=parameter, subject="Filename")
-    pvalue_friedman=friedman_test['p-unc']
+    mwu = [[0 for i in range(len(parameter_values))] for j in range(len(parameter_values))]
+    i = 0
+    
+    for p1 in parameter_values:
+        p1_values = df_f1_r[df_f1_r[parameter] == p1]['F1Score_Range'].to_numpy()
+        j = 0
+        for p2 in parameter_values:
+            p2_values = df_f1_r[df_f1_r[parameter] == p2]['F1Score_Range'].to_numpy()
+            # print(p1_values, p2_values)
+            # print(filename, parameter)
+            # print(p2_values, p1, p2)
+            _, mwu[i][j] = stats.mannwhitneyu(x=p1_values, y=p2_values, alternative = 'greater')
+            
+            j += 1
+        i += 1
+    
+    mwu_df_f1_range = pd.DataFrame(mwu, columns = parameter_values)
+    mwu_df_f1_range.index = parameter_values
+    print(mwu_df_f1_range)
+    
+    friedman_test_f1_r = pg.friedman(data=df_f1_r, dv="F1Score_Range", within=parameter, subject="Filename")
+    pvalue_friedman_f1_r = friedman_test_f1_r['p-unc']
+    
     
     
     # conv = sp.posthoc_conover_friedman(a=df_f1_r, y_col="F1Score_Range", group_col=parameter, block_col="Filename", 
@@ -145,13 +165,13 @@ if __name__ == '__main__':
     contamination = ['auto'] 
     max_features = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
     bootstrap = [True, False]
-    n_jobs = [1, -1] 
+    n_jobs = [1, 'None'] 
     warm_start = [True, False]
     
     
     calculate_draw_score(master_files, 'Sk', 'IF', 'n_estimators', n_estimators)
-    # calculate_draw_score(master_files, 'Sk', 'IF', 'max_samples', max_samples)
-    # calculate_draw_score(master_files, 'Sk', 'IF', 'max_features', max_features)
-    # calculate_draw_score(master_files, 'Sk', 'IF', 'bootstrap', bootstrap)
-    # calculate_draw_score(master_files, 'Sk', 'IF', 'n_jobs', n_jobs)
-    # calculate_draw_score(master_files, 'Sk', 'IF', 'warm_start', warm_start)
+    calculate_draw_score(master_files, 'Sk', 'IF', 'max_samples', max_samples)
+    calculate_draw_score(master_files, 'Sk', 'IF', 'max_features', max_features)
+    calculate_draw_score(master_files, 'Sk', 'IF', 'bootstrap', bootstrap)
+    calculate_draw_score(master_files, 'Sk', 'IF', 'n_jobs', n_jobs)
+    calculate_draw_score(master_files, 'Sk', 'IF', 'warm_start', warm_start)

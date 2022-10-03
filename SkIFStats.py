@@ -164,33 +164,58 @@ def calculate_draw_score(allFiles, Tool, Algo, parameter, parameter_values):
     # axf = sns.boxplot(x=parameter, y="F1Score_Median", data=df_f1_m)
     # plt.savefig("Fig/"+Algo+'_'+Tool+'_'+parameter+"_F1Score_Median.pdf", bbox_inches="tight", pad_inches=0)
     # plt.clf()
-def plot_acc_range():
-    df = pd.read_csv("Stats/SkIF_F1.csv")
+
+
+def plot_acc_range(measurement):
+    df = pd.read_csv("Stats/SkIF_"+measurement+".csv")
     runs = []
     for i in range(30):
         runs.append(('R'+str(i)))
     
-    df["F1"] = 0
-    df["Range"] = 0
+    df["Performance"] = 0
+    df["Nondeterminism"] = 0
     for i in range(df.shape[0]):
         run_values = df.loc[i, runs].tolist()
         
-        f1_range = (np.percentile(run_values, 75) - np.percentile(run_values, 25))/(np.percentile(run_values, 75) + np.percentile(run_values, 25))
+        range_ = (np.percentile(run_values, 75) - np.percentile(run_values, 25))/(np.percentile(run_values, 75) + np.percentile(run_values, 25))
         
-        df.iloc[i, df.columns.get_loc('F1')] =  np.mean(run_values)
-        df.iloc[i, df.columns.get_loc('Range')] = f1_range
+        df.iloc[i, df.columns.get_loc('Performance')] =  np.mean(run_values)
+        df.iloc[i, df.columns.get_loc('Nondeterminism')] = range_
+    
+    median_df = df.groupby(["n_estimators", "max_samples", "max_features", "bootstrap", "n_jobs", "warm_start"])[["Performance", "Nondeterminism"]].median()
+    median_df = median_df.reset_index()
+    # print(median_df)
+    # print(median_df["n_estimators"])
+    i_n_estimators=100
+    i_max_samples='auto'
+    i_contamination='auto' 
+    i_max_features=1.0
+    i_bootstrap=False
+    i_n_jobs="None"
+    i_warm_start = False
+    default_run = median_df[(median_df['n_estimators']==i_n_estimators)&
+                                    (median_df['max_samples']==str(i_max_samples))&
+                                    (median_df['max_features']==i_max_features)&
+                                    (median_df['bootstrap']==i_bootstrap)&
+                                    (median_df['n_jobs']==str(i_n_jobs))&
+                                    (median_df['warm_start']==i_warm_start)]
+    default_performance = default_run['Performance'].values
+    default_nondeter = default_run['Nondeterminism'].values
         
-    print(df)
+    print(default_performance)
     
-    median_f1 = df.groupby(["n_estimators", "max_samples", "max_features", "bootstrap", "n_jobs", "warm_start"])[["F1", "Range"]].median()
+    accuracy = median_df["Performance"].values
+    nondeterminism = median_df["Nondeterminism"].values
+    # print(nondeterminism)
+    # fig = plt.Figure()
+    # plt.plot(nondeterminism, accuracy, ".")
+    # plt.title(measurement)
+    # plt.xlabel("Nondeterminism")
+    # plt.ylabel("Performance")
+    # plt.savefig("Fig/IF_Sk_"+measurement+"_Iter1.pdf", bbox_inches="tight", pad_inches=0)
+    # plt.show()
     
-    accuracy = median_f1["F1"].values
-    nondeterminism = median_f1["Range"].values
-    print(nondeterminism)
-    plt.plot(nondeterminism, accuracy, ".")
-    plt.xlabel("Nondeterminism")
-    plt.ylabel("F1 Score")
-    plt.show()
+    
     
 if __name__ == '__main__':
     folderpath = datasetFolderDir
@@ -210,7 +235,10 @@ if __name__ == '__main__':
     n_jobs = [1, 'None'] 
     warm_start = [True, False]
     
-    plot_acc_range()
+    plot_acc_range("F1")
+    plot_acc_range("Accuracy")
+    plot_acc_range("ARI")
+    
     # calculate_draw_score(master_files, 'Sk', 'IF', 'n_estimators', n_estimators)
     # calculate_draw_score(master_files, 'Sk', 'IF', 'max_samples', max_samples)
     # calculate_draw_score(master_files, 'Sk', 'IF', 'max_features', max_features)

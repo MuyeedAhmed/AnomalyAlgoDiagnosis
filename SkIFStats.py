@@ -100,31 +100,45 @@ def calculate_draw_score(allFiles, Tool, Algo, parameter, parameter_values):
     df_f1_m = pd.DataFrame(f1_med_all, columns = ['Filename', parameter, 'F1Score_Median'])
     
     
+    ### Mann–Whitney U test
     mwu = [[0 for i in range(len(parameter_values))] for j in range(len(parameter_values))]
     i = 0
+    for p1 in parameter_values:
+        p1_values = df_f1_m[df_f1_m[parameter] == p1]['F1Score_Median'].to_numpy()
+        j = 0
+        for p2 in parameter_values:
+            p2_values = df_f1_m[df_f1_m[parameter] == p2]['F1Score_Median'].to_numpy()
+            _, mwu[i][j] = stats.mannwhitneyu(x=p1_values, y=p2_values, alternative = 'greater')
+            j += 1
+        i += 1
+    mwu_df_f1_range = pd.DataFrame(mwu, columns = parameter_values)
+    mwu_df_f1_range.index = parameter_values
+    mwu_df_f1_range.to_csv("Mann–Whitney U test/MWU_SkIF_F1_Median_"+parameter+".csv")
     
+    
+    mwu = [[0 for i in range(len(parameter_values))] for j in range(len(parameter_values))]
+    i = 0
     for p1 in parameter_values:
         p1_values = df_f1_r[df_f1_r[parameter] == p1]['F1Score_Range'].to_numpy()
         j = 0
         for p2 in parameter_values:
             p2_values = df_f1_r[df_f1_r[parameter] == p2]['F1Score_Range'].to_numpy()
-            # print(p1_values, p2_values)
-            # print(filename, parameter)
-            # print(p2_values, p1, p2)
             _, mwu[i][j] = stats.mannwhitneyu(x=p1_values, y=p2_values, alternative = 'greater')
-            
             j += 1
         i += 1
-    
     mwu_df_f1_range = pd.DataFrame(mwu, columns = parameter_values)
     mwu_df_f1_range.index = parameter_values
-    mwu_df_f1_range.to_csv("Stats/MWU_SkIF_F1_Range_"+parameter+".csv")
-    # print(mwu_df_f1_range)
+    mwu_df_f1_range.to_csv("Mann–Whitney U test/MWU_SkIF_F1_Range_"+parameter+".csv")
+
     
+    
+    ### Friedman Test
     friedman_test_f1_r = pg.friedman(data=df_f1_r, dv="F1Score_Range", within=parameter, subject="Filename")
     pvalue_friedman_f1_r = friedman_test_f1_r['p-unc']
     
     
+    
+    return pvalue_friedman_f1_r
     
     # conv = sp.posthoc_conover_friedman(a=df_f1_r, y_col="F1Score_Range", group_col=parameter, block_col="Filename", 
     #                              p_adjust="fdr_bh", melted=True)
@@ -150,7 +164,34 @@ def calculate_draw_score(allFiles, Tool, Algo, parameter, parameter_values):
     # axf = sns.boxplot(x=parameter, y="F1Score_Median", data=df_f1_m)
     # plt.savefig("Fig/"+Algo+'_'+Tool+'_'+parameter+"_F1Score_Median.pdf", bbox_inches="tight", pad_inches=0)
     # plt.clf()
-
+def plot_acc_range():
+    df = pd.read_csv("Stats/SkIF_F1.csv")
+    runs = []
+    for i in range(30):
+        runs.append(('R'+str(i)))
+    
+    df["F1"] = 0
+    df["Range"] = 0
+    for i in range(df.shape[0]):
+        run_values = df.loc[i, runs].tolist()
+        
+        f1_range = (np.percentile(run_values, 75) - np.percentile(run_values, 25))/(np.percentile(run_values, 75) + np.percentile(run_values, 25))
+        
+        df.iloc[i, df.columns.get_loc('F1')] =  np.mean(run_values)
+        df.iloc[i, df.columns.get_loc('Range')] = f1_range
+        
+    print(df)
+    
+    median_f1 = df.groupby(["n_estimators", "max_samples", "max_features", "bootstrap", "n_jobs", "warm_start"])[["F1", "Range"]].median()
+    
+    accuracy = median_f1["F1"].values
+    nondeterminism = median_f1["Range"].values
+    print(nondeterminism)
+    plt.plot(nondeterminism, accuracy, ".")
+    plt.xlabel("Nondeterminism")
+    plt.ylabel("F1 Score")
+    plt.show()
+    
 if __name__ == '__main__':
     folderpath = datasetFolderDir
     master_files1 = glob.glob(folderpath+"*.mat")
@@ -169,10 +210,10 @@ if __name__ == '__main__':
     n_jobs = [1, 'None'] 
     warm_start = [True, False]
     
-    
-    calculate_draw_score(master_files, 'Sk', 'IF', 'n_estimators', n_estimators)
-    calculate_draw_score(master_files, 'Sk', 'IF', 'max_samples', max_samples)
-    calculate_draw_score(master_files, 'Sk', 'IF', 'max_features', max_features)
-    calculate_draw_score(master_files, 'Sk', 'IF', 'bootstrap', bootstrap)
-    calculate_draw_score(master_files, 'Sk', 'IF', 'n_jobs', n_jobs)
-    calculate_draw_score(master_files, 'Sk', 'IF', 'warm_start', warm_start)
+    plot_acc_range()
+    # calculate_draw_score(master_files, 'Sk', 'IF', 'n_estimators', n_estimators)
+    # calculate_draw_score(master_files, 'Sk', 'IF', 'max_samples', max_samples)
+    # calculate_draw_score(master_files, 'Sk', 'IF', 'max_features', max_features)
+    # calculate_draw_score(master_files, 'Sk', 'IF', 'bootstrap', bootstrap)
+    # calculate_draw_score(master_files, 'Sk', 'IF', 'n_jobs', n_jobs)
+    # calculate_draw_score(master_files, 'Sk', 'IF', 'warm_start', warm_start)

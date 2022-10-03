@@ -185,30 +185,36 @@ def plot_acc_range(measurement):
     median_df = df.groupby(["n_estimators", "max_samples", "max_features", "bootstrap", "n_jobs", "warm_start"])[["Performance", "Nondeterminism"]].median()
     median_df = median_df.reset_index()
     # print(median_df)
-    # print(median_df["n_estimators"])
-    i_n_estimators=100
-    i_max_samples='auto'
-    i_contamination='auto' 
-    i_max_features=1.0
-    i_bootstrap=False
-    i_n_jobs="None"
-    i_warm_start = False
-    default_run = median_df[(median_df['n_estimators']==i_n_estimators)&
-                                    (median_df['max_samples']==str(i_max_samples))&
-                                    (median_df['max_features']==i_max_features)&
-                                    (median_df['bootstrap']==i_bootstrap)&
-                                    (median_df['n_jobs']==str(i_n_jobs))&
-                                    (median_df['warm_start']==i_warm_start)]
-    default_performance = default_run['Performance'].values
-    default_nondeter = default_run['Nondeterminism'].values
-        
-    print(default_performance)
+    # print(median_df["Performance"].idxmax())
+    print(median_df.iloc[median_df["Performance"].idxmax()])
+    # print(median_df["Nondeterminism"].idxmin())
+    print(median_df.iloc[median_df["Nondeterminism"].idxmin()])
     
-    accuracy = median_df["Performance"].values
-    nondeterminism = median_df["Nondeterminism"].values
-    # print(nondeterminism)
+    
+    
+    # i_n_estimators=100
+    # i_max_samples='auto'
+    # i_contamination='auto' 
+    # i_max_features=1.0
+    # i_bootstrap=False
+    # i_n_jobs="None"
+    # i_warm_start = False
+    # default_run = median_df[(median_df['n_estimators']==i_n_estimators)&
+    #                                 (median_df['max_samples']==str(i_max_samples))&
+    #                                 (median_df['max_features']==i_max_features)&
+    #                                 (median_df['bootstrap']==i_bootstrap)&
+    #                                 (median_df['n_jobs']==str(i_n_jobs))&
+    #                                 (median_df['warm_start']==i_warm_start)]
+    # default_performance = default_run['Performance'].values[0]
+    # default_nondeter = default_run['Nondeterminism'].values[0]
+        
+    
+    # performance = median_df["Performance"].values
+    # nondeterminism = median_df["Nondeterminism"].values
+
     # fig = plt.Figure()
-    # plt.plot(nondeterminism, accuracy, ".")
+    # plt.plot(nondeterminism, performance, ".")
+    # plt.plot(default_nondeter, default_performance, "o")
     # plt.title(measurement)
     # plt.xlabel("Nondeterminism")
     # plt.ylabel("Performance")
@@ -235,8 +241,8 @@ if __name__ == '__main__':
     n_jobs = [1, 'None'] 
     warm_start = [True, False]
     
-    plot_acc_range("F1")
     plot_acc_range("Accuracy")
+    plot_acc_range("F1")
     plot_acc_range("ARI")
     
     # calculate_draw_score(master_files, 'Sk', 'IF', 'n_estimators', n_estimators)

@@ -267,7 +267,7 @@ if __name__ == '__main__':
         
         for FileNumber in range(30):
             print(FileNumber, end=' ')
-            isolationforest(master_files[FileNumber], parameters, param_iteration)
+            isolationforest(rand_files[FileNumber], parameters, param_iteration)
             
             
 

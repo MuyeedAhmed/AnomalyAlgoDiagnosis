@@ -20,9 +20,9 @@ from sklearn.metrics.cluster import adjusted_rand_score
 import pingouin as pg
 import random
 
-# datasetFolderDir = '/Users/muyeedahmed/Desktop/Research/Dataset/Dataset_Anomaly/'
+datasetFolderDir = '/Users/muyeedahmed/Desktop/Research/Dataset/Dataset_Anomaly/'
 # datasetFolderDir = '/home/neamtiu/Desktop/ma234/AnomalyDetection/Dataset/'
-datasetFolderDir = '../Dataset_Combined/'
+# datasetFolderDir = '../Dataset_Combined/'
 
 
 # def isolationforest(filename, n_estimators, max_samples, max_features, bootstrap, n_jobs, warm_start):
@@ -73,55 +73,58 @@ def runIF(filename, X, gt, params, parameter_iteration):
 
     labelFile = filename + "_" + str(params[0][1]) + "_" + str(params[1][1]) + "_" + str(params[2][1]) + "_" + str(params[3][1]) + "_" + str(params[4][1]) + "_" + str(params[5][1]) + "_" + str(params[6][1])
 
-    if os.path.exists("IF/Labels_"+labelFile+".csv") == 1:
-        # print("The Labels Already Exist")
-        # print("IF/Labels_"+labelFile+".csv")
+    if os.path.exists("IF/Labels_Sk_IF_"+labelFile+".csv") == 1:
         return
     
-    
-    fstat_acc=open("Stats/SkIF_Accuracy.csv", "a")
-    fstat_acc.write(filename+','+ str(params[0][1]) + ','+ str(params[1][1]) + ',' + str(params[2][1]) + ',' + str(params[3][1]) + ',' + str(params[4][1]) + ',' + str(params[5][1]) + ',' + str(params[6][1]) + ',' + str(parameter_iteration))
-    
-    fstat_f1=open("Stats/SkIF_F1.csv", "a")
-    fstat_f1.write(filename+','+ str(params[0][1]) + ','+ str(params[1][1]) + ',' + str(params[2][1]) + ',' + str(params[3][1]) + ',' + str(params[4][1]) + ',' + str(params[5][1]) + ',' + str(params[6][1]) + ',' + str(parameter_iteration))
-    
-    fstat_ari=open("Stats/SkIF_ARI.csv", "a")
-    fstat_ari.write(filename+','+ str(params[0][1]) + ','+ str(params[1][1]) + ',' + str(params[2][1]) + ',' + str(params[3][1]) + ',' + str(params[4][1]) + ',' + str(params[5][1]) + ',' + str(params[6][1]) + ',' + str(parameter_iteration))
-    
-    
-    for i in range(10):##
+    labels = []
+    # accuracy = []
+    f1 = []
+    ari = []
+    for i in range(10):
         clustering = IsolationForest(n_estimators=params[0][1], max_samples=params[1][1], 
                                       max_features=params[3][1], bootstrap=params[4][1], 
                                       n_jobs=params[5][1], warm_start=params[6][1]).fit(X)
     
         l = clustering.predict(X)
         l = [0 if x == 1 else 1 for x in l]
+        labels.append(l)
+
+        # accuracy.append(metrics.accuracy_score(gt, l))        
+        f1.append(metrics.f1_score(gt, l))
         
-        
-        
-        accuracy = metrics.accuracy_score(gt, l)
-        fstat_acc.write(','+str(accuracy))
-        
-        f1 = metrics.f1_score(gt, l)
-        fstat_f1.write(','+str(f1))
-        
-        ari = adjusted_rand_score(gt, l)
-        fstat_ari.write(','+str(ari))
-        
-    flabel=open("IF/Labels_"+labelFile+".csv", 'a')
-    flabel.write("Done")
-    flabel.close()
+    
+    for i in range(len(labels)):
+        for j in range(i+1, len(labels)):
+          ari.append(adjusted_rand_score(labels[i], labels[j]))      
+    
+    fileLabels=open("../Labels/Sklearn/IF/Labels_Sk_IF_"+labelFile+".csv", 'a')
+    for l in labels:
+        fileLabels.write(','.join(str(s) for s in l) + '\n')
+    fileLabels.close()
     
     
-    fstat_acc.write('\n')
-    fstat_f1.write('\n')
-    fstat_ari.write('\n')
     
+    flabel_done=open("IF/Labels_Sk_IF_"+labelFile+".csv", 'a')
+    flabel_done.write("Done")
+    flabel_done.close()
+    
+    
+    # fstat_acc=open("Stats/SkIF_Accuracy.csv", "a")
+    # fstat_acc.write(filename+','+ str(params[0][1]) + ','+ str(params[1][1]) + ',' + str(params[2][1]) + ',' + str(params[3][1]) + ',' + str(params[4][1]) + ',' + str(params[5][1]) + ',' + str(params[6][1]) + ',' + str(parameter_iteration) + ',')
+    # fstat_acc.write(','.join(str(s) for s in accuracy) + '\n')
+    # fstat_acc.close()
+    
+    fstat_f1=open("Stats/SkIF_F1.csv", "a")
+    fstat_f1.write(filename+','+ str(params[0][1]) + ','+ str(params[1][1]) + ',' + str(params[2][1]) + ',' + str(params[3][1]) + ',' + str(params[4][1]) + ',' + str(params[5][1]) + ',' + str(params[6][1]) + ',' + str(parameter_iteration) + ',')
+    fstat_f1.write(','.join(str(s) for s in f1) + '\n')
     fstat_f1.close()
-    fstat_acc.close()
+    
+    fstat_ari=open("Stats/SkIF_ARI.csv", "a")
+    fstat_ari.write(filename+','+ str(params[0][1]) + ','+ str(params[1][1]) + ',' + str(params[2][1]) + ',' + str(params[3][1]) + ',' + str(params[4][1]) + ',' + str(params[5][1]) + ',' + str(params[6][1]) + ',' + str(parameter_iteration) + ',')
+    fstat_ari.write(','.join(str(s) for s in ari) + '\n')
     fstat_ari.close()
 
-def calculate_score(allFiles, Tool, Algo, parameter, parameter_values, all_parameters):
+def calculate_score(allFiles, parameter, parameter_values, all_parameters):
     i_n_estimators=all_parameters[0][1]
     i_max_samples=all_parameters[1][1]
     i_contamination=all_parameters[2][1]
@@ -130,17 +133,24 @@ def calculate_score(allFiles, Tool, Algo, parameter, parameter_values, all_param
     i_n_jobs=all_parameters[5][1]
     i_warm_start = all_parameters[6][1]
     
-    dfacc = pd.read_csv("Stats/SkIF_Accuracy.csv")
+    # dfacc = pd.read_csv("Stats/SkIF_Accuracy.csv")
     dff1 = pd.read_csv("Stats/SkIF_F1.csv")
-    runs = []
-    for i in range(10):##
-        runs.append(('R'+str(i)))
+    dfari =  pd.read_csv("Stats/SkIF_ARI.csv")
+    
+    f1_runs = []
+    for i in range(10):
+        f1_runs.append(('R'+str(i)))
 
+    ari_runs = []
+    for i in range(45):
+        ari_runs.append(('R'+str(i)))
 
-    accuracy_range_all = []
-    accuracy_med_all = []
+    # accuracy_range_all = []
+    # accuracy_med_all = []
     f1_range_all = []
     f1_med_all = []
+    ari_all = []
+    
     for filename in allFiles:
         for p in parameter_values:
             if parameter == 'n_estimators':
@@ -156,13 +166,13 @@ def calculate_score(allFiles, Tool, Algo, parameter, parameter_values, all_param
             elif parameter == 'warm_start':
                 i_warm_start = p
                         
-            accuracy = dfacc[(dfacc['Filename']==filename)&
-                            (dfacc['n_estimators']==i_n_estimators)&
-                            (dfacc['max_samples']==str(i_max_samples))&
-                            (dfacc['max_features']==i_max_features)&
-                            (dfacc['bootstrap']==i_bootstrap)&
-                            (dfacc['n_jobs']==str(i_n_jobs))&
-                            (dfacc['warm_start']==i_warm_start)]
+            # accuracy = dfacc[(dfacc['Filename']==filename)&
+            #                 (dfacc['n_estimators']==i_n_estimators)&
+            #                 (dfacc['max_samples']==str(i_max_samples))&
+            #                 (dfacc['max_features']==i_max_features)&
+            #                 (dfacc['bootstrap']==i_bootstrap)&
+            #                 (dfacc['n_jobs']==str(i_n_jobs))&
+            #                 (dfacc['warm_start']==i_warm_start)]
                 
 
             f1 = dff1[(dff1['Filename']==filename)&
@@ -174,45 +184,65 @@ def calculate_score(allFiles, Tool, Algo, parameter, parameter_values, all_param
                             (dff1['warm_start']==i_warm_start)]
             if f1.empty:
                 continue
+            ari = dfari[(dfari['Filename']==filename)&
+                            (dfari['n_estimators']==i_n_estimators)&
+                            (dfari['max_samples']==str(i_max_samples))&
+                            (dfari['max_features']==i_max_features)&
+                            (dfari['bootstrap']==i_bootstrap)&
+                            (dfari['n_jobs']==str(i_n_jobs))&
+                            (dfari['warm_start']==i_warm_start)]
             
-            accuracy_values = accuracy[runs].to_numpy()[0]
+            # accuracy_values = accuracy[runs].to_numpy()[0]
             
-            f1_values = f1[runs].to_numpy()[0]
-
-            # ari[run] = adjusted_rand_score(gt, l)
+            f1_values = f1[f1_runs].to_numpy()[0]
+            ari_values = ari[ari_runs].to_numpy()[0]
             
-            accDiff = (np.percentile(accuracy_values, 75) - np.percentile(accuracy_values, 25))/(np.percentile(accuracy_values, 75) + np.percentile(accuracy_values, 25))
-            accuracy_range_all.append([filename, p, accDiff])
-            accuracy_med_all.append([filename, p, np.percentile(accuracy_values, 50)])
+            # accDiff = (np.percentile(accuracy_values, 75) - np.percentile(accuracy_values, 25))/(np.percentile(accuracy_values, 75) + np.percentile(accuracy_values, 25))
+            # accuracy_range_all.append([filename, p, accDiff])
+            # accuracy_med_all.append([filename, p, np.percentile(accuracy_values, 50)])
             
             f1Diff = (np.percentile(f1_values, 75) - np.percentile(f1_values, 25))/(np.percentile(f1_values, 75) + np.percentile(f1_values, 25))
             f1_range_all.append([filename, p, f1Diff])
             f1_med_all.append([filename, p, np.percentile(f1_values, 50)])
-    df_acc_r = pd.DataFrame(accuracy_range_all, columns = ['Filename', parameter, 'Accuracy_Range'])
-    df_acc_m = pd.DataFrame(accuracy_med_all, columns = ['Filename', parameter, 'Accuracy_Median'])
+            
+            ari_all.append([filename, p, np.percentile(ari_values, 50)])
+            
+    # df_acc_r = pd.DataFrame(accuracy_range_all, columns = ['Filename', parameter, 'Accuracy_Range'])
+    # df_acc_m = pd.DataFrame(accuracy_med_all, columns = ['Filename', parameter, 'Accuracy_Median'])
     df_f1_r = pd.DataFrame(f1_range_all, columns = ['Filename', parameter, 'F1Score_Range'])
     df_f1_m = pd.DataFrame(f1_med_all, columns = ['Filename', parameter, 'F1Score_Median'])
+    df_ari_m = pd.DataFrame(ari_all, columns = ['Filename', parameter, 'ARI'])
 
-    df_acc_r = df_acc_r.fillna(0)
-    df_acc_m = df_acc_m.fillna(0)
-    df_f1_r = df_f1_r.fillna(0)
-    df_f1_m = df_f1_m.fillna(0)
+    if parameter == 'n_jobs':
+        # df_acc_r = df_acc_r.fillna(0)
+        # df_acc_m = df_acc_m.fillna(0)
+        df_f1_r = df_f1_r.fillna(0)
+        df_f1_m = df_f1_m.fillna(0)
+        df_ari_m = df_ari_m.fillna(0)
+        df_f1_r[parameter] = df_f1_r[parameter].astype(int)
+        df_f1_m[parameter] = df_f1_m[parameter].astype(int)
+        df_ari_m[parameter] = df_ari_m[parameter].astype(int)    
 
     ### Friedman Test
-    friedman_test_acc_m = pg.friedman(data=df_acc_m, dv="Accuracy_Median", within=parameter, subject="Filename")
-    pvalue_friedman_acc_m = friedman_test_acc_m['p-unc']['Friedman']
+    # friedman_test_acc_m = pg.friedman(data=df_acc_m, dv="Accuracy_Median", within=parameter, subject="Filename")
+    # pvalue_friedman_acc_m = friedman_test_acc_m['p-unc']['Friedman']
+    # friedman_test_acc_r = pg.friedman(data=df_acc_r, dv="Accuracy_Range", within=parameter, subject="Filename")
+    # pvalue_friedman_acc_r = friedman_test_acc_r['p-unc']['Friedman']
     
     friedman_test_f1_m = pg.friedman(data=df_f1_m, dv="F1Score_Median", within=parameter, subject="Filename")
-    pvalue_friedman_f1_m = friedman_test_f1_m['p-unc']['Friedman']
-    
-    friedman_test_acc_r = pg.friedman(data=df_acc_r, dv="Accuracy_Range", within=parameter, subject="Filename")
-    pvalue_friedman_acc_r = friedman_test_acc_r['p-unc']['Friedman']
+    p_f_f1_m = friedman_test_f1_m['p-unc']['Friedman']
     
     friedman_test_f1_r = pg.friedman(data=df_f1_r, dv="F1Score_Range", within=parameter, subject="Filename")
-    pvalue_friedman_f1_r = friedman_test_f1_r['p-unc']['Friedman']
+    p_f_f1_r = friedman_test_f1_r['p-unc']['Friedman']
     
-    avg_friedman = (pvalue_friedman_acc_m + pvalue_friedman_f1_m + pvalue_friedman_acc_r + pvalue_friedman_f1_r)/4
-    return avg_friedman, df_acc_m[parameter].loc[df_acc_m["Accuracy_Median"].idxmax()], df_acc_r[parameter].loc[df_acc_r["Accuracy_Range"].idxmin()], df_f1_m[parameter].loc[df_f1_m["F1Score_Median"].idxmax()], df_f1_r[parameter].loc[df_f1_r["F1Score_Range"].idxmin()]  
+    friedman_test_f1_m = pg.friedman(data=df_f1_m, dv="F1Score_Median", within=parameter, subject="Filename")
+    p_f_ari = friedman_test_f1_m['p-unc']['Friedman']
+    
+    parameter_value_max_f1_median = df_f1_m[parameter].loc[df_f1_m["F1Score_Median"].idxmax()]
+    parameter_value_min_f1_range = df_f1_r[parameter].loc[df_f1_r["F1Score_Range"].idxmin()]  
+    parameter_value_max_ari = df_ari_m[parameter].loc[df_ari_m["ARI"].idxmax()]
+    
+    return p_f_f1_m, p_f_f1_r, p_f_ari, parameter_value_max_f1_median, parameter_value_min_f1_range, parameter_value_max_ari
 
 if __name__ == '__main__':
     folderpath = datasetFolderDir
@@ -243,9 +273,14 @@ if __name__ == '__main__':
     parameters.append(["warm_start", False, warm_start])
     
     R = ""
-    for i in range(9):##
+    for i in range(9):
         R += "R"+str(i)+","
-    R+="R9"##
+    R+="R9"
+    ARI_R = ""
+    for i in range(44):
+        ARI_R += "R"+str(i)+","
+    ARI_R+="R44"
+    
     if os.path.exists("Stats/SkIF_Accuracy.csv") == 0:
         fstat_acc=open("Stats/SkIF_Accuracy.csv", "w")
         fstat_acc.write('Filename,n_estimators,max_samples,contamination,max_features,bootstrap,n_jobs,warm_start,Parameter_Iteration,'+R+"\n")
@@ -258,14 +293,17 @@ if __name__ == '__main__':
 
     if os.path.exists("Stats/SkIF_ARI.csv") == 0:    
         fstat_ari=open("Stats/SkIF_ARI.csv", "w")
-        fstat_ari.write('Filename,n_estimators,max_samples,contamination,max_features,bootstrap,n_jobs,warm_start,Parameter_Iteration,'+R+"\n")
+        fstat_ari.write('Filename,n_estimators,max_samples,contamination,max_features,bootstrap,n_jobs,warm_start,Parameter_Iteration,'+ARI_R+"\n")
         fstat_ari.close()
-    print(master_files)
+    
+    fstat_winner=open("Stats/SkIF_Winners.csv", "w")
+    fstat_winner.write('Parameter,Friedman,Max_F1,Min_F1_Range,Max_ARI\n')
+    fstat_winner.close()
     for param_iteration in range(len(parameters)):
         # for FileNumber in range(len(master_files)):
-        rand_files = random.sample(master_files, 30)
+        rand_files = random.sample(master_files, 2)
         
-        for FileNumber in range(30):
+        for FileNumber in range(2):
             print(FileNumber, end=' ')
             isolationforest(rand_files[FileNumber], parameters, param_iteration)
             
@@ -274,18 +312,13 @@ if __name__ == '__main__':
         friedmanValues = [10]*7
         f1_range = [0]*7
         f1_median =[0]*7 
+        ari = [0]*7
         for i in range(7):
             if len(parameters[i][2]) > 1:
-                friedmanValues[i], _, _, f1_median[i], f1_range[i]= calculate_score(master_files, 'Sk', 'IF', parameters[i][0], parameters[i][2], parameters)
-            
-        # friedmanValues[0], _, _, f1_median[0], f1_range[0]= calculate_score(master_files, 'Sk', 'IF', 'n_estimators', n_estimators, parameters)
-        # friedmanValues[1], _, _, f1_median[1], f1_range[1]= calculate_score(master_files, 'Sk', 'IF', 'max_samples', max_samples, parameters)
-    
-        # friedmanValues[3], _, _, f1_median[3], f1_range[3]= calculate_score(master_files, 'Sk', 'IF', 'max_features', max_features, parameters)
-        # friedmanValues[4], _, _, f1_median[4], f1_range[4]= calculate_score(master_files, 'Sk', 'IF', 'bootstrap', bootstrap, parameters)
-        # friedmanValues[5], _, _, f1_median[5], f1_range[5]= calculate_score(master_files, 'Sk', 'IF', 'n_jobs', n_jobs, parameters)
-        # friedmanValues[6], _, _, f1_median[6], f1_range[6]= calculate_score(master_files, 'Sk', 'IF', 'warm_start', warm_start, parameters)
-        # print(friedmanValues)
+                p_f_f1_m, p_f_f1_r, p_f_ari, f1_median[i], f1_range[i], ari[i] = calculate_score(master_files, parameters[i][0], parameters[i][2], parameters)
+                
+                friedmanValues[i] = (p_f_f1_m + p_f_f1_r + p_f_ari)/3
+                
         index_min = np.argmin(friedmanValues)
 
         if index_min == 5 and f1_median[index_min] == 0:
@@ -293,8 +326,15 @@ if __name__ == '__main__':
             
         parameters[index_min][1] = f1_median[index_min]
         parameters[index_min][2] = [f1_median[index_min]]
-        # parameters[0][1] = 128##
-        # parameters[0][2] = [128]##
+        
+        fstat_winner=open("Stats/SkIF_Winners.csv", "a")
+        fstat_winner.write(parameters[index_min][0]+','+friedmanValues[index_min]+','+f1_median[index_min]+','+f1_range[index_min]+','+ari[index_min]+'\n')
+        fstat_winner.close()
+        
         print(parameters)        
+        
+        
+        
+        
         
         

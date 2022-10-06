@@ -24,8 +24,9 @@ import matplotlib.pyplot as plt
 sns.set_theme(style="whitegrid")
 
 # datasetFolderDir = '/Users/muyeedahmed/Desktop/Research/Dataset/Dataset_Anomaly/'
-datasetFolderDir = '/home/neamtiu/Desktop/ma234/AnomalyDetection/Dataset/'
+# datasetFolderDir = '/home/neamtiu/Desktop/ma234/AnomalyDetection/Dataset/'
 # datasetFolderDir = '../Dataset_Combined/'
+datasetFolderDir = 'Dataset/'
 
 def isolationforest(filename, parameters, parameter_iteration):
     print(filename)
@@ -106,10 +107,9 @@ def runOCSVM(filename, X, gt, params, parameter_iteration):
         l = [0 if x == 1 else 1 for x in l]
         labels.append(l)
 
-        # accuracy.append(metrics.accuracy_score(gt, l))        
+        # accuracy.append(metrics.accuracy_score(gt, l))
         f1.append(metrics.f1_score(gt, l))
         
-    
     for i in range(len(labels)):
         for j in range(i+1, len(labels)):
           ari.append(adjusted_rand_score(labels[i], labels[j]))      

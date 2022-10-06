@@ -20,9 +20,9 @@ from sklearn.metrics.cluster import adjusted_rand_score
 import pingouin as pg
 import random
 
-datasetFolderDir = '/Users/muyeedahmed/Desktop/Research/Dataset/Dataset_Anomaly/'
+# datasetFolderDir = '/Users/muyeedahmed/Desktop/Research/Dataset/Dataset_Anomaly/'
 # datasetFolderDir = '/home/neamtiu/Desktop/ma234/AnomalyDetection/Dataset/'
-# datasetFolderDir = '../Dataset_Combined/'
+datasetFolderDir = '../Dataset_Combined/'
 
 
 # def isolationforest(filename, n_estimators, max_samples, max_features, bootstrap, n_jobs, warm_start):
@@ -301,9 +301,9 @@ if __name__ == '__main__':
     fstat_winner.close()
     for param_iteration in range(len(parameters)):
         # for FileNumber in range(len(master_files)):
-        rand_files = random.sample(master_files, 2)
+        rand_files = random.sample(master_files, 30)
         
-        for FileNumber in range(2):
+        for FileNumber in range(30):
             print(FileNumber, end=' ')
             isolationforest(rand_files[FileNumber], parameters, param_iteration)
             
@@ -318,17 +318,18 @@ if __name__ == '__main__':
                 p_f_f1_m, p_f_f1_r, p_f_ari, f1_median[i], f1_range[i], ari[i] = calculate_score(master_files, parameters[i][0], parameters[i][2], parameters)
                 
                 friedmanValues[i] = (p_f_f1_m + p_f_f1_r + p_f_ari)/3
-                
+            
         index_min = np.argmin(friedmanValues)
 
         if index_min == 5 and f1_median[index_min] == 0:
             f1_median[index_min] = None
-            
+        if friedmanValues[index_min] > 1:
+            break
         parameters[index_min][1] = f1_median[index_min]
         parameters[index_min][2] = [f1_median[index_min]]
         
         fstat_winner=open("Stats/SkIF_Winners.csv", "a")
-        fstat_winner.write(parameters[index_min][0]+','+friedmanValues[index_min]+','+f1_median[index_min]+','+f1_range[index_min]+','+ari[index_min]+'\n')
+        fstat_winner.write(parameters[index_min][0]+','+str(friedmanValues[index_min])+','+str(f1_median[index_min])+','+str(f1_range[index_min])+','+str(ari[index_min])+'\n')
         fstat_winner.close()
         
         print(parameters)        

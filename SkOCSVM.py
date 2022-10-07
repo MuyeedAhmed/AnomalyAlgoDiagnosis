@@ -380,7 +380,7 @@ if __name__ == '__main__':
             if len(parameters[i][2]) > 1:
                 p_f_f1_m, p_f_f1_r, p_f_ari, f1_median[i], f1_range[i], ari[i] = calculate_score(master_files, parameters[i][0], parameters[i][2], parameters)
                 
-                friedmanValues[i] = (p_f_f1_m + p_f_f1_r + p_f_ari)/3
+                friedmanValues[i] = p_f_f1_r
             
         index_min = np.argmin(friedmanValues)
 

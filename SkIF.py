@@ -17,15 +17,18 @@ import numpy as np
 from sklearn import metrics
 from copy import copy, deepcopy
 from sklearn.metrics.cluster import adjusted_rand_score
-import pingouin as pg
+# import pingouin as pg
 import random
 import seaborn as sns
 import matplotlib.pyplot as plt
 sns.set_theme(style="whitegrid")
+# import scikit_posthocs as sp
+import scipy.stats as stats
+from scipy.stats import gmean
 
 # datasetFolderDir = '/Users/muyeedahmed/Desktop/Research/Dataset/Dataset_Anomaly/'
 # datasetFolderDir = '/home/neamtiu/Desktop/ma234/AnomalyDetection/Dataset/'
-datasetFolderDir = '../Dataset_Combined/'
+datasetFolderDir = 'Dataset/'
 
 
 # def isolationforest(filename, n_estimators, max_samples, max_features, bootstrap, n_jobs, warm_start):
@@ -217,8 +220,6 @@ def calculate_score(allFiles, parameter, parameter_values, all_parameters):
     df_ari_m = pd.DataFrame(ari_all, columns = ['Filename', parameter, 'ARI'])
 
     if parameter == 'n_jobs':
-        # df_acc_r = df_acc_r.fillna(0)
-        # df_acc_m = df_acc_m.fillna(0)
         df_f1_r = df_f1_r.fillna(0)
         df_f1_m = df_f1_m.fillna(0)
         df_ari_m = df_ari_m.fillna(0)
@@ -227,19 +228,46 @@ def calculate_score(allFiles, parameter, parameter_values, all_parameters):
         df_ari_m[parameter] = df_ari_m[parameter].astype(int)    
 
     ### Friedman Test
-    # friedman_test_acc_m = pg.friedman(data=df_acc_m, dv="Accuracy_Median", within=parameter, subject="Filename")
-    # pvalue_friedman_acc_m = friedman_test_acc_m['p-unc']['Friedman']
-    # friedman_test_acc_r = pg.friedman(data=df_acc_r, dv="Accuracy_Range", within=parameter, subject="Filename")
-    # pvalue_friedman_acc_r = friedman_test_acc_r['p-unc']['Friedman']
     
-    friedman_test_f1_m = pg.friedman(data=df_f1_m, dv="F1Score_Median", within=parameter, subject="Filename")
-    p_f_f1_m = friedman_test_f1_m['p-unc']['Friedman']
+    # friedman_test_f1_m = pg.friedman(data=df_f1_m, dv="F1Score_Median", within=parameter, subject="Filename")
+    # p_f_f1_m = friedman_test_f1_m['p-unc']['Friedman']
     
-    friedman_test_f1_r = pg.friedman(data=df_f1_r, dv="F1Score_Range", within=parameter, subject="Filename")
-    p_f_f1_r = friedman_test_f1_r['p-unc']['Friedman']
+    # friedman_test_f1_r = pg.friedman(data=df_f1_r, dv="F1Score_Range", within=parameter, subject="Filename")
+    # p_f_f1_r = friedman_test_f1_r['p-unc']['Friedman']
     
-    friedman_test_f1_m = pg.friedman(data=df_f1_m, dv="F1Score_Median", within=parameter, subject="Filename")
-    p_f_ari = friedman_test_f1_m['p-unc']['Friedman']
+    # friedman_test_f1_m = pg.friedman(data=df_f1_m, dv="F1Score_Median", within=parameter, subject="Filename")
+    # p_f_ari = friedman_test_f1_m['p-unc']['Friedman']
+    
+    ### Mann–Whitney U test
+    # mwu = [[0 for i in range(len(parameter_values))] for j in range(len(parameter_values))]
+    # i = 0
+    # for p1 in parameter_values:
+    #     p1_values = df_f1_m[df_f1_m[parameter] == p1]['F1Score_Median'].to_numpy()
+    #     j = 0
+    #     for p2 in parameter_values:
+    #         p2_values = df_f1_m[df_f1_m[parameter] == p2]['F1Score_Median'].to_numpy()
+    #         _, mwu[i][j] = stats.mannwhitneyu(x=p1_values, y=p2_values, alternative = 'greater')
+    #         j += 1
+    #     i += 1
+    # mwu_df_f1_range = pd.DataFrame(mwu, columns = parameter_values)
+    # mwu_df_f1_range.index = parameter_values
+    # mwu_df_f1_range.to_csv("Mann–Whitney U test/MWU_SkIF_F1_Median_"+parameter+".csv")
+    
+    
+    mwu = [[0 for i in range(len(parameter_values))] for j in range(len(parameter_values))]
+    i = 0
+    for p1 in parameter_values:
+        p1_values = df_f1_r[df_f1_r[parameter] == p1]['F1Score_Range'].to_numpy()
+        j = 0
+        for p2 in parameter_values:
+            p2_values = df_f1_r[df_f1_r[parameter] == p2]['F1Score_Range'].to_numpy()
+            _, mwu[i][j] = stats.mannwhitneyu(x=p1_values, y=p2_values, alternative = 'greater')
+            j += 1
+        i += 1
+    mwu_df_f1_range = pd.DataFrame(mwu, columns = parameter_values)
+    mwu_df_f1_range.index = parameter_values
+    mwu_df_f1_range.to_csv("Mann–Whitney U test/MWU_SkIF_F1_Range_"+parameter+".csv")
+    
     
     parameter_value_max_f1_median = df_f1_m[parameter].loc[df_f1_m["F1Score_Median"].idxmax()]
     parameter_value_min_f1_range = df_f1_r[parameter].loc[df_f1_r["F1Score_Range"].idxmin()]  
@@ -339,35 +367,35 @@ if __name__ == '__main__':
         ARI_R += "R"+str(i)+","
     ARI_R+="R44"
     
-    if os.path.exists("Stats/SkIF_Accuracy.csv") == 0:
-        fstat_acc=open("Stats/SkIF_Accuracy.csv", "w")
-        fstat_acc.write('Filename,n_estimators,max_samples,contamination,max_features,bootstrap,n_jobs,warm_start,Parameter_Iteration,'+R+"\n")
-        fstat_acc.close()
+    # if os.path.exists("Stats/SkIF_Accuracy.csv") == 0:
+    #     fstat_acc=open("Stats/SkIF_Accuracy.csv", "w")
+    #     fstat_acc.write('Filename,n_estimators,max_samples,contamination,max_features,bootstrap,n_jobs,warm_start,Parameter_Iteration,'+R+"\n")
+    #     fstat_acc.close()
         
-    if os.path.exists("Stats/SkIF_F1.csv") == 0: 
-        fstat_f1=open("Stats/SkIF_F1.csv", "w")
-        fstat_f1.write('Filename,n_estimators,max_samples,contamination,max_features,bootstrap,n_jobs,warm_start,Parameter_Iteration,'+R+"\n")
-        fstat_f1.close()
+    # if os.path.exists("Stats/SkIF_F1.csv") == 0: 
+    #     fstat_f1=open("Stats/SkIF_F1.csv", "w")
+    #     fstat_f1.write('Filename,n_estimators,max_samples,contamination,max_features,bootstrap,n_jobs,warm_start,Parameter_Iteration,'+R+"\n")
+    #     fstat_f1.close()
 
-    if os.path.exists("Stats/SkIF_ARI.csv") == 0:    
-        fstat_ari=open("Stats/SkIF_ARI.csv", "w")
-        fstat_ari.write('Filename,n_estimators,max_samples,contamination,max_features,bootstrap,n_jobs,warm_start,Parameter_Iteration,'+ARI_R+"\n")
-        fstat_ari.close()
+    # if os.path.exists("Stats/SkIF_ARI.csv") == 0:    
+    #     fstat_ari=open("Stats/SkIF_ARI.csv", "w")
+    #     fstat_ari.write('Filename,n_estimators,max_samples,contamination,max_features,bootstrap,n_jobs,warm_start,Parameter_Iteration,'+ARI_R+"\n")
+    #     fstat_ari.close()
     
-    fstat_winner=open("Stats/SkIF_Winners.csv", "w")
-    fstat_winner.write('Parameter,Friedman,Max_F1,Min_F1_Range,Max_ARI\n')
-    fstat_winner.close()
+    # fstat_winner=open("Stats/SkIF_Winners.csv", "w")
+    # fstat_winner.write('Parameter,Friedman,Max_F1,Min_F1_Range,Max_ARI\n')
+    # fstat_winner.close()
     for param_iteration in range(len(parameters)):
-        # for FileNumber in range(len(master_files)):
-        rand_files = random.sample(master_files, 30)
+        # # for FileNumber in range(len(master_files)):
+        # rand_files = random.sample(master_files, 30)
         
-        for FileNumber in range(30):
-            print(FileNumber, end=' ')
-            isolationforest(rand_files[FileNumber], parameters, param_iteration)
+        # for FileNumber in range(30):
+        #     print(FileNumber, end=' ')
+        #     # isolationforest(rand_files[FileNumber], parameters, param_iteration)
             
             
 
-        friedmanValues = [10]*7
+        MWU = [10]*7
         f1_range = [0]*7
         f1_median =[0]*7 
         ari = [0]*7
@@ -375,20 +403,20 @@ if __name__ == '__main__':
             if len(parameters[i][2]) > 1:
                 p_f_f1_m, p_f_f1_r, p_f_ari, f1_median[i], f1_range[i], ari[i] = calculate_score(master_files, parameters[i][0], parameters[i][2], parameters)
                 
-                friedmanValues[i] = (p_f_f1_m + p_f_f1_r + p_f_ari)/3
+                MWU[i] = p_f_f1_r
             
-        index_min = np.argmin(friedmanValues)
+        index_min = np.argmin(MWU)
 
         if index_min == 5 and f1_median[index_min] == 0:
             f1_median[index_min] = None
-        if friedmanValues[index_min] > 1:
+        if MWU[index_min] > 1:
             break
         parameters[index_min][1] = f1_median[index_min]
         parameters[index_min][2] = [f1_median[index_min]]
         
-        fstat_winner=open("Stats/SkIF_Winners.csv", "a")
-        fstat_winner.write(parameters[index_min][0]+','+str(friedmanValues[index_min])+','+str(f1_median[index_min])+','+str(f1_range[index_min])+','+str(ari[index_min])+'\n')
-        fstat_winner.close()
+        # fstat_winner=open("Stats/SkIF_Winners.csv", "a")
+        # fstat_winner.write(parameters[index_min][0]+','+str(MWU[index_min])+','+str(f1_median[index_min])+','+str(f1_range[index_min])+','+str(ari[index_min])+'\n')
+        # fstat_winner.close()
         
         print(parameters)        
         

@@ -418,8 +418,8 @@ if __name__ == '__main__':
                 MWU_min[i] = mwu_geomean
         index_min = np.argmin(MWU_geo)
 
-        if index_min == 5 and f1_median[index_min] == 0:
-            f1_median[index_min] = None
+        if index_min == 5 and f1_range[index_min] == 0:
+            f1_range[index_min] = None
         if MWU_min[index_min] > 1:
             print("MWU_min: ", end='')
             print(MWU_min)

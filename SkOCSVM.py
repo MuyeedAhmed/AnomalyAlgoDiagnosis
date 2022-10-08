@@ -29,7 +29,7 @@ from scipy.stats import gmean
 # datasetFolderDir = '../Dataset_Combined/'
 datasetFolderDir = 'Dataset/'
 
-def isolationforest(filename, parameters, parameter_iteration):
+def ocsvm(filename, parameters, parameter_iteration):
     print(filename)
     folderpath = datasetFolderDir
     
@@ -335,7 +335,7 @@ if __name__ == '__main__':
         
         for FileNumber in range(30):
             print(FileNumber, end=' ')
-            isolationforest(rand_files[FileNumber], parameters, param_iteration)
+            ocsvm(rand_files[FileNumber], parameters, param_iteration)
             
             
 

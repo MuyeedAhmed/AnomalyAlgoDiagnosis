@@ -22,7 +22,8 @@ import random
 import seaborn as sns
 import matplotlib.pyplot as plt
 sns.set_theme(style="whitegrid")
-
+import scipy.stats as stats
+from scipy.stats import gmean
 # datasetFolderDir = '/Users/muyeedahmed/Desktop/Research/Dataset/Dataset_Anomaly/'
 # datasetFolderDir = '/home/neamtiu/Desktop/ma234/AnomalyDetection/Dataset/'
 # datasetFolderDir = '../Dataset_Combined/'
@@ -86,9 +87,7 @@ def isolationforest(filename, parameters, parameter_iteration):
     
     
 def runOCSVM(filename, X, gt, params, parameter_iteration):
-
     labelFile = filename + "_" + str(params[0][1]) + "_" + str(params[1][1]) + "_" + str(params[2][1]) + "_" + str(params[3][1]) + "_" + str(params[4][1]) + "_" + str(params[5][1]) + "_" + str(params[6][1]) + "_" + str(params[7][1]) + "_" + str(params[8][1])
-
     if os.path.exists("OCSVM/Labels_Sk_OCSVM_"+labelFile+".csv") == 1:
         return
     
@@ -113,19 +112,15 @@ def runOCSVM(filename, X, gt, params, parameter_iteration):
     for i in range(len(labels)):
         for j in range(i+1, len(labels)):
           ari.append(adjusted_rand_score(labels[i], labels[j]))      
-    
-    fileLabels=open("../Labels/Sklearn/OCSVM/Labels_Sk_OCSVM_"+labelFile+".csv", 'a')
-    for l in labels:
-        fileLabels.write(','.join(str(s) for s in l) + '\n')
-    fileLabels.close()
-    
-    
+    if os.path.exists("../AnomalyAlgoDiagnosis_Labels/Labels_Sk_OCSVM_"+labelFile+".csv") == 0:
+        fileLabels=open("../AnomalyAlgoDiagnosis_Labels/Labels_Sk_OCSVM_"+labelFile+".csv", 'a')
+        for l in labels:
+            fileLabels.write(','.join(str(s) for s in l) + '\n')
+        fileLabels.close()
     
     flabel_done=open("OCSVM/Labels_Sk_OCSVM_"+labelFile+".csv", 'a')
     flabel_done.write("Done")
     flabel_done.close()
-    
-    
    
     fstat_f1=open("Stats/SkOCSVM_F1.csv", "a")
     fstat_f1.write(filename+','+ str(params[0][1]) + ','+ str(params[1][1]) + ',' + str(params[2][1]) + ',' + str(params[3][1]) + ',' + str(params[4][1]) + ',' + str(params[5][1]) + ',' + str(params[6][1]) + ',' + str(params[7][1]) + ',' + str(params[8][1]) + ',' + str(parameter_iteration) + ',')
@@ -233,76 +228,48 @@ def calculate_score(allFiles, parameter, parameter_values, all_parameters):
 
     ### Friedman Test
     
-    friedman_test_f1_m = pg.friedman(data=df_f1_m, dv="F1Score_Median", within=parameter, subject="Filename")
-    p_f_f1_m = friedman_test_f1_m['p-unc']['Friedman']
+    # friedman_test_f1_m = pg.friedman(data=df_f1_m, dv="F1Score_Median", within=parameter, subject="Filename")
+    # p_f_f1_m = friedman_test_f1_m['p-unc']['Friedman']
     
-    friedman_test_f1_r = pg.friedman(data=df_f1_r, dv="F1Score_Range", within=parameter, subject="Filename")
-    p_f_f1_r = friedman_test_f1_r['p-unc']['Friedman']
+    # friedman_test_f1_r = pg.friedman(data=df_f1_r, dv="F1Score_Range", within=parameter, subject="Filename")
+    # p_f_f1_r = friedman_test_f1_r['p-unc']['Friedman']
     
-    friedman_test_f1_m = pg.friedman(data=df_f1_m, dv="F1Score_Median", within=parameter, subject="Filename")
-    p_f_ari = friedman_test_f1_m['p-unc']['Friedman']
+    # friedman_test_f1_m = pg.friedman(data=df_f1_m, dv="F1Score_Median", within=parameter, subject="Filename")
+    # p_f_ari = friedman_test_f1_m['p-unc']['Friedman']
+    
+    
+    ### Mann–Whitney U test
+
+    mwu_f1_range = [[0 for i in range(len(parameter_values))] for j in range(len(parameter_values))]
+    i = 0
+    for p1 in parameter_values:
+        p1_values = df_f1_r[df_f1_r[parameter] == p1]['F1Score_Range'].to_numpy()
+        j = 0
+        for p2 in parameter_values:
+            p2_values = df_f1_r[df_f1_r[parameter] == p2]['F1Score_Range'].to_numpy()
+            if len(p1_values) == 0 or len(p2_values) == 0:
+                mwu_f1_range[i][j] = None
+                continue
+            _, mwu_f1_range[i][j] = stats.mannwhitneyu(x=p1_values, y=p2_values, alternative = 'greater')
+            j += 1
+        i += 1
+    mwu_df_f1_range = pd.DataFrame(mwu_f1_range, columns = parameter_values)
+    mwu_df_f1_range.index = parameter_values
+    mwu_df_f1_range.to_csv("Mann–Whitney U test/MWU_SkOCSVM_F1_Range_"+parameter+".csv")
+    
+    try:
+        mwu_geomean = gmean(gmean(mwu_f1_range))
+        mwu_min = np.min(mwu_f1_range)
+    except:
+        mwu_geomean = 11
+        mwu_min = 11
     
     parameter_value_max_f1_median = df_f1_m[parameter].loc[df_f1_m["F1Score_Median"].idxmax()]
     parameter_value_min_f1_range = df_f1_r[parameter].loc[df_f1_r["F1Score_Range"].idxmin()]  
     parameter_value_max_ari = df_ari_m[parameter].loc[df_ari_m["ARI"].idxmax()]
     
-    return p_f_f1_m, p_f_f1_r, p_f_ari, parameter_value_max_f1_median, parameter_value_min_f1_range, parameter_value_max_ari
+    return mwu_geomean, mwu_min, parameter_value_max_f1_median, parameter_value_min_f1_range, parameter_value_max_ari
 
-# def plot_acc_range(measurement):
-#     print(measurement)
-#     df = pd.read_csv("Stats/SkOCSVM_"+measurement+".csv")
-#     runs = []
-#     for i in range(30):
-#         runs.append(('R'+str(i)))
-    
-#     df["Performance"] = 0
-#     df["Nondeterminism"] = 0
-#     for i in range(df.shape[0]):
-#         run_values = df.loc[i, runs].tolist()
-        
-#         range_ = (np.percentile(run_values, 75) - np.percentile(run_values, 25))/(np.percentile(run_values, 75) + np.percentile(run_values, 25))
-        
-#         df.iloc[i, df.columns.get_loc('Performance')] =  np.mean(run_values)
-#         df.iloc[i, df.columns.get_loc('Nondeterminism')] = range_
-    
-#     median_df = df.groupby(["n_estimators", "max_samples", "max_features", "bootstrap", "n_jobs", "warm_start"])[["Performance", "Nondeterminism"]].median()
-#     median_df = median_df.reset_index()
-    
-#     print(median_df.iloc[median_df["Performance"].idxmax()])
-#     print(median_df.iloc[median_df["Nondeterminism"].idxmin()])
-    
-    
-    
-#     i_n_estimators=100
-#     i_max_samples='auto'
-#     i_contamination='auto' 
-#     i_max_features=1.0
-#     i_bootstrap=False
-#     i_n_jobs="None"
-#     i_warm_start = False
-#     default_run = median_df[(median_df['n_estimators']==i_n_estimators)&
-#                                     (median_df['max_samples']==str(i_max_samples))&
-#                                     (median_df['max_features']==i_max_features)&
-#                                     (median_df['bootstrap']==i_bootstrap)&
-#                                     (median_df['n_jobs']==str(i_n_jobs))&
-#                                     (median_df['warm_start']==i_warm_start)]
-#     default_performance = default_run['Performance'].values[0]
-#     default_nondeter = default_run['Nondeterminism'].values[0]
-        
-    
-#     performance = median_df["Performance"].values
-#     nondeterminism = median_df["Nondeterminism"].values
-
-#     fig = plt.Figure()
-#     plt.plot(nondeterminism, performance, ".")
-#     plt.plot(default_nondeter, default_performance, "o")
-#     plt.title(measurement)
-#     plt.xlabel("Nondeterminism")
-#     plt.ylabel("Performance")
-#     plt.savefig("Fig/OCSVM_Sk_"+measurement+"_Iter1.pdf", bbox_inches="tight", pad_inches=0)
-#     plt.show()
-    
-    
 if __name__ == '__main__':
     folderpath = datasetFolderDir
     master_files1 = glob.glob(folderpath+"*.mat")
@@ -358,10 +325,10 @@ if __name__ == '__main__':
         fstat_ari=open("Stats/SkOCSVM_ARI.csv", "w")
         fstat_ari.write('Filename,kernel,degree,gamma,coef0,tol,nu,shrinking,cache_size,max_iter,Parameter_Iteration,'+ARI_R+"\n")
         fstat_ari.close()
-    
-    fstat_winner=open("Stats/SkOCSVM_Winners.csv", "w")
-    fstat_winner.write('Parameter,Friedman,Max_F1,Min_F1_Range,Max_ARI\n')
-    fstat_winner.close()
+    if os.path.exists("Stats/SkOCSVM_Winners.csv") == 0:  
+        fstat_winner=open("Stats/SkOCSVM_Winners.csv", "w")
+        fstat_winner.write('Parameter,Friedman,Max_F1,Min_F1_Range,Max_ARI\n')
+        fstat_winner.close()
     for param_iteration in range(len(parameters)):
         # for FileNumber in range(len(master_files)):
         rand_files = random.sample(master_files, 30)
@@ -372,29 +339,35 @@ if __name__ == '__main__':
             
             
 
-        friedmanValues = [10]*9
+        MWU_geo = [10]*10
+        MWU_min = [10]*9
         f1_range = [0]*9
         f1_median =[0]*9 
         ari = [0]*9
         for i in range(9):
             if len(parameters[i][2]) > 1:
-                p_f_f1_m, p_f_f1_r, p_f_ari, f1_median[i], f1_range[i], ari[i] = calculate_score(master_files, parameters[i][0], parameters[i][2], parameters)
+                mwu_geomean, mwu_min, f1_median[i], f1_range[i], ari[i] = calculate_score(master_files, parameters[i][0], parameters[i][2], parameters)
                 
-                friedmanValues[i] = p_f_f1_r
-            
-        index_min = np.argmin(friedmanValues)
+                MWU_geo[i] = mwu_geomean
+                MWU_min[i] = mwu_geomean
+        index_min = np.argmin(MWU_geo)
 
-        if friedmanValues[index_min] > 1:
+        if MWU_min[index_min] > 1:
+            print("MWU_min: ", end='')
+            print(MWU_min)
             break
-        parameters[index_min][1] = f1_median[index_min]
-        parameters[index_min][2] = [f1_median[index_min]]
+        parameters[index_min][1] = f1_range[index_min]
+        parameters[index_min][2] = [f1_range[index_min]]
         
         fstat_winner=open("Stats/SkOCSVM_Winners.csv", "a")
-        fstat_winner.write(parameters[index_min][0]+','+str(friedmanValues[index_min])+','+str(f1_median[index_min])+','+str(f1_range[index_min])+','+str(ari[index_min])+'\n')
+        fstat_winner.write(parameters[index_min][0]+','+str(MWU_geo[index_min])+','+str(f1_median[index_min])+','+str(f1_range[index_min])+','+str(ari[index_min])+'\n')
         fstat_winner.close()
         
-        print(parameters)        
-        
+        print(parameters)              
+
+
+
+
         
         
         

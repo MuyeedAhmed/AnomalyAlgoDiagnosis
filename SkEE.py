@@ -156,14 +156,14 @@ def calculate_score(allFiles, parameter, parameter_values, all_parameters):
             f1 = dff1[(dff1['Filename']==filename)&
                             (dff1['store_precision']==i_store_precision)&
                             (dff1['assume_centered']==i_assume_centered)&
-                            (dff1['support_fraction']==i_support_fraction)&
+                            (dff1['support_fraction']==str(i_support_fraction))&
                             (dff1['contamination']==i_contamination)]
             if f1.empty:
                 continue
             ari = dfari[(dfari['Filename']==filename)&
                             (dfari['store_precision']==i_store_precision)&
                             (dfari['assume_centered']==i_assume_centered)&
-                            (dfari['support_fraction']==i_support_fraction)&
+                            (dfari['support_fraction']==str(i_support_fraction))&
                             (dfari['contamination']==i_contamination)]
                         
             f1_values = f1[f1_runs].to_numpy()[0]

@@ -1,0 +1,6 @@
+Parameter,Friedman,Max_F1,Min_F1_Range,Max_ARI
+n_estimators,0.002131633801839687,512,64,64
+max_samples,0.39202786268543577,auto,auto,auto
+max_features,0.4064340940517224,0.7,0.5,0.2
+bootstrap,0.36096406460871483,False,False,False
+n_jobs,0.45354364447709794,1,0,0

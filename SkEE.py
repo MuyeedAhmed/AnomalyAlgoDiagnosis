@@ -5,7 +5,8 @@ Created on Sat Oct  8 05:01:01 2022
 
 @author: muyeedahmed
 """
-
+import warnings
+warnings.filterwarnings('ignore')
 import os
 import glob
 import pandas as pd

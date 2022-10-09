@@ -5,7 +5,8 @@ Created on Sat Oct  8 05:01:01 2022
 
 @author: muyeedahmed
 """
-
+import warnings
+warnings.filterwarnings('ignore')
 import os
 import glob
 import pandas as pd
@@ -16,7 +17,7 @@ import numpy as np
 from sklearn import metrics
 from copy import copy, deepcopy
 from sklearn.metrics.cluster import adjusted_rand_score
-import pingouin as pg
+
 import random
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -62,26 +63,36 @@ def ee(filename, parameters, parameter_iteration):
    
     for p in range(len(parameters)):
         passing_param = deepcopy(parameters)
-        print(parameters[p][0], end=': ')
+        # print(parameters[p][0], end=': ')
         for pv in range(len(parameters[p][2])):
             passing_param[p][1] = parameters[p][2][pv]
             runEE(filename, X, gt, passing_param, parameter_iteration)
-            print(parameters[p][2][pv], end = ', ')
-        print()
+            # print(parameters[p][2][pv], end = ', ')
+        # print()
       
     
 def runEE(filename, X, gt, params, parameter_iteration):
     labelFile = filename + "_" + str(params[0][1]) + "_" + str(params[1][1]) + "_" + str(params[2][1]) + "_" + str(params[3][1])
     if os.path.exists("EE/Labels_Sk_EE_"+labelFile+".csv") == 1:
         return
-    
+    sp = params[0][1]
+    ac = params[1][1]
+    sf = params[2][1]
+    cont = params[3][1]
+    if cont == "LOF":
+        percentage_file = pd.read_csv("Stats/SkPercentage.csv")
+        cont  = percentage_file[percentage_file["Filename"] == filename]["LOF"].to_numpy()[0]
+    if cont == "IF":
+        percentage_file = pd.read_csv("Stats/SkPercentage.csv")
+        cont  = percentage_file[percentage_file["Filename"] == filename]["IF"].to_numpy()[0]
+
     labels = []
     f1 = []
     ari = []
     for i in range(10):
         try:
-            clustering = EllipticEnvelope(store_precision=params[0][1], assume_centered=params[1][1], 
-                                     support_fraction=params[2][1], contamination=params[3][1]).fit(X)
+            clustering = EllipticEnvelope(store_precision=sp, assume_centered=ac, 
+                                     support_fraction=sf, contamination=cont).fit(X)
         except:
             return
     
@@ -157,14 +168,14 @@ def calculate_score(allFiles, parameter, parameter_values, all_parameters):
                             (dff1['store_precision']==i_store_precision)&
                             (dff1['assume_centered']==i_assume_centered)&
                             (dff1['support_fraction']==str(i_support_fraction))&
-                            (dff1['contamination']==i_contamination)]
+                            (str(dff1['contamination'])==str(i_contamination))]
             if f1.empty:
                 continue
             ari = dfari[(dfari['Filename']==filename)&
                             (dfari['store_precision']==i_store_precision)&
                             (dfari['assume_centered']==i_assume_centered)&
                             (dfari['support_fraction']==str(i_support_fraction))&
-                            (dfari['contamination']==i_contamination)]
+                            (str(dfari['contamination'])==str(i_contamination))]
                         
             f1_values = f1[f1_runs].to_numpy()[0]
             ari_values = ari[ari_runs].to_numpy()[0]
@@ -270,6 +281,7 @@ if __name__ == '__main__':
         fstat_winner=open("Stats/SkEE_Winners.csv", "w")
         fstat_winner.write('Parameter,MWU_P,Max_F1,Min_F1_Range,Max_ARI\n')
         fstat_winner.close()
+    
     for param_iteration in range(len(parameters)):
         # for FileNumber in range(len(master_files)):
         rand_files = random.sample(master_files, 30)

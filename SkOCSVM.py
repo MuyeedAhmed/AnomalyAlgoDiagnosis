@@ -6,7 +6,8 @@ Created on Tue Oct  4 16:18:20 2022
 @author: muyeedahmed
 """
 
-
+import warnings
+warnings.filterwarnings("ignore")
 import os
 import glob
 import pandas as pd
@@ -17,7 +18,6 @@ import numpy as np
 from sklearn import metrics
 from copy import copy, deepcopy
 from sklearn.metrics.cluster import adjusted_rand_score
-import pingouin as pg
 import random
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -60,14 +60,6 @@ def ocsvm(filename, parameters, parameter_iteration):
     else:
         print("File doesn't exist")
         return
-    
-    # kernel = ['linear', 'poly', 'rbf', 'sigmoid', 'precomputed']
-    # degree = [3, 4, 5, 6] # Kernel poly only
-    # gamma = ['scale', 'auto'] # Kernel ‘rbf’, ‘poly’ and ‘sigmoid’
-    # coef0 = [0.0, 0.1, 0.2, 0.3, 0.4] # Kernel ‘poly’ and ‘sigmoid’
-
-    
-    
     
     for p in range(len(parameters)):
         passing_param = deepcopy(parameters)
@@ -339,7 +331,7 @@ if __name__ == '__main__':
             
             
 
-        MWU_geo = [10]*10
+        MWU_geo = [10]*9
         MWU_min = [10]*9
         f1_range = [0]*9
         f1_median =[0]*9 

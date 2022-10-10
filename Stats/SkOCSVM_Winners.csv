@@ -1,0 +1,7 @@
+Parameter,Friedman,Max_F1,Min_F1_Range,Max_ARI
+nu,nan,0.4,0.1,0.1
+gamma,nan,scale,scale,scale
+tol,nan,0.01,0.1,0.1
+shrinking,nan,True,True,True
+cache_size,nan,50,50,50
+max_iter,nan,-1,-1,-1

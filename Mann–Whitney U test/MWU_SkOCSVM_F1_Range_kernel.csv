@@ -1,0 +1,6 @@
+,linear,poly,rbf,sigmoid,precomputed
+linear,,,,,
+poly,,,,,
+rbf,,,,,
+sigmoid,,,,,
+precomputed,,0.0,0.0,0.0,0.0

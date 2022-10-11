@@ -31,9 +31,6 @@ function main_function()
     NumExpansionDimensions.name = "NumExpansionDimensions";
     NumExpansionDimensions.default = "auto";
     NumExpansionDimensions.values = ["auto", 2^12, 2^15, 2^17, 2^19];
-    CategoricalPredictors.name = "CategoricalPredictors";
-    CategoricalPredictors.default = "auto";
-    CategoricalPredictors.values = ["auto", 1, 2, 4, 8, 16, 32, 64, 128, 256];
     StandardizeData.name = "StandardizeData";
     StandardizeData.default = 0;
     StandardizeData.values = [0, 1];
@@ -47,7 +44,7 @@ function main_function()
     IterationLimit.default = 1000;
     IterationLimit.values = [100, 200, 500, 1000, 2000];
     
-    parameters = [ContaminationFraction, KernelScale, Lambda, NumExpansionDimensions, CategoricalPredictors, StandardizeData, BetaTolerance, GradientTolerance, IterationLimit];
+    parameters = [ContaminationFraction, KernelScale, Lambda, NumExpansionDimensions, StandardizeData, BetaTolerance, GradientTolerance, IterationLimit];
 
 %     if isfile("Stats/MatlabOCSVM_F1.csv") == false
 %         R = "";
@@ -142,7 +139,7 @@ function OCSVM(filename, parameters)
 end
 %% Run OCSVM
 function runOCSVM(filename, X, y, params)
-    labelFile = "OCSVM_Matlab/Labels_Sk_EE_"+filename + "_" + params(1).default + "_" + params(2).default + "_" + params(3).default + "_" + params(4).default + "_" + params(5).default + "_" + params(6).default + "_" + params(7).default + "_" + params(8).default + "_" + params(9).default + ".csv";
+    labelFile = "OCSVM_Matlab/Labels_Sk_EE_"+filename + "_" + params(1).default + "_" + params(2).default + "_" + params(3).default + "_" + params(4).default + "_" + params(5).default + "_" + params(6).default + "_" + params(7).default + "_" + params(8).default + ".csv";
     if isfile(labelFile)
        return
     end
@@ -155,7 +152,6 @@ function runOCSVM(filename, X, y, params)
     p6 = params(6).default;
     p7 = params(7).default;
     p8 = params(8).default;
-    p9 = params(9).default;
     
     sX = string([1:size(X, 2)]);
     
@@ -163,8 +159,8 @@ function runOCSVM(filename, X, y, params)
     try
         for z = 1:10
             [Mdl, tf] = ocsvm(X, PredictorNames=sX,ContaminationFraction=p1, KernelScale=p2, Lambda=p3, NumExpansionDimensions=p4, ...
-                StandardizeData=p6, BetaTolerance=p7, ...
-                GradientTolerance=p8, IterationLimit=p9);
+                StandardizeData=p5, BetaTolerance=p6, ...
+                GradientTolerance=p7, IterationLimit=p8);
             outliersSet = [outliersSet;tf'];
         end
 %         writefilename = sprintf('../AnomalyAlgoDiagnosis_Labels_Matlab/%s', labelFile);

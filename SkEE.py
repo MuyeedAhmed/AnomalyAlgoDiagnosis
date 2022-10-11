@@ -47,7 +47,7 @@ def ee(filename, parameters, parameter_iteration):
             return
         
     elif os.path.exists(folderpath+filename+".csv") == 1:
-        if os.path.getsize(folderpath+filename+".csv") > 1000000: # 10MB
+        if os.path.getsize(folderpath+filename+".csv") > 1000000: # 1MB
             print("Didn\'t run -> Too large - ", filename)    
             return
         X = pd.read_csv(folderpath+filename+".csv")
@@ -63,12 +63,12 @@ def ee(filename, parameters, parameter_iteration):
    
     for p in range(len(parameters)):
         passing_param = deepcopy(parameters)
-        # print(parameters[p][0], end=': ')
+        print(parameters[p][0], end=': ')
         for pv in range(len(parameters[p][2])):
             passing_param[p][1] = parameters[p][2][pv]
             runEE(filename, X, gt, passing_param, parameter_iteration)
-            # print(parameters[p][2][pv], end = ', ')
-        # print()
+            print(parameters[p][2][pv], end = ', ')
+        print()
       
     
 def runEE(filename, X, gt, params, parameter_iteration):
@@ -153,6 +153,7 @@ def calculate_score(allFiles, parameter, parameter_values, all_parameters):
     ari_all = []
     
     for filename in allFiles:
+        print(filename)
         for p in parameter_values:
             if parameter == 'store_precision':
                 i_store_precision = p
@@ -168,15 +169,16 @@ def calculate_score(allFiles, parameter, parameter_values, all_parameters):
                             (dff1['store_precision']==i_store_precision)&
                             (dff1['assume_centered']==i_assume_centered)&
                             (dff1['support_fraction']==str(i_support_fraction))&
-                            (str(dff1['contamination'])==str(i_contamination))]
+                            (dff1['contamination']==str(i_contamination))]
+            
             if f1.empty:
                 continue
             ari = dfari[(dfari['Filename']==filename)&
                             (dfari['store_precision']==i_store_precision)&
                             (dfari['assume_centered']==i_assume_centered)&
                             (dfari['support_fraction']==str(i_support_fraction))&
-                            (str(dfari['contamination'])==str(i_contamination))]
-                        
+                            (dfari['contamination']==str(i_contamination))]
+            
             f1_values = f1[f1_runs].to_numpy()[0]
             ari_values = ari[ari_runs].to_numpy()[0]
             
@@ -223,7 +225,7 @@ def calculate_score(allFiles, parameter, parameter_values, all_parameters):
     except:
         mwu_geomean = 11
         mwu_min = 11
-    
+    # print(df_f1_m)
     parameter_value_max_f1_median = df_f1_m[parameter].loc[df_f1_m["F1Score_Median"].idxmax()]
     parameter_value_min_f1_range = df_f1_r[parameter].loc[df_f1_r["F1Score_Range"].idxmin()]  
     parameter_value_max_ari = df_ari_m[parameter].loc[df_ari_m["ARI"].idxmax()]

@@ -153,7 +153,6 @@ def calculate_score(allFiles, parameter, parameter_values, all_parameters):
     ari_all = []
     
     for filename in allFiles:
-        print(filename)
         for p in parameter_values:
             if parameter == 'store_precision':
                 i_store_precision = p
@@ -263,8 +262,7 @@ def plot_acc_range():
     default_run = median_df[(median_df['store_precision']==True)&
                                     (median_df['assume_centered']==False)&
                                     (median_df['support_fraction']==str(None))&
-                                    (median_df['contamination']==0.1)]
-    print(default_run)
+                                    (median_df['contamination']==str(0.1))]
     default_performance = default_run['Performance'].values[0]
     default_nondeter = default_run['Nondeterminism'].values[0]
         

@@ -262,7 +262,7 @@ def plot_acc_range():
     
     default_run = median_df[(median_df['store_precision']==True)&
                                     (median_df['assume_centered']==False)&
-                                    (median_df['support_fraction']==None)&
+                                    (median_df['support_fraction']==str(None))&
                                     (median_df['contamination']==0.1)]
     print(default_run)
     default_performance = default_run['Performance'].values[0]
@@ -305,71 +305,71 @@ if __name__ == '__main__':
     parameters.append(["contamination", 0.1, contamination])
     
     
-    R = ""
-    for i in range(9):
-        R += "R"+str(i)+","
-    R+="R9"
-    ARI_R = ""
-    for i in range(44):
-        ARI_R += "R"+str(i)+","
-    ARI_R+="R44"
+    # R = ""
+    # for i in range(9):
+    #     R += "R"+str(i)+","
+    # R+="R9"
+    # ARI_R = ""
+    # for i in range(44):
+    #     ARI_R += "R"+str(i)+","
+    # ARI_R+="R44"
     
-    if os.path.exists("Stats/SkEE_Accuracy.csv") == 0:
-        fstat_acc=open("Stats/SkEE_Accuracy.csv", "w")
-        fstat_acc.write('Filename,store_precision,assume_centered,support_fraction,contamination,Parameter_Iteration,'+R+"\n")
-        fstat_acc.close()
+    # if os.path.exists("Stats/SkEE_Accuracy.csv") == 0:
+    #     fstat_acc=open("Stats/SkEE_Accuracy.csv", "w")
+    #     fstat_acc.write('Filename,store_precision,assume_centered,support_fraction,contamination,Parameter_Iteration,'+R+"\n")
+    #     fstat_acc.close()
         
-    if os.path.exists("Stats/SkEE_F1.csv") == 0: 
-        fstat_f1=open("Stats/SkEE_F1.csv", "w")
-        fstat_f1.write('Filename,store_precision,assume_centered,support_fraction,contamination,Parameter_Iteration,'+R+"\n")
-        fstat_f1.close()
+    # if os.path.exists("Stats/SkEE_F1.csv") == 0: 
+    #     fstat_f1=open("Stats/SkEE_F1.csv", "w")
+    #     fstat_f1.write('Filename,store_precision,assume_centered,support_fraction,contamination,Parameter_Iteration,'+R+"\n")
+    #     fstat_f1.close()
 
-    if os.path.exists("Stats/SkEE_ARI.csv") == 0:    
-        fstat_ari=open("Stats/SkEE_ARI.csv", "w")
-        fstat_ari.write('Filename,store_precision,assume_centered,support_fraction,contamination,Parameter_Iteration,'+ARI_R+"\n")
-        fstat_ari.close()
-    if os.path.exists("Stats/SkEE_Winners.csv") == 0:  
-        fstat_winner=open("Stats/SkEE_Winners.csv", "w")
-        fstat_winner.write('Parameter,MWU_P,Max_F1,Min_F1_Range,Max_ARI\n')
-        fstat_winner.close()
+    # if os.path.exists("Stats/SkEE_ARI.csv") == 0:    
+    #     fstat_ari=open("Stats/SkEE_ARI.csv", "w")
+    #     fstat_ari.write('Filename,store_precision,assume_centered,support_fraction,contamination,Parameter_Iteration,'+ARI_R+"\n")
+    #     fstat_ari.close()
+    # if os.path.exists("Stats/SkEE_Winners.csv") == 0:  
+    #     fstat_winner=open("Stats/SkEE_Winners.csv", "w")
+    #     fstat_winner.write('Parameter,MWU_P,Max_F1,Min_F1_Range,Max_ARI\n')
+    #     fstat_winner.close()
     
-    for param_iteration in range(len(parameters)):
-        # for FileNumber in range(len(master_files)):
-        rand_files = random.sample(master_files, 30)
+    # for param_iteration in range(len(parameters)):
+    #     # for FileNumber in range(len(master_files)):
+    #     rand_files = random.sample(master_files, 30)
         
-        for FileNumber in range(30):
-            print(FileNumber, end=' ')
-            ee(rand_files[FileNumber], parameters, param_iteration)
+    #     for FileNumber in range(30):
+    #         print(FileNumber, end=' ')
+    #         ee(rand_files[FileNumber], parameters, param_iteration)
             
 
-        MWU_geo = [10]*len(parameters)
-        MWU_min = [10]*len(parameters)
-        f1_range = [0]*len(parameters)
-        f1_median =[0]*len(parameters) 
-        ari = [0]*len(parameters)
-        for i in range(len(parameters)):
-            if len(parameters[i][2]) > 1:
-                mwu_geomean, mwu_min, f1_median[i], f1_range[i], ari[i] = calculate_score(master_files, parameters[i][0], parameters[i][2], parameters)
+    #     MWU_geo = [10]*len(parameters)
+    #     MWU_min = [10]*len(parameters)
+    #     f1_range = [0]*len(parameters)
+    #     f1_median =[0]*len(parameters) 
+    #     ari = [0]*len(parameters)
+    #     for i in range(len(parameters)):
+    #         if len(parameters[i][2]) > 1:
+    #             mwu_geomean, mwu_min, f1_median[i], f1_range[i], ari[i] = calculate_score(master_files, parameters[i][0], parameters[i][2], parameters)
                 
-                MWU_geo[i] = mwu_geomean
-                MWU_min[i] = mwu_geomean
-        index_min = np.argmin(MWU_geo)
+    #             MWU_geo[i] = mwu_geomean
+    #             MWU_min[i] = mwu_geomean
+    #     index_min = np.argmin(MWU_geo)
         
-        if index_min == 2 and f1_range[index_min] == 0:
-            f1_range[index_min] = None
+    #     if index_min == 2 and f1_range[index_min] == 0:
+    #         f1_range[index_min] = None
             
-        if MWU_min[index_min] > 1:
-            print("MWU_min: ", end='')
-            print(MWU_min)
-            break
-        parameters[index_min][1] = f1_range[index_min]
-        parameters[index_min][2] = [f1_range[index_min]]
+    #     if MWU_min[index_min] > 1:
+    #         print("MWU_min: ", end='')
+    #         print(MWU_min)
+    #         break
+    #     parameters[index_min][1] = f1_range[index_min]
+    #     parameters[index_min][2] = [f1_range[index_min]]
         
-        fstat_winner=open("Stats/SkEE_Winners.csv", "a")
-        fstat_winner.write(parameters[index_min][0]+','+str(MWU_geo[index_min])+','+str(f1_median[index_min])+','+str(f1_range[index_min])+','+str(ari[index_min])+'\n')
-        fstat_winner.close()
+    #     fstat_winner=open("Stats/SkEE_Winners.csv", "a")
+    #     fstat_winner.write(parameters[index_min][0]+','+str(MWU_geo[index_min])+','+str(f1_median[index_min])+','+str(f1_range[index_min])+','+str(ari[index_min])+'\n')
+    #     fstat_winner.close()
         
-        print(parameters)              
+    #     print(parameters)              
 
     plot_acc_range()
 

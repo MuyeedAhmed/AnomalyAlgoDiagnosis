@@ -262,6 +262,56 @@ def calculate_score(allFiles, parameter, parameter_values, all_parameters):
     
     return mwu_geomean, mwu_min, parameter_value_max_f1_median, parameter_value_min_f1_range, parameter_value_max_ari
 
+
+def plot_acc_range():
+    df = pd.read_csv("Stats/SkOCSVM_F1.csv")
+    runs = []
+    for i in range(10):
+        runs.append(('R'+str(i)))
+    
+    df["Performance"] = 0
+    df["Nondeterminism"] = 0
+    for i in range(df.shape[0]):
+        run_values = df.loc[i, runs].tolist()
+        
+        range_ = (np.percentile(run_values, 75) - np.percentile(run_values, 25))/(np.percentile(run_values, 75) + np.percentile(run_values, 25))
+        
+        df.iloc[i, df.columns.get_loc('Performance')] =  np.mean(run_values)
+        df.iloc[i, df.columns.get_loc('Nondeterminism')] = range_
+    
+    median_df = df.groupby(["kernel", "degree", "gamma", "coef0", "tol", "nu", "shrinking", "cache_size", "max_iter"])[["Performance", "Nondeterminism"]].median()
+    median_df = median_df.reset_index()
+    
+    print(median_df.iloc[median_df["Performance"].idxmax()])
+    print(median_df.iloc[median_df["Nondeterminism"].idxmin()])
+    
+    
+    default_run = median_df[(median_df['kernel']=='rbf')&
+                                    (median_df['degree']==3)&
+                                    (median_df['gamma']=='scale')&
+                                    (median_df['coef0']==0.0)&
+                                    (median_df['tol']==1e-3)&
+                                    (median_df['nu']==0.5)&
+                                    (median_df['shrinking']==True)&
+                                    (median_df['cache_size']==200)&
+                                    (median_df['max_iter']==-1)]
+    default_performance = default_run['Performance'].values[0]
+    default_nondeter = default_run['Nondeterminism'].values[0]
+        
+    
+    performance = median_df["Performance"].values
+    nondeterminism = median_df["Nondeterminism"].values
+
+    fig = plt.Figure()
+    plt.plot(nondeterminism, performance, ".")
+    plt.plot(default_nondeter, default_performance, "o")
+    plt.title("F1 Score")
+    plt.xlabel("Nondeterminism")
+    plt.ylabel("Performance")
+    plt.savefig("Fig/OCSVM_Sk_F1_Iter2.pdf", bbox_inches="tight", pad_inches=0)
+    plt.show()
+
+
 if __name__ == '__main__':
     folderpath = datasetFolderDir
     master_files1 = glob.glob(folderpath+"*.mat")
@@ -357,7 +407,7 @@ if __name__ == '__main__':
         
         print(parameters)              
 
-
+    plot_acc_range()
 
 
         

@@ -285,11 +285,10 @@ def calculate_score(allFiles, parameter, parameter_values, all_parameters):
     # return p_f_f1_m, p_f_f1_r, p_f_ari, parameter_value_max_f1_median, parameter_value_min_f1_range, parameter_value_max_ari
     return mwu_geomean, mwu_min, parameter_value_max_f1_median, parameter_value_min_f1_range, parameter_value_max_ari
 
-def plot_acc_range(measurement):
-    print(measurement)
-    df = pd.read_csv("Stats/SkIF_"+measurement+".csv")
+def plot_acc_range():
+    df = pd.read_csv("Stats/SkIF_F1.csv")
     runs = []
-    for i in range(30):
+    for i in range(10):
         runs.append(('R'+str(i)))
     
     df["Performance"] = 0
@@ -333,10 +332,10 @@ def plot_acc_range(measurement):
     fig = plt.Figure()
     plt.plot(nondeterminism, performance, ".")
     plt.plot(default_nondeter, default_performance, "o")
-    plt.title(measurement)
+    plt.title("F1 Score")
     plt.xlabel("Nondeterminism")
     plt.ylabel("Performance")
-    plt.savefig("Fig/IF_Sk_"+measurement+"_Iter1.pdf", bbox_inches="tight", pad_inches=0)
+    plt.savefig("Fig/IF_Sk_F1_Iter2.pdf", bbox_inches="tight", pad_inches=0)
     plt.show()
     
     
@@ -434,7 +433,7 @@ if __name__ == '__main__':
         print(parameters)        
         
         
-        
+    plot_acc_range()
         
         
         

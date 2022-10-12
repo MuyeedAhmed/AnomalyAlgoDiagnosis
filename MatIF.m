@@ -113,7 +113,6 @@ function runIF(filename, X, y, params)
         percentage_table_file = percentage_table(string(percentage_table.Filename)==filename_char(1:end-4), :);
         p1 = percentage_table_file.LOF;
     elseif string(p1) == "IF"
-        disp(p1)
         percentage_table = readtable("Stats/SkPercentage.csv");
         filename_char = convertStringsToChars(filename);
         percentage_table_file = percentage_table(string(percentage_table.Filename)==filename_char(1:end-4), :);

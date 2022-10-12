@@ -139,7 +139,7 @@ function OCSVM(filename, parameters)
 end
 %% Run OCSVM
 function runOCSVM(filename, X, y, params)
-    labelFile = "OCSVM_Matlab/Labels_Sk_EE_"+filename + "_" + params(1).default + "_" + params(2).default + "_" + params(3).default + "_" + params(4).default + "_" + params(5).default + "_" + params(6).default + "_" + params(7).default + "_" + params(8).default + ".csv";
+    labelFile = "OCSVM_Matlab/Labels_Mat_OCSVM_"+filename + "_" + params(1).default + "_" + params(2).default + "_" + params(3).default + "_" + params(4).default + "_" + params(5).default + "_" + params(6).default + "_" + params(7).default + "_" + params(8).default + ".csv";
     if isfile(labelFile)
        return
     end

@@ -31,12 +31,14 @@ from scipy.stats import gmean
 datasetFolderDir = 'Dataset/'
 
 
-# def isolationforest(filename, n_estimators, max_samples, max_features, bootstrap, n_jobs, warm_start):
 def isolationforest(filename, parameters, parameter_iteration):
     print(filename)
     folderpath = datasetFolderDir
     
     if os.path.exists(folderpath+filename+".mat") == 1:
+        if os.path.getsize(folderpath+filename+".mat") > 200000: # 200KB
+            # print("Didn\'t run -> Too large - ", filename)    
+            return
         try:
             df = loadmat(folderpath+filename+".mat")
         except NotImplementedError:
@@ -46,11 +48,11 @@ def isolationforest(filename, parameters, parameter_iteration):
         gt = gt.reshape((len(gt)))
         X=df['X']
         if np.isnan(X).any():
-            print("Didn\'t run -> NaN - ", filename)
+            # print("Didn\'t run -> NaN - ", filename)
             return
         
     elif os.path.exists(folderpath+filename+".csv") == 1:
-        if os.path.getsize(folderpath+filename+".csv") > 1000000: # 10MB
+        if os.path.getsize(folderpath+filename+".csv") > 200000: # 200KB
             print("Didn\'t run -> Too large - ", filename)    
             return
         X = pd.read_csv(folderpath+filename+".csv")
@@ -392,15 +394,15 @@ if __name__ == '__main__':
         fstat_ari.close()
     if os.path.exists("Stats/SkIF_Winners.csv") == 0:  
         fstat_winner=open("Stats/SkIF_Winners.csv", "w")
-        fstat_winner.write('Parameter,Friedman,Max_F1,Min_F1_Range,Max_ARI\n')
+        fstat_winner.write('Parameter,MWU_P,Max_F1,Min_F1_Range,Max_ARI\n')
         fstat_winner.close()
     for param_iteration in range(len(parameters)):
-        # # for FileNumber in range(len(master_files)):
-        rand_files = random.sample(master_files, 30)
+        for FileNumber in range(len(master_files)):
+        # rand_files = random.sample(master_files, 30)
         
-        for FileNumber in range(30):
+        # for FileNumber in range(30):
             print(FileNumber, end=' ')
-            isolationforest(rand_files[FileNumber], parameters, param_iteration)
+            isolationforest(master_files[FileNumber], parameters, param_iteration)
             
             
 
@@ -433,7 +435,7 @@ if __name__ == '__main__':
         print(parameters)        
         
         
-    plot_acc_range()
+    # plot_acc_range()
         
         
         

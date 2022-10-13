@@ -1,0 +1,5 @@
+Parameter,MWU_P,Max_F1,Min_F1_Range,Max_ARI
+store_precision,nan,True,False,True
+assume_centered,nan,False,False,True
+contamination,nan,0.4,0.1,0.1
+support_fraction,0.21924632492067161,0.0,0.8,0.9

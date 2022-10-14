@@ -273,7 +273,7 @@ def calculate_score(allFiles, parameter, parameter_values, all_parameters, p_ite
         i += 1
     mwu_df_f1_range = pd.DataFrame(mwu_f1_range, columns = parameter_values)
     mwu_df_f1_range.index = parameter_values
-    mwu_df_f1_range.to_csv("Mann–Whitney U test/MWU_SkIF_F1_Range_"+parameter+"_"+p_iter+".csv")
+    mwu_df_f1_range.to_csv("Mann–Whitney U test/MWU_SkIF_F1_Range_"+parameter+"_"+str(p_iter)+".csv")
     
     try:
         mwu_f1_range = [[z+1 for z in y] for y in mwu_f1_range]

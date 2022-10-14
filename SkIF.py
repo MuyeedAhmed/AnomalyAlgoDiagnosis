@@ -282,7 +282,7 @@ def calculate_score(allFiles, parameter, parameter_values, all_parameters, p_ite
     except:
         mwu_geomean = 11
         mwu_min = 11
-    
+    print(df_f1_r)
     parameter_value_max_f1_median = df_f1_m[parameter].loc[df_f1_m["F1Score_Median"].idxmax()]
     parameter_value_min_f1_range = df_f1_r[parameter].loc[df_f1_r["F1Score_Range"].idxmin()]  
     parameter_value_max_ari = df_ari_m[parameter].loc[df_ari_m["ARI"].idxmax()]
@@ -421,7 +421,9 @@ if __name__ == '__main__':
                 MWU_geo[i] = mwu_geomean
                 MWU_min[i] = mwu_geomean
         index_min = np.argmin(MWU_geo)
-
+        print(f1_range)
+        print(MWU_geo)
+        print(MWU_min)
         if index_min == 5 and f1_range[index_min] == 0:
             f1_range[index_min] = None
         if MWU_min[index_min] > 2:

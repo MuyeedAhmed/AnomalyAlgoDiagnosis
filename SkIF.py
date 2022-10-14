@@ -25,7 +25,7 @@ sns.set_theme(style="whitegrid")
 # import scikit_posthocs as sp
 import scipy.stats as stats
 from scipy.stats import gmean
-
+import math
 # datasetFolderDir = '/Users/muyeedahmed/Desktop/Research/Dataset/Dataset_Anomaly/'
 # datasetFolderDir = '/home/neamtiu/Desktop/ma234/AnomalyDetection/Dataset/'
 datasetFolderDir = 'Dataset/'
@@ -132,7 +132,7 @@ def runIF(filename, X, gt, params, parameter_iteration):
     fstat_ari.write(','.join(str(s) for s in ari) + '\n')
     fstat_ari.close()
 
-def calculate_score(allFiles, parameter, parameter_values, all_parameters):
+def calculate_score(allFiles, parameter, parameter_values, all_parameters, p_iter):
     i_n_estimators=all_parameters[0][1]
     i_max_samples=all_parameters[1][1]
     i_contamination=all_parameters[2][1]
@@ -210,6 +210,8 @@ def calculate_score(allFiles, parameter, parameter_values, all_parameters):
             # accuracy_med_all.append([filename, p, np.percentile(accuracy_values, 50)])
             
             f1Diff = (np.percentile(f1_values, 75) - np.percentile(f1_values, 25))/(np.percentile(f1_values, 75) + np.percentile(f1_values, 25))
+            if math.isnan(f1Diff):
+                f1Diff = 0
             f1_range_all.append([filename, p, f1Diff])
             f1_med_all.append([filename, p, np.percentile(f1_values, 50)])
             
@@ -271,9 +273,10 @@ def calculate_score(allFiles, parameter, parameter_values, all_parameters):
         i += 1
     mwu_df_f1_range = pd.DataFrame(mwu_f1_range, columns = parameter_values)
     mwu_df_f1_range.index = parameter_values
-    mwu_df_f1_range.to_csv("Mann–Whitney U test/MWU_SkIF_F1_Range_"+parameter+".csv")
+    mwu_df_f1_range.to_csv("Mann–Whitney U test/MWU_SkIF_F1_Range_"+parameter+"_"+p_iter+".csv")
     
     try:
+        mwu_f1_range = [[z+1 for z in y] for y in mwu_f1_range]
         mwu_geomean = gmean(gmean(mwu_f1_range))
         mwu_min = np.min(mwu_f1_range)
     except:
@@ -413,7 +416,7 @@ if __name__ == '__main__':
         ari = [0]*7
         for i in range(7):
             if len(parameters[i][2]) > 1:
-                mwu_geomean, mwu_min, f1_median[i], f1_range[i], ari[i] = calculate_score(master_files, parameters[i][0], parameters[i][2], parameters)
+                mwu_geomean, mwu_min, f1_median[i], f1_range[i], ari[i] = calculate_score(master_files, parameters[i][0], parameters[i][2], parameters, param_iteration)
                 
                 MWU_geo[i] = mwu_geomean
                 MWU_min[i] = mwu_geomean
@@ -421,7 +424,7 @@ if __name__ == '__main__':
 
         if index_min == 5 and f1_range[index_min] == 0:
             f1_range[index_min] = None
-        if MWU_min[index_min] > 1:
+        if MWU_min[index_min] > 2:
             print("MWU_min: ", end='')
             print(MWU_min)
             break

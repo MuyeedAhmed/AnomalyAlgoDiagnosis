@@ -17,7 +17,7 @@ import numpy as np
 from sklearn import metrics
 from copy import copy, deepcopy
 from sklearn.metrics.cluster import adjusted_rand_score
-
+import math
 import random
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -131,7 +131,7 @@ def runEE(filename, X, gt, params, parameter_iteration):
     
 
 
-def calculate_score(allFiles, parameter, parameter_values, all_parameters):
+def calculate_score(allFiles, parameter, parameter_values, all_parameters, p_iter):
     i_store_precision = all_parameters[0][1]
     i_assume_centered = all_parameters[1][1]
     i_support_fraction = all_parameters[2][1]
@@ -185,6 +185,8 @@ def calculate_score(allFiles, parameter, parameter_values, all_parameters):
             ari_values = ari[ari_runs].to_numpy()[0]
             
             f1Diff = (np.percentile(f1_values, 75) - np.percentile(f1_values, 25))/(np.percentile(f1_values, 75) + np.percentile(f1_values, 25))
+            if math.isnan(f1Diff):
+                f1Diff = 0
             f1_range_all.append([filename, p, f1Diff])
             f1_med_all.append([filename, p, np.percentile(f1_values, 50)])
             
@@ -202,6 +204,8 @@ def calculate_score(allFiles, parameter, parameter_values, all_parameters):
         df_f1_m[parameter] = df_f1_m[parameter].astype(float)
         df_ari_m[parameter] = df_ari_m[parameter].astype(float)
         parameter_values = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+   
+    
     ### Mann–Whitney U test
 
     mwu_f1_range = [[0 for i in range(len(parameter_values))] for j in range(len(parameter_values))]
@@ -215,19 +219,22 @@ def calculate_score(allFiles, parameter, parameter_values, all_parameters):
                 mwu_f1_range[i][j] = None
                 continue
             _, mwu_f1_range[i][j] = stats.mannwhitneyu(x=p1_values, y=p2_values, alternative = 'greater')
+
             j += 1
         i += 1
     mwu_df_f1_range = pd.DataFrame(mwu_f1_range, columns = parameter_values)
     mwu_df_f1_range.index = parameter_values
-    mwu_df_f1_range.to_csv("Mann–Whitney U test/MWU_SkEE_F1_Range_"+parameter+".csv")
+    mwu_df_f1_range.to_csv("Mann–Whitney U test/MWU_SkEE_F1_Range_"+parameter+"_"+str(p_iter)+".csv")
+    
     
     try:
+        mwu_f1_range = [[z+1 for z in y] for y in mwu_f1_range]
         mwu_geomean = gmean(gmean(mwu_f1_range))
         mwu_min = np.min(mwu_f1_range)
     except:
         mwu_geomean = 11
         mwu_min = 11
-    # print(df_f1_m)
+        
     parameter_value_max_f1_median = df_f1_m[parameter].loc[df_f1_m["F1Score_Median"].idxmax()]
     parameter_value_min_f1_range = df_f1_r[parameter].loc[df_f1_r["F1Score_Range"].idxmin()]  
     parameter_value_max_ari = df_ari_m[parameter].loc[df_ari_m["ARI"].idxmax()]
@@ -336,9 +343,6 @@ if __name__ == '__main__':
     
     for param_iteration in range(len(parameters)):
         for FileNumber in range(len(master_files)):
-        # rand_files = random.sample(master_files, 30)
-        
-        # for FileNumber in range(30):
             print(FileNumber, end=' ')
             ee(master_files[FileNumber], parameters, param_iteration)
             
@@ -350,7 +354,7 @@ if __name__ == '__main__':
         ari = [0]*len(parameters)
         for i in range(len(parameters)):
             if len(parameters[i][2]) > 1:
-                mwu_geomean, mwu_min, f1_median[i], f1_range[i], ari[i] = calculate_score(master_files, parameters[i][0], parameters[i][2], parameters)
+                mwu_geomean, mwu_min, f1_median[i], f1_range[i], ari[i] = calculate_score(master_files, parameters[i][0], parameters[i][2], parameters, param_iteration)
                 
                 MWU_geo[i] = mwu_geomean
                 MWU_min[i] = mwu_geomean
@@ -359,7 +363,7 @@ if __name__ == '__main__':
         if index_min == 2 and f1_range[index_min] == 0:
             f1_range[index_min] = None
             
-        if MWU_min[index_min] > 1:
+        if MWU_min[index_min] > 2:
             print("MWU_min: ", end='')
             print(MWU_min)
             break

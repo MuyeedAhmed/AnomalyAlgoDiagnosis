@@ -256,9 +256,13 @@ def calculate_score(allFiles, parameter, parameter_values, all_parameters):
         mwu_geomean = 11
         mwu_min = 11
     
-    parameter_value_max_f1_median = df_f1_m[parameter].loc[df_f1_m["F1Score_Median"].idxmax()]
-    parameter_value_min_f1_range = df_f1_r[parameter].loc[df_f1_r["F1Score_Range"].idxmin()]  
-    parameter_value_max_ari = df_ari_m[parameter].loc[df_ari_m["ARI"].idxmax()]
+    f1_m_grouped = df_f1_m.groupby(parameter)[["F1Score_Median"]].median().reset_index()
+    f1_r_grouped = df_f1_r.groupby(parameter)[["F1Score_Range"]].median().reset_index()
+    ari_m_grouped = df_ari_m.groupby(parameter)[["ARI"]].median().reset_index()
+    
+    parameter_value_max_f1_median = f1_m_grouped[parameter].loc[f1_m_grouped["F1Score_Median"].idxmax()]
+    parameter_value_min_f1_range = f1_r_grouped[parameter].loc[f1_r_grouped["F1Score_Range"].idxmin()]  
+    parameter_value_max_ari = ari_m_grouped[parameter].loc[ari_m_grouped["ARI"].idxmax()]
     
     return mwu_geomean, mwu_min, parameter_value_max_f1_median, parameter_value_min_f1_range, parameter_value_max_ari
 
@@ -391,7 +395,7 @@ if __name__ == '__main__':
                 mwu_geomean, mwu_min, f1_median[i], f1_range[i], ari[i] = calculate_score(master_files, parameters[i][0], parameters[i][2], parameters)
                 
                 MWU_geo[i] = mwu_geomean
-                MWU_min[i] = mwu_geomean
+                MWU_min[i] = mwu_min
         index_min = np.argmin(MWU_geo)
 
         if MWU_min[index_min] > 1:

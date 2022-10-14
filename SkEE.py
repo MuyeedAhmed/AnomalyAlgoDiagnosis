@@ -24,9 +24,7 @@ import matplotlib.pyplot as plt
 sns.set_theme(style="whitegrid")
 import scipy.stats as stats
 from scipy.stats import gmean
-# datasetFolderDir = '/Users/muyeedahmed/Desktop/Research/Dataset/Dataset_Anomaly/'
-# datasetFolderDir = '/home/neamtiu/Desktop/ma234/AnomalyDetection/Dataset/'
-# datasetFolderDir = '../Dataset_Combined/'
+
 datasetFolderDir = 'Dataset/'
 
 def ee(filename, parameters, parameter_iteration):
@@ -316,38 +314,38 @@ if __name__ == '__main__':
     parameters.append(["contamination", 0.1, contamination])
     
     
-    # R = ""
-    # for i in range(9):
-    #     R += "R"+str(i)+","
-    # R+="R9"
-    # ARI_R = ""
-    # for i in range(44):
-    #     ARI_R += "R"+str(i)+","
-    # ARI_R+="R44"
+    R = ""
+    for i in range(9):
+        R += "R"+str(i)+","
+    R+="R9"
+    ARI_R = ""
+    for i in range(44):
+        ARI_R += "R"+str(i)+","
+    ARI_R+="R44"
     
-    # if os.path.exists("Stats/SkEE_Accuracy.csv") == 0:
-    #     fstat_acc=open("Stats/SkEE_Accuracy.csv", "w")
-    #     fstat_acc.write('Filename,store_precision,assume_centered,support_fraction,contamination,Parameter_Iteration,'+R+"\n")
-    #     fstat_acc.close()
+    if os.path.exists("Stats/SkEE_Accuracy.csv") == 0:
+        fstat_acc=open("Stats/SkEE_Accuracy.csv", "w")
+        fstat_acc.write('Filename,store_precision,assume_centered,support_fraction,contamination,Parameter_Iteration,'+R+"\n")
+        fstat_acc.close()
         
-    # if os.path.exists("Stats/SkEE_F1.csv") == 0: 
-    #     fstat_f1=open("Stats/SkEE_F1.csv", "w")
-    #     fstat_f1.write('Filename,store_precision,assume_centered,support_fraction,contamination,Parameter_Iteration,'+R+"\n")
-    #     fstat_f1.close()
+    if os.path.exists("Stats/SkEE_F1.csv") == 0: 
+        fstat_f1=open("Stats/SkEE_F1.csv", "w")
+        fstat_f1.write('Filename,store_precision,assume_centered,support_fraction,contamination,Parameter_Iteration,'+R+"\n")
+        fstat_f1.close()
 
-    # if os.path.exists("Stats/SkEE_ARI.csv") == 0:    
-    #     fstat_ari=open("Stats/SkEE_ARI.csv", "w")
-    #     fstat_ari.write('Filename,store_precision,assume_centered,support_fraction,contamination,Parameter_Iteration,'+ARI_R+"\n")
-    #     fstat_ari.close()
-    # if os.path.exists("Stats/SkEE_Winners.csv") == 0:  
-    #     fstat_winner=open("Stats/SkEE_Winners.csv", "w")
-    #     fstat_winner.write('Parameter,MWU_P,Max_F1,Min_F1_Range,Max_ARI\n')
-    #     fstat_winner.close()
+    if os.path.exists("Stats/SkEE_ARI.csv") == 0:    
+        fstat_ari=open("Stats/SkEE_ARI.csv", "w")
+        fstat_ari.write('Filename,store_precision,assume_centered,support_fraction,contamination,Parameter_Iteration,'+ARI_R+"\n")
+        fstat_ari.close()
+    if os.path.exists("Stats/SkEE_Winners.csv") == 0:  
+        fstat_winner=open("Stats/SkEE_Winners.csv", "w")
+        fstat_winner.write('Parameter,MWU_P,Max_F1,Min_F1_Range,Max_ARI\n')
+        fstat_winner.close()
     
     for param_iteration in range(len(parameters)):
-    #     for FileNumber in range(len(master_files)):
-    #         print(FileNumber, end=' ')
-    #         ee(master_files[FileNumber], parameters, param_iteration)
+        for FileNumber in range(len(master_files)):
+            print(FileNumber, end=' ')
+            ee(master_files[FileNumber], parameters, param_iteration)
             
 
         MWU_geo = [10]*len(parameters)

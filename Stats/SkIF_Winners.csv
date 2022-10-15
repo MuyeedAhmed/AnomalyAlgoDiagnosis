@@ -1,0 +1,7 @@
+Parameter,MWU_P,Max_F1,Min_F1_Range,Max_ARI
+n_estimators,1.4292012592567185,32,512,512
+max_features,1.475708991317946,0.1,0.7,0.9
+max_samples,1.4908257850722009,0.4,0.9,1.0
+warm_start,1.4950522134598327,True,False,True
+n_jobs,1.4952572944903881,1,None,0
+bootstrap,1.5003820542177284,True,False,False

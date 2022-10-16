@@ -376,21 +376,18 @@ if __name__ == '__main__':
         fstat_winner.write('Parameter,Friedman,Max_F1,Min_F1_Range,Max_ARI\n')
         fstat_winner.close()
     for param_iteration in range(len(parameters)):
-        # for FileNumber in range(len(master_files)):
-        rand_files = random.sample(master_files, 30)
-        
-        for FileNumber in range(30):
+        for FileNumber in range(len(master_files)):
             print(FileNumber, end=' ')
-            ocsvm(rand_files[FileNumber], parameters, param_iteration)
+            ocsvm(master_files[FileNumber], parameters, param_iteration)
             
             
 
-        MWU_geo = [10]*9
-        MWU_min = [10]*9
-        f1_range = [0]*9
-        f1_median =[0]*9 
-        ari = [0]*9
-        for i in range(9):
+        MWU_geo = [10]*len(parameters)
+        MWU_min = [10]*len(parameters)
+        f1_range = [0]*len(parameters)
+        f1_median =[0]*len(parameters)
+        ari = [0]*len(parameters)
+        for i in range(len(parameters)):
             if len(parameters[i][2]) > 1:
                 mwu_geomean, mwu_min, f1_median[i], f1_range[i], ari[i] = calculate_score(master_files, parameters[i][0], parameters[i][2], parameters)
                 

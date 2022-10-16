@@ -409,12 +409,12 @@ if __name__ == '__main__':
             
             
 
-        MWU_geo = [10]*7
-        MWU_min = [10]*7
-        f1_range = [0]*7
-        f1_median =[0]*7 
-        ari = [0]*7
-        for i in range(7):
+        MWU_geo = [10]*len(parameters)
+        MWU_min = [10]*len(parameters)
+        f1_range = [0]*len(parameters)
+        f1_median =[0]*len(parameters) 
+        ari = [0]*len(parameters)
+        for i in range(len(parameters)):
             if len(parameters[i][2]) > 1:
                 mwu_geomean, mwu_min, f1_median[i], f1_range[i], ari[i] = calculate_score(master_files, parameters[i][0], parameters[i][2], parameters, param_iteration)
                 

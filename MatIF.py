@@ -266,13 +266,17 @@ if __name__ == '__main__':
         for i in range(winners.shape[0]):
             if parameters[param_iteration][0] == winners.loc[i,'Parameter']:
                 parameters[param_iteration][1] = winners.loc[i,'Min_F1_Range']
+                try:
+                    parameters[param_iteration][1] = int(parameters[param_iteration][1])
+                except:
+                    pass 
                 parameters[param_iteration][2] = [winners.loc[i,'Min_F1_Range']]                
     
-    param_iteration = 0
+    param_iteration = 2
     
-    for FileNumber in range(len(master_files)):
-        print(FileNumber, end=' ')
-        isolationforest(master_files[FileNumber], parameters, param_iteration)
+    # for FileNumber in range(len(master_files)):
+        # print(FileNumber, end=' ')
+        # isolationforest(master_files[FileNumber], parameters, param_iteration)
 
     MWU_geo = [10]*len(parameters)
     MWU_min = [10]*len(parameters)
@@ -298,7 +302,7 @@ if __name__ == '__main__':
         parameters[index_min][2] = [f1_range[index_min]]
     
         fstat_winner=open("Stats/MatIF_Winners.csv", "a")
-        fstat_winner.write(parameters[index_min][0]+','+str(MWU_geo[index_min])+','+str(f1_median[index_min])+','+str(f1_range[index_min])+','+str(ari[index_min])+'\n')
+        fstat_winner.write('\n'+parameters[index_min][0]+','+str(MWU_geo[index_min])+','+str(f1_median[index_min])+','+str(f1_range[index_min])+','+str(ari[index_min])+'\n')
         fstat_winner.close()
     
     print(parameters)

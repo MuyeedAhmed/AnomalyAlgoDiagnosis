@@ -1,3 +1,4 @@
 Parameter,MWU_P,Max_F1,Min_F1_Range,Max_ARI
 ContaminationFraction,1.466489282,0.15,IF,0
 NumLearners,1.429132162,512,512,512
+NumObservationsPerLearner,1.468488086,0.2,1,1

@@ -125,8 +125,8 @@ def plot_ari_f1():
     settings2_nondeter = settings2_run['ARI_Median'].values
     
     fig = plt.Figure()
-    plt.plot(settings2_nondeter, settings2_performance, ".", color = 'blue')
     plt.plot(settings1_nondeter, settings1_performance, ".", color = 'green')
+    plt.plot(settings2_nondeter, settings2_performance, ".", color = 'blue')
     plt.plot(default_nondeter, default_performance, "o", color='red')
     plt.title("Matlab - Isolation Forest")
     plt.xlabel("Determinism")

@@ -22,11 +22,13 @@ function main_function()
     ContaminationFraction.name = "ContaminationFraction";
     ContaminationFraction.default = "IF";
     ContaminationFraction.values = ["IF"];
-    %ContaminationFraction.default = 0;
-    %ContaminationFraction.values = [0, 0.05, 0.1, 0.15, 0.2, 0.25, "LOF", "IF"];
+%     ContaminationFraction.default = 0;
+%     ContaminationFraction.values = [0, 0.05, 0.1, 0.15, 0.2, 0.25, "LOF", "IF"];
     NumLearners.name = "NumLearners";
-    NumLearners.default = 100;
-    NumLearners.values = [1, 2, 4, 8, 16, 32, 64, 100, 128, 256, 512];
+    NumLearners.default = 512;
+    NumLearners.values = [512];
+%     NumLearners.default = 100;
+%     NumLearners.values = [1, 2, 4, 8, 16, 32, 64, 100, 128, 256, 512];
     NumObservationsPerLearner.name = "NumObservationsPerLearner";
     NumObservationsPerLearner.default = "auto";
     NumObservationsPerLearner.values = ["auto", 0.05, 0.1, 0.2, 0.5, 1];

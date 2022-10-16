@@ -37,9 +37,9 @@ def ocsvm(filename, parameters, parameter_iteration):
     folderpath = datasetFolderDir
     
     if os.path.exists(folderpath+filename+".mat") == 1:
-        if os.path.getsize(folderpath+filename+".mat") > 200000: # 200KB
-            # print("Didn\'t run -> Too large - ", filename)    
-            return
+        # if os.path.getsize(folderpath+filename+".mat") > 200000: # 200KB
+        #     # print("Didn\'t run -> Too large - ", filename)    
+        #     return
         try:
             df = loadmat(folderpath+filename+".mat")
         except NotImplementedError:
@@ -53,9 +53,9 @@ def ocsvm(filename, parameters, parameter_iteration):
             return
         
     elif os.path.exists(folderpath+filename+".csv") == 1:
-        if os.path.getsize(folderpath+filename+".csv") > 200000: # 200KB
-            print("Didn\'t run -> Too large - ", filename)    
-            return
+        # if os.path.getsize(folderpath+filename+".csv") > 200000: # 200KB
+        #     # print("Didn\'t run -> Too large - ", filename)    
+        #     return
         X = pd.read_csv(folderpath+filename+".csv")
         target=X["target"].to_numpy()
         X=X.drop("target", axis=1)

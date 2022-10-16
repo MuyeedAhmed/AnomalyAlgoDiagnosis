@@ -14,19 +14,12 @@ import mat73
 from scipy.io import loadmat
 import numpy as np
 from sklearn import metrics
-from copy import copy, deepcopy
 from sklearn.metrics.cluster import adjusted_rand_score
-# import pingouin as pg
-import random
-import seaborn as sns
-import matplotlib.pyplot as plt
-sns.set_theme(style="whitegrid")
 import scipy.stats as stats
 from scipy.stats import gmean
 import math
 
 datasetFolderDir = 'Dataset/'
-
 
 def isolationforest(filename, parameters, parameter_iteration):
     print(filename)
@@ -76,11 +69,13 @@ def isolationforest(filename, parameters, parameter_iteration):
     
 def runIF(filename, X, gt, params, parameter_iteration):
     
-    labelFile = filename + str(params[0][1]) + "_" + str(params[1][1]) + "_" + str(params[2][1])
+    labelFile = filename + "_" + str(params[0][1]) + "_" + str(params[1][1]) + "_" + str(params[2][1])
 
     if os.path.exists("IF_Matlab/Labels_Mat_IF_"+labelFile+".csv") == 0:
-        # print("IF_Matlab/Labels_Mat_IF_"+labelFile+".csv")
         return
+    if os.path.exists("IF_Matlab_Done/Labels_Mat_IF_"+labelFile+".csv"):
+        return
+    
     
     labels = []
     # accuracy = []
@@ -95,8 +90,10 @@ def runIF(filename, X, gt, params, parameter_iteration):
     for i in range(len(labels)):
         for j in range(i+1, len(labels)):
           ari.append(adjusted_rand_score(labels[i], labels[j]))
-    # print(np.mean(f1), end=' - ')
-    # print(np.mean(ari), end=' - ')
+          
+    flabel_done=open("IF_Matlab_Done/Labels_Mat_IF_"+labelFile+".csv", 'a')
+    flabel_done.write("Done")
+    flabel_done.close()
     
     fstat_f1=open("Stats/MatIF_F1.csv", "a")
     fstat_f1.write(filename+','+ str(params[0][1]) + ','+ str(params[1][1]) + ',' + str(params[2][1]) + ',' + str(parameter_iteration) + ',')
@@ -167,16 +164,6 @@ def calculate_score(allFiles, parameter, parameter_values, all_parameters, p_ite
     df_f1_m = pd.DataFrame(f1_med_all, columns = ['Filename', parameter, 'F1Score_Median'])
     df_ari_m = pd.DataFrame(ari_all, columns = ['Filename', parameter, 'ARI'])
     
-    # if parameter == 'n_jobs':
-    #     df_f1_r = df_f1_r.fillna(0)
-    #     df_f1_m = df_f1_m.fillna(0)
-    #     df_ari_m = df_ari_m.fillna(0)
-    #     df_f1_r[parameter] = df_f1_r[parameter].astype(int)
-    #     df_f1_m[parameter] = df_f1_m[parameter].astype(int)
-    #     df_ari_m[parameter] = df_ari_m[parameter].astype(int)
-    #     parameter_values = [1, 0]
-
-
     
     ### Mann–Whitney U test
 
@@ -214,107 +201,6 @@ def calculate_score(allFiles, parameter, parameter_values, all_parameters, p_ite
     parameter_value_max_ari = ari_m_grouped[parameter].loc[ari_m_grouped["ARI"].idxmax()]
     
     return mwu_geomean, mwu_min, parameter_value_max_f1_median, parameter_value_min_f1_range, parameter_value_max_ari
-
-def plot_ari_f1():
-    df_f1 = pd.read_csv("Stats/MatIF_F1.csv")
-    df_ari = pd.read_csv("Stats/MatIF_ARI.csv")
-    
-    runs_r = []
-    runs_ari = []
-    
-    for i in range(10):
-        runs_r.append(('R'+str(i)))
-    for i in range(45):
-        runs_ari.append(('R'+str(i)))
-
-    df_f1["F1_Median"] = 0
-    df_f1["F1_Range"] = 0
-    df_ari["ARI_Median"] = 0
-    
-    for i in range(df_f1.shape[0]):
-        run_values = df_f1.loc[i, runs_r].tolist()
-        
-        range_ = (np.percentile(run_values, 75) - np.percentile(run_values, 25))/(np.percentile(run_values, 75) + np.percentile(run_values, 25))
-        if math.isnan(range_):
-            range_ = 0
-            
-        df_f1.iloc[i, df_f1.columns.get_loc('F1_Median')] =  np.mean(run_values)
-        df_f1.iloc[i, df_f1.columns.get_loc('F1_Range')] = range_
-    df_f1 = df_f1.drop(columns=runs_r, axis=1)
-        
-    for i in range(df_ari.shape[0]):
-        run_values = df_ari.loc[i, runs_ari].tolist()
-        df_ari.iloc[i, df_ari.columns.get_loc('ARI_Median')] =  np.mean(run_values)
-    df_ari= df_ari.drop(columns=runs_ari, axis=1)
-    
-    df_all = pd.merge(df_f1, df_ari,  how='left', left_on=["Filename","ContaminationFraction", "NumLearners", "NumObservationsPerLearner", "Parameter_Iteration"], right_on = ["Filename","ContaminationFraction", "NumLearners", "NumObservationsPerLearner", "Parameter_Iteration"])
-    
-    df_all.to_csv("Stats/MatIF_Merged.csv")
-    
-    median_df = df_all.groupby(["ContaminationFraction", "NumLearners", "NumObservationsPerLearner"])[["F1_Median", "F1_Range", "ARI_Median"]].mean()
-    median_df = median_df.reset_index()
-    
-    median_df.to_csv("Stats/MatIF_Grouped_Median.csv")
-
-    '''
-    Plot Group Summary
-    '''
-    i_ContaminationFraction=0
-    i_NumLearners=100
-    i_NumObservationsPerLearner='auto'
-   
-    default_run = median_df[(median_df['ContaminationFraction']==str(i_ContaminationFraction))&
-                    (median_df['NumLearners']==i_NumLearners)&
-                    (median_df['NumObservationsPerLearner']==str(i_NumObservationsPerLearner))]
-    
-    default_performance = default_run['F1_Median'].values[0]
-    default_nondeter = default_run['ARI_Median'].values[0]
-        
-    
-    performance = median_df["F1_Median"].values
-    nondeterminism = median_df["ARI_Median"].values
-
-    fig = plt.Figure()
-    plt.plot(nondeterminism, performance, ".")
-    plt.plot(default_nondeter, default_performance, "o")
-    plt.title("Matlab - Isolation Forest")
-    plt.xlabel("Determinism")
-    plt.ylabel("Performance")
-    plt.savefig("Fig/MatIF_F1_ARI.pdf", bbox_inches="tight", pad_inches=0)
-    plt.show()
-    
-    '''
-    Plot For All Dataset
-    '''
-    ## Default
-    default_run = df_all[(df_all['ContaminationFraction']==str(0))&
-                    (df_all['NumLearners']==100)&
-                    (df_all['NumObservationsPerLearner']=='auto')]
-    default_performance = default_run['F1_Median'].values
-    default_nondeter = default_run['ARI_Median'].values
-    ## Settings 1
-    settings1_run = df_all[(df_all['ContaminationFraction']=='IF')&
-                    (df_all['NumLearners']==100)&
-                    (df_all['NumObservationsPerLearner']=='auto')]
-    settings1_performance = settings1_run['F1_Median'].values
-    settings1_nondeter = settings1_run['ARI_Median'].values
-    
-    ## Settings 2
-    settings2_run = df_all[(df_all['ContaminationFraction']=='LOF')&
-                    (df_all['NumLearners']==100)&
-                    (df_all['NumObservationsPerLearner']=='auto')]
-    settings2_performance = settings2_run['F1_Median'].values
-    settings2_nondeter = settings2_run['ARI_Median'].values
-    
-    fig = plt.Figure()
-    plt.plot(settings2_nondeter, settings2_performance, ".", color = 'blue')
-    plt.plot(settings1_nondeter, settings1_performance, ".", color = 'green')
-    plt.plot(default_nondeter, default_performance, "o", color='red')
-    plt.title("Matlab - Isolation Forest")
-    plt.xlabel("Determinism")
-    plt.ylabel("Performance")
-    plt.savefig("Fig/MatIF_D_F1_ARI.pdf", bbox_inches="tight", pad_inches=0)
-    plt.show()
     
     
 def remove_file_extension():
@@ -360,54 +246,59 @@ if __name__ == '__main__':
         fstat_f1=open("Stats/MatIF_F1.csv", "w")
         fstat_f1.write('Filename,ContaminationFraction,NumLearners,NumObservationsPerLearner,Parameter_Iteration,'+R+"\n")
         fstat_f1.close()
-
+        
     if os.path.exists("Stats/MatIF_ARI.csv") == 0:    
         fstat_ari=open("Stats/MatIF_ARI.csv", "w")
         fstat_ari.write('Filename,ContaminationFraction,NumLearners,NumObservationsPerLearner,Parameter_Iteration,'+ARI_R+"\n")
         fstat_ari.close()
-    if os.path.exists("Stats/MatIF_Winners.csv") == 0:  
+        
+    if os.path.exists("Stats/MatIF_Winners.csv") == 0:
         fstat_winner=open("Stats/MatIF_Winners.csv", "w")
         fstat_winner.write('Parameter,MWU_P,Max_F1,Min_F1_Range,Max_ARI\n')
         fstat_winner.close()
     
-    # # # for param_iteration in range(len(parameters)):
+    # # for param_iteration in range(len(parameters)):
+    winners = pd.read_csv("Stats/MatIF_Winners.csv")
+    for param_iteration in range(len(parameters)):
+        for i in range(winners.shape[0]):
+            if parameters[param_iteration][0] == winners.loc[i,'Parameter']:
+                parameters[param_iteration][1] = winners.loc[i,'Min_F1_Range']
+                parameters[param_iteration][2] = [winners.loc[i,'Min_F1_Range']]                
     
-    # param_iteration = 0
-    # for FileNumber in range(len(master_files)):
-    #     print(FileNumber, end=' ')
-    #     isolationforest(master_files[FileNumber], parameters, param_iteration)
+    param_iteration = 0
+    
+    for FileNumber in range(len(master_files)):
+        print(FileNumber, end=' ')
+        isolationforest(master_files[FileNumber], parameters, param_iteration)
 
-    # MWU_geo = [10]*len(parameters)
-    # MWU_min = [10]*len(parameters)
-    # f1_range = [0]*len(parameters)
-    # f1_median =[0]*len(parameters)
-    # ari = [0]*len(parameters)
-    # for i in range(len(parameters)):
-    #     if len(parameters[i][2]) > 1:
-    #         mwu_geomean, mwu_min, f1_median[i], f1_range[i], ari[i] = calculate_score(master_files, parameters[i][0], parameters[i][2], parameters, param_iteration)
+    MWU_geo = [10]*len(parameters)
+    MWU_min = [10]*len(parameters)
+    f1_range = [0]*len(parameters)
+    f1_median =[0]*len(parameters)
+    ari = [0]*len(parameters)
+    for i in range(len(parameters)):
+        if len(parameters[i][2]) > 1:
+            mwu_geomean, mwu_min, f1_median[i], f1_range[i], ari[i] = calculate_score(master_files, parameters[i][0], parameters[i][2], parameters, param_iteration)
             
-    #         MWU_geo[i] = mwu_geomean
-    #         MWU_min[i] = mwu_min
-    # index_min = np.argmin(MWU_geo)
+            MWU_geo[i] = mwu_geomean
+            MWU_min[i] = mwu_min
+    index_min = np.argmin(MWU_geo)
 
-    # if index_min == 5 and f1_range[index_min] == 0:
-    #     f1_range[index_min] = None
-    # if MWU_min[index_min] > 2:
-    #     print("MWU_min: ", end='')
-    #     print(MWU_min)
-    #     # break
-    # else:
-    #     parameters[index_min][1] = f1_range[index_min]
-    #     parameters[index_min][2] = [f1_range[index_min]]
+    if index_min == 5 and f1_range[index_min] == 0:
+        f1_range[index_min] = None
+    if MWU_min[index_min] > 2:
+        print("MWU_min: ", end='')
+        print(MWU_min)
+        # break
+    else:
+        parameters[index_min][1] = f1_range[index_min]
+        parameters[index_min][2] = [f1_range[index_min]]
     
-    #     fstat_winner=open("Stats/MatIF_Winners.csv", "a")
-    #     fstat_winner.write(parameters[index_min][0]+','+str(MWU_geo[index_min])+','+str(f1_median[index_min])+','+str(f1_range[index_min])+','+str(ari[index_min])+'\n')
-    #     fstat_winner.close()
+        fstat_winner=open("Stats/MatIF_Winners.csv", "a")
+        fstat_winner.write(parameters[index_min][0]+','+str(MWU_geo[index_min])+','+str(f1_median[index_min])+','+str(f1_range[index_min])+','+str(ari[index_min])+'\n')
+        fstat_winner.close()
     
-    # print(parameters)        
-        
-        
-    # plot_ari_f1()
+    print(parameters)
         
         
         

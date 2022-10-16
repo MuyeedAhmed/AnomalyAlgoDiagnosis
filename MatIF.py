@@ -272,11 +272,11 @@ if __name__ == '__main__':
                     pass 
                 parameters[param_iteration][2] = [winners.loc[i,'Min_F1_Range']]                
     
-    param_iteration = 2
+    param_iteration = len(parameters)
     
-    # for FileNumber in range(len(master_files)):
-        # print(FileNumber, end=' ')
-        # isolationforest(master_files[FileNumber], parameters, param_iteration)
+    for FileNumber in range(len(master_files)):
+        print(FileNumber, end=' ')
+        isolationforest(master_files[FileNumber], parameters, param_iteration)
 
     MWU_geo = [10]*len(parameters)
     MWU_min = [10]*len(parameters)

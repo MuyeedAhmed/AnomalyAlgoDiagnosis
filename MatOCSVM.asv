@@ -48,6 +48,31 @@ function main_function()
     
     parameters = [ContaminationFraction, KernelScale, Lambda, NumExpansionDimensions, StandardizeData, BetaTolerance, GradientTolerance, IterationLimit];
 
+%     if isfile("Stats/MatlabOCSVM_F1.csv") == false
+%         R = "";
+%         for i=1:9
+%             R = R+"R"+i+",";
+%         end
+%         R=R+"R10";
+%         fid = fopen('Stats/MatlabOCSVM_F1.csv', 'w');
+%         fprintf(fid, "Filename,store_precision,assume_centered,support_fraction,contamination,Parameter_Iteration,"+R+"\n");
+%         fclose(fid);
+%     end
+%     if isfile("Stats/MatlabOCSVM_ARI.csv") == false
+%         ARI_R = "";
+%         for i =1:44
+%             ARI_R = ARI_R + "R"+i+",";
+%         end
+%         ARI_R = ARI_R+"R45";
+%         fid = fopen('Stats/MatlabOCSVM_ARI.csv', 'w');
+%         fprintf(fid, "Filename,store_precision,assume_centered,support_fraction,contamination,"+ARI_R+"\n");
+%         fclose(fid);
+%     end
+%     if isfile("Stats/MatlabOCSVM_Winners.csv") == false
+%         fid = fopen('Stats/MatlabOCSVM_ARI.csv', 'w');
+%         fprintf(fid, "Parameter,MWU_P,Max_F1,Min_F1_Range,Max_ARI\n");
+%         fclose(fid);
+%     end
     filenamesize = size(filenames);
     
     for i = 1:filenamesize(2)
@@ -133,12 +158,14 @@ function runOCSVM(filename, X, y, params)
     p8 = params(8).default;
     if string(p1) == "LOF"
         percentage_table = readtable("Stats/SkPercentage.csv");
-        percentage_table_file = percentage_table(string(percentage_table.Filename)==filename, :);
+        filename_char = convertStringsToChars(filename);
+        percentage_table_file = percentage_table(string(percentage_table.Filename)==filename_char(1:end-4), :);
         p1 = percentage_table_file.LOF;
     elseif string(p1) == "IF"
         disp(p1)
         percentage_table = readtable("Stats/SkPercentage.csv");
-        percentage_table_file = percentage_table(string(percentage_table.Filename)==filename, :);
+        filename_char = convertStringsToChars(filename);
+        percentage_table_file = percentage_table(string(percentage_table.Filename)==filename_char(1:end-4), :);
         p1 = percentage_table_file.IF;        
     end
     sX = string([1:size(X, 2)]);

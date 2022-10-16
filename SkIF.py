@@ -292,60 +292,6 @@ def calculate_score(allFiles, parameter, parameter_values, all_parameters, p_ite
     parameter_value_max_ari = ari_m_grouped[parameter].loc[ari_m_grouped["ARI"].idxmax()]
     
     return mwu_geomean, mwu_min, parameter_value_max_f1_median, parameter_value_min_f1_range, parameter_value_max_ari
-
-def plot_acc_range():
-    df = pd.read_csv("Stats/SkIF_F1.csv")
-    runs = []
-    for i in range(10):
-        runs.append(('R'+str(i)))
-    
-    df["Performance"] = 0
-    df["Nondeterminism"] = 0
-    for i in range(df.shape[0]):
-        run_values = df.loc[i, runs].tolist()
-        
-        range_ = (np.percentile(run_values, 75) - np.percentile(run_values, 25))/(np.percentile(run_values, 75) + np.percentile(run_values, 25))
-        
-        df.iloc[i, df.columns.get_loc('Performance')] =  np.mean(run_values)
-        df.iloc[i, df.columns.get_loc('Nondeterminism')] = range_
-    
-    median_df = df.groupby(["n_estimators", "max_samples", "max_features", "bootstrap", "n_jobs", "warm_start"])[["Performance", "Nondeterminism"]].median()
-    median_df = median_df.reset_index()
-    
-    print(median_df.iloc[median_df["Performance"].idxmax()])
-    print(median_df.iloc[median_df["Nondeterminism"].idxmin()])
-    
-    
-    
-    i_n_estimators=100
-    i_max_samples='auto'
-    i_contamination='auto' 
-    i_max_features=1.0
-    i_bootstrap=False
-    i_n_jobs="None"
-    i_warm_start = False
-    default_run = median_df[(median_df['n_estimators']==i_n_estimators)&
-                                    (median_df['max_samples']==str(i_max_samples))&
-                                    (median_df['max_features']==i_max_features)&
-                                    (median_df['bootstrap']==i_bootstrap)&
-                                    (median_df['n_jobs']==str(i_n_jobs))&
-                                    (median_df['warm_start']==i_warm_start)]
-    default_performance = default_run['Performance'].values[0]
-    default_nondeter = default_run['Nondeterminism'].values[0]
-        
-    
-    performance = median_df["Performance"].values
-    nondeterminism = median_df["Nondeterminism"].values
-
-    fig = plt.Figure()
-    plt.plot(nondeterminism, performance, ".")
-    plt.plot(default_nondeter, default_performance, "o")
-    plt.title("F1 Score")
-    plt.xlabel("Nondeterminism")
-    plt.ylabel("Performance")
-    plt.savefig("Fig/IF_Sk_F1_Iter2.pdf", bbox_inches="tight", pad_inches=0)
-    plt.show()
-    
     
 if __name__ == '__main__':
     folderpath = datasetFolderDir
@@ -437,8 +383,6 @@ if __name__ == '__main__':
         
         print(parameters)        
         
-        
-    # plot_acc_range()
         
         
         

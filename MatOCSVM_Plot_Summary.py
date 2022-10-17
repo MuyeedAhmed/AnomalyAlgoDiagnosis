@@ -119,7 +119,7 @@ def plot_ari_f1():
     default_nondeter = default_run['ARI_Median'].values
     ## Settings 1
     settings1_run = df_all[(df_all['ContaminationFraction']=='IF')&
-                           (df_all['KernelScale']==str(1))&
+                           (df_all['KernelScale']=='auto')&
                            (df_all['Lambda']=='auto')&
                            (df_all['NumExpansionDimensions']=='auto')&
                            (df_all['StandardizeData']==0)&

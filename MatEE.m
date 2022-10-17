@@ -161,7 +161,7 @@ function runEE(filename_with_extension, X, y, params)
         
             elseif strcmp(p1, "ogk") == 1
                 [sig,mu,mah,outliers] = robustcov(X, Method=p1, NumOGKIterations=p5, UnivariateEstimator=p6);
-            elseif strcmp(p1, "olivehawkins") == 1 
+            elseif strcmp(p1, "olivehawkins") == 1
                 [sig,mu,mah,outliers] = robustcov(X, Method=p1, OutlierFraction=p2, ...
                     ReweightingMethod=p7, NumConcentrationSteps=p8, StartMethod=p9);
             end

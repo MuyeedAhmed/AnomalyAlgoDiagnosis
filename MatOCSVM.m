@@ -79,7 +79,7 @@ end
 function OCSVM(filename, parameters)
     readfilename = sprintf('Dataset/%s', filename);
     the_size=dir(readfilename).bytes;
-    if the_size > 1000000
+    if the_size > 200000
         return
     end
     
@@ -115,7 +115,7 @@ function OCSVM(filename, parameters)
     end
 end
 %% Run OCSVM
-function runOCSVM(filename, X, y, params)
+function runOCSVM(filename_with_extension, X, y, params)
     filename_char = convertStringsToChars(filename_with_extension);
     filename = filename_char(1:end-4);
     labelFile = "OCSVM_Matlab/Labels_Mat_OCSVM_"+filename + "_" + params(1).default + "_" + params(2).default + "_" + params(3).default + "_" + params(4).default + "_" + params(5).default + "_" + params(6).default + "_" + params(7).default + "_" + params(8).default + ".csv";
@@ -136,7 +136,6 @@ function runOCSVM(filename, X, y, params)
         percentage_table_file = percentage_table(string(percentage_table.Filename)==filename, :);
         p1 = percentage_table_file.LOF;
     elseif string(p1) == "IF"
-        disp(p1)
         percentage_table = readtable("Stats/SkPercentage.csv");
         percentage_table_file = percentage_table(string(percentage_table.Filename)==filename, :);
         p1 = percentage_table_file.IF;        

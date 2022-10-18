@@ -20,8 +20,8 @@ function main_function()
 
     parameters = [];
     ContaminationFraction.name = "ContaminationFraction";
-    ContaminationFraction.default = "IF";
-    ContaminationFraction.values = ["IF"];
+    ContaminationFraction.default = "LOF";
+    ContaminationFraction.values = ["LOF"];
 %     ContaminationFraction.default = 0;
 %     ContaminationFraction.values = [0, 0.05, 0.1, 0.15, 0.2, 0.25, "LOF", "IF"];
     KernelScale.name = "KernelScale";

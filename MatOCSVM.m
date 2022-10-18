@@ -25,8 +25,10 @@ function main_function()
 %     ContaminationFraction.default = 0;
 %     ContaminationFraction.values = [0, 0.05, 0.1, 0.15, 0.2, 0.25, "LOF", "IF"];
     KernelScale.name = "KernelScale";
-    KernelScale.default = 1;
-    KernelScale.values = [1, "auto", 0.01, 0.05, 0.1, 0.2, 0.5, 1, 2, 5];
+    KernelScale.default = "auto";
+    KernelScale.values = ["auto"];
+%     KernelScale.default = 1;
+%     KernelScale.values = [1, "auto", 0.01, 0.05, 0.1, 0.2, 0.5, 1, 2, 5];
     Lambda.name = "Lambda";
     Lambda.default = "auto";
     Lambda.values = ["auto", 0.01, 0.05, 0.1, 0.2, 0.5, 1, 2, 5];

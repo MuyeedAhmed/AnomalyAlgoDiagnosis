@@ -21,7 +21,8 @@ function main_function()
     parameters = [];
 
     Method.name = "Method";
-    Method.default = "fmcd";
+    Method.default = "ogk";
+%     Method.default = "fmcd";
     Method.values = ["fmcd", "ogk", "olivehawkins"];
     OutlierFraction.name = "OutlierFraction";% fcmd, olivehawkins
     OutlierFraction.default = 0.5;

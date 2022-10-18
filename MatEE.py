@@ -177,7 +177,7 @@ def calculate_score(allFiles, parameter, parameter_values, all_parameters, p_ite
                         (dfari['ReweightingMethod']==i_ReweightingMethod)&
                         (dfari['NumConcentrationSteps']==i_NumConcentrationSteps)&
                         (dfari['StartMethod']==i_StartMethod)]
-                        
+            
             f1_values = f1[f1_runs].to_numpy()[0]
             ari_values = ari[ari_runs].to_numpy()[0]
             

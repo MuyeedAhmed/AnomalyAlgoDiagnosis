@@ -6,7 +6,8 @@ Created on Sun Oct 16 02:42:43 2022
 @author: muyeedahmed
 """
 
-
+import warnings
+warnings.filterwarnings("ignore")
 import os
 import glob
 import pandas as pd
@@ -31,7 +32,7 @@ datasetFolderDir = 'Dataset/'
 
 
 
-def plot_ari_f1():
+def calculate():
     df_f1 = pd.read_csv("Stats/SkIF_F1.csv")
     df_ari = pd.read_csv("Stats/SkIF_ARI.csv")
     
@@ -69,17 +70,21 @@ def plot_ari_f1():
 
     df_all = pd.merge(df_f1, df_ari,  how='left', left_on=join_on, right_on =join_on)
     
-    df_all.to_csv("Stats/SkIF_Merged.csv")
+    df_all.to_csv("Stats/SkIF_Merged.csv", index=False)
     
     median_df = df_all.groupby(parameter_names)[["F1_Median", "F1_Range", "ARI_Median"]].mean()
     median_df = median_df.reset_index()
     
-    median_df.to_csv("Stats/SkIF_Grouped_Median.csv")
+    median_df.to_csv("Stats/SkIF_Grouped_Median.csv", index=False)
     
     
-    print(median_df.iloc[median_df["Performance"].idxmax()])
-    print(median_df.iloc[median_df["Nondeterminism"].idxmin()])
+    # print(median_df.iloc[median_df["F1_Median"].idxmax()])
+    # print(median_df.iloc[median_df["ARI_Median"].idxmin()])
+
+def plot_ari_f1():
     
+    median_df = pd.read_csv("Stats/SkIF_Grouped_Median.csv")    
+    df_all = pd.read_csv("Stats/SkIF_Merged.csv")
     '''
     Plot Group Summary
     '''
@@ -90,17 +95,17 @@ def plot_ari_f1():
     i_bootstrap=False
     i_n_jobs="None"
     i_warm_start = False
-    default_run = median_df[(median_df['n_estimators']==i_n_estimators)&
+    default_run_mean = median_df[(median_df['n_estimators']==i_n_estimators)&
                             (median_df['max_samples']==str(i_max_samples))&
                             (median_df['max_features']==i_max_features)&
                             (median_df['bootstrap']==i_bootstrap)&
                             (median_df['n_jobs']==str(i_n_jobs))&
                             (median_df['warm_start']==i_warm_start)]
 
-       
-    default_performance = default_run['F1_Median'].values[0]
-    default_nondeter_range = default_run['F1_Range'].values[0]
-    default_nondeter_ari = default_run['ARI_Median'].values[0]
+    
+    mean_default_performance = default_run_mean['F1_Median'].values[0]
+    mean_default_nondeter_range = default_run_mean['F1_Range'].values[0]
+    mean_default_nondeter_ari = default_run_mean['ARI_Median'].values[0]
     
     performance = median_df["F1_Median"].values    
     nondeterminism_range = median_df["F1_Range"].values
@@ -108,7 +113,7 @@ def plot_ari_f1():
 
     fig = plt.Figure()
     plt.plot(nondeterminism_range, performance, ".")
-    plt.plot(default_nondeter_range, default_performance, "o")
+    plt.plot(mean_default_nondeter_range, mean_default_performance, "d")
     plt.title("Scikit-learn - Isolation Forest")
     plt.xlabel("Nondeterminism (F1 Score Range)")
     plt.ylabel("Performance (F1 Score)")
@@ -117,7 +122,7 @@ def plot_ari_f1():
 
     fig = plt.Figure()
     plt.plot(nondeterminism_ari, performance, ".")
-    plt.plot(default_nondeter_ari, default_performance, "o")
+    plt.plot(mean_default_nondeter_ari, mean_default_performance, marker ='d')
     plt.title("Scikit-learn - Isolation Forest")
     plt.xlabel("Determinism (ARI)")
     plt.ylabel("Performance (F1 Score)")
@@ -129,14 +134,14 @@ def plot_ari_f1():
     Plot For All Dataset
     '''
     ## Default
-    default_run = df_all[(df_all['n_estimators']==i_n_estimators)&
+    default_run_all = df_all[(df_all['n_estimators']==i_n_estimators)&
                         (df_all['max_samples']==str(i_max_samples))&
                         (df_all['max_features']==i_max_features)&
                         (df_all['bootstrap']==i_bootstrap)&
                         (df_all['n_jobs']==str(i_n_jobs))&
                         (df_all['warm_start']==i_warm_start)]
-    default_performance = default_run['F1_Median'].values
-    default_nondeter = default_run['ARI_Median'].values
+    default_all_performance = default_run_all['F1_Median'].values
+    default_all_nondeter = default_run_all['ARI_Median'].values
     
     ## Settings 1
     settings1_run = df_all[(df_all['n_estimators']==512)&
@@ -147,6 +152,15 @@ def plot_ari_f1():
                         (df_all['warm_start']==False)]
     settings1_performance = settings1_run['F1_Median'].values
     settings1_nondeter = settings1_run['ARI_Median'].values
+    
+    mean_settings1 = median_df[(median_df['n_estimators']==512)&
+                                    (median_df['max_samples']==str(1.0))&
+                                    (median_df['max_features']==0.7)&
+                                    (median_df['bootstrap']==False)&
+                                    (median_df['n_jobs']==str(None))&
+                                    (median_df['warm_start']==False)]
+    mean_settings1_performance = mean_settings1['F1_Median'].values
+    mean_settings1_nondeter = mean_settings1['ARI_Median'].values
     
     ## Settings 2
     settings2_run = df_all[(df_all['n_estimators']==512)&
@@ -159,13 +173,29 @@ def plot_ari_f1():
     settings2_performance = settings2_run['F1_Median'].values
     settings2_nondeter = settings2_run['ARI_Median'].values
     
+    mean_settings2 = median_df[(median_df['n_estimators']==512)&
+                                    (median_df['max_samples']==str(0.4))&
+                                    (median_df['max_features']==0.7)&
+                                    (median_df['bootstrap']==False)&
+                                    (median_df['n_jobs']==str(None))&
+                                    (median_df['warm_start']==False)]
+    mean_settings2_performance = mean_settings2['F1_Median'].values
+    mean_settings2_nondeter = mean_settings2['ARI_Median'].values
+    
     fig = plt.Figure()
-    plt.plot(settings2_nondeter, settings2_performance, ".", color = 'blue')
-    plt.plot(settings1_nondeter, settings1_performance, ".", color = 'green')
-    plt.plot(default_nondeter, default_performance, ".", color='red')
+    
+    plt.plot(default_all_nondeter, default_all_performance, '.', color='red', marker = 'd', markersize = 4, alpha=.5)
+    plt.plot(settings1_nondeter, settings1_performance, '.', color = 'green', marker = 'v', markersize = 4, alpha=.5)
+    plt.plot(settings2_nondeter, settings2_performance, '.', color = 'blue', marker = '^', markersize = 4, alpha=.5)
+     
+    plt.plot(mean_default_nondeter_ari, mean_default_performance, '.', color='red', marker = 'd', markersize = 8, markeredgecolor='black', markeredgewidth=1.5)
+    plt.plot(mean_settings1_nondeter, mean_settings1_performance, '.', color = 'green', marker = 'v', markersize = 8, markeredgecolor='black', markeredgewidth=1.5)
+    plt.plot(mean_settings2_nondeter, mean_settings2_performance, '.', color = 'blue', marker = '^', markersize = 8, markeredgecolor='black', markeredgewidth=1.5)
+    
+    plt.legend(['Default Setting', 'Custom Setting 1', 'Custom Setting 2'])
     plt.title("Scikit-learn - Isolation Forest")
-    plt.xlabel("Determinism")
-    plt.ylabel("Performance")
+    plt.xlabel("Determinism (ARI)")
+    plt.ylabel("Performance (F1 Score)")
     plt.savefig("Fig/SkIF_D_F1_ARI.pdf", bbox_inches="tight", pad_inches=0)
     plt.show()
     
@@ -179,10 +209,11 @@ def plot_ari_f1():
     s2_lose_performance = 0
     s2_win_nd = 0
     s2_lose_nd = 0
-    for i in range(default_run.shape[0]):
-        fname = default_run.iloc[i]["Filename"]
-        F1_Median = default_run.iloc[i]["F1_Median"]
-        ARI_Median = default_run.iloc[i]["ARI_Median"]
+
+    for i in range(default_run_all.shape[0]):
+        fname = default_run_all.iloc[i]["Filename"]
+        F1_Median = default_run_all.iloc[i]["F1_Median"]
+        ARI_Median = default_run_all.iloc[i]["ARI_Median"]
         s1_run = settings1_run[settings1_run["Filename"] == fname]
         s1_F1_Median = s1_run["F1_Median"].values
         s1_ARI_Median = s1_run["ARI_Median"].values
@@ -206,22 +237,18 @@ def plot_ari_f1():
             s2_win_nd += 1
         elif s2_ARI_Median > ARI_Median:
             s2_lose_nd += 1
-            
-    print(s1_win_performance/(s1_win_performance+s1_lose_performance))
-    print(s1_win_nd/(s1_win_nd+s1_lose_nd))
     
-    print(s2_win_performance/(s2_win_performance+s2_lose_performance))
+    
+    print("Setting 1", end=': ')
+    print(s1_win_performance/(s1_win_performance+s1_lose_performance), end=' / ')
+    print(s1_win_nd/(s1_win_nd+s1_lose_nd))
+    print("Setting 2", end=': ')
+    print(s2_win_performance/(s2_win_performance+s2_lose_performance), end=' / ')
     print(s2_win_nd/(s2_win_nd+s2_lose_nd))
     
     
-    
-    
-    
-    
-    
-    
 if __name__ == '__main__':
-    
+    calculate()
     plot_ari_f1()
         
         

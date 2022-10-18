@@ -80,7 +80,60 @@ def calculate():
     
     # print(median_df.iloc[median_df["F1_Median"].idxmax()])
     # print(median_df.iloc[median_df["ARI_Median"].idxmin()])
+def top5():
+    df_all = pd.read_csv("Stats/SkIF_Merged.csv")
+    default_run_all = df_all[(df_all['n_estimators']==100)&
+                        (df_all['max_samples']=='auto')&
+                        (df_all['max_features']==1.0)&
+                        (df_all['bootstrap']==False)&
+                        (df_all['n_jobs']=="None")&
+                        (df_all['warm_start']==False)]
+    settings2_run = df_all[(df_all['n_estimators']==512)&
+                        (df_all['max_samples']==str(0.4))&
+                        (df_all['max_features']==0.7)&
+                        (df_all['bootstrap']==False)&
+                        (df_all['n_jobs']==str(None))&
+                        (df_all['warm_start']==False)]
+    
+    df = pd.DataFrame(columns = ['Filename', 'Determinism_Default', 'Performance_Default', 'Determinism_CS2', 'Performance_CS2', 'Performance_Improve', 'Determinism_Improve'])
+    for i in range(default_run_all.shape[0]):
+        fname = default_run_all.iloc[i]["Filename"]
+        F1_Median = default_run_all.iloc[i]["F1_Median"]
+        ARI_Median = default_run_all.iloc[i]["ARI_Median"]
+        
+        # s1_run = settings1_run[settings1_run["Filename"] == fname]
+        # s1_F1_Median = s1_run["F1_Median"].values[0]
+        # s1_ARI_Median = s1_run["ARI_Median"].values[0]
+        # if s1_F1_Median >= F1_Median:
+        #     s1_win_performance += 1
+        # elif s1_F1_Median < F1_Median:
+        #     s1_lose_performance += 1
+        # if s1_ARI_Median >= ARI_Median:
+        #     s1_win_nd += 1
+        # elif s1_ARI_Median < ARI_Median:
+        #     s1_lose_nd += 1
 
+        s2_run = settings2_run[settings2_run["Filename"] == fname]
+        s2_F1_Median = s2_run["F1_Median"].values[0]
+        s2_ARI_Median = s2_run["ARI_Median"].values[0]
+        
+        df = df.append({'Filename' : fname,
+                        'Determinism_Default' : ARI_Median, 
+                        'Performance_Default' : F1_Median, 
+                        'Determinism_CS2' : s2_ARI_Median, 
+                        'Performance_CS2' : s2_F1_Median,
+                        'Performance_Improve' : (s2_F1_Median - F1_Median), 
+                        'Determinism_Improve' :(s2_ARI_Median - ARI_Median)}, ignore_index=True)
+        # if s2_F1_Median >= F1_Median:
+        #     s2_win_performance += 1
+        # elif s2_F1_Median < F1_Median:
+        #     s2_lose_performance += 1
+        # if s2_ARI_Median >= ARI_Median:
+        #     s2_win_nd += 1
+        # elif s2_ARI_Median < ARI_Median:
+        #     s2_lose_nd += 1
+    df.to_csv("Stats/SkIF_DefaultVSCS2.csv", index = False)
+    
 def plot_ari_f1():
     
     median_df = pd.read_csv("Stats/SkIF_Grouped_Median.csv")    
@@ -215,41 +268,49 @@ def plot_ari_f1():
         F1_Median = default_run_all.iloc[i]["F1_Median"]
         ARI_Median = default_run_all.iloc[i]["ARI_Median"]
         s1_run = settings1_run[settings1_run["Filename"] == fname]
-        s1_F1_Median = s1_run["F1_Median"].values
-        s1_ARI_Median = s1_run["ARI_Median"].values
-        if s1_F1_Median > F1_Median:
+        s1_F1_Median = s1_run["F1_Median"].values[0]
+        s1_ARI_Median = s1_run["ARI_Median"].values[0]
+        if s1_F1_Median >= F1_Median:
             s1_win_performance += 1
         elif s1_F1_Median < F1_Median:
             s1_lose_performance += 1
-        if s1_ARI_Median > ARI_Median:
+        if s1_ARI_Median >= ARI_Median:
             s1_win_nd += 1
-        elif s1_ARI_Median > ARI_Median:
+        elif s1_ARI_Median < ARI_Median:
             s1_lose_nd += 1
 
         s2_run = settings2_run[settings2_run["Filename"] == fname]
         s2_F1_Median = s2_run["F1_Median"].values
         s2_ARI_Median = s2_run["ARI_Median"].values
-        if s2_F1_Median > F1_Median:
+        if s2_F1_Median >= F1_Median:
             s2_win_performance += 1
         elif s2_F1_Median < F1_Median:
             s2_lose_performance += 1
-        if s2_ARI_Median > ARI_Median:
+        if s2_ARI_Median >= ARI_Median:
             s2_win_nd += 1
-        elif s2_ARI_Median > ARI_Median:
+        elif s2_ARI_Median < ARI_Median:
             s2_lose_nd += 1
     
+    print("Default: ", mean_default_nondeter_ari, mean_default_performance)
+    print("Settings1 : ", mean_settings1_nondeter, mean_settings1_performance)
+    print("Settings1 : ", mean_settings2_nondeter, mean_settings2_performance)
     
     print("Setting 1", end=': ')
-    print(s1_win_performance/(s1_win_performance+s1_lose_performance), end=' / ')
-    print(s1_win_nd/(s1_win_nd+s1_lose_nd))
+    print("Performance: ", s1_win_performance, s1_lose_performance)
+    print("Deter: ", s1_win_nd, s1_lose_nd)
+    
+    # print(s1_win_performance/(s1_win_performance+s1_lose_performance), end=' / ')
+    # print(s1_win_nd/(s1_win_nd+s1_lose_nd))
     print("Setting 2", end=': ')
-    print(s2_win_performance/(s2_win_performance+s2_lose_performance), end=' / ')
-    print(s2_win_nd/(s2_win_nd+s2_lose_nd))
+    print("Performance: ", s2_win_performance, s2_lose_performance)
+    print("Deter: ", s2_win_nd, s2_lose_nd)
+    # print(s2_win_performance/(s2_win_performance+s2_lose_performance), end=' / ')
+    # print(s2_win_nd/(s2_win_nd+s2_lose_nd))
     
     
 if __name__ == '__main__':
-    calculate()
-    plot_ari_f1()
-        
+    # calculate()
+    # plot_ari_f1()
+    top5()
         
         

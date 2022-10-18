@@ -160,7 +160,60 @@ def plot_ari_f1():
     plt.savefig("Fig/MatIF_D_F1_ARI.pdf", bbox_inches="tight", pad_inches=0)
     plt.show()
 
+    ## Calculate Percentage
+    
+    s1_win_performance = 0
+    s1_lose_performance = 0
+    s1_win_nd = 0
+    s1_lose_nd = 0
+    s2_win_performance = 0
+    s2_lose_performance = 0
+    s2_win_nd = 0
+    s2_lose_nd = 0
 
+    for i in range(default_run_all.shape[0]):
+        fname = default_run_all.iloc[i]["Filename"]
+        F1_Median = default_run_all.iloc[i]["F1_Median"]
+        ARI_Median = default_run_all.iloc[i]["ARI_Median"]
+        s1_run = settings1_run[settings1_run["Filename"] == fname]
+        s1_F1_Median = s1_run["F1_Median"].values[0]
+        s1_ARI_Median = s1_run["ARI_Median"].values[0]
+        if s1_F1_Median >= F1_Median:
+            s1_win_performance += 1
+        elif s1_F1_Median < F1_Median:
+            s1_lose_performance += 1
+        if s1_ARI_Median >= ARI_Median:
+            s1_win_nd += 1
+        elif s1_ARI_Median < ARI_Median:
+            s1_lose_nd += 1
+
+        s2_run = settings2_run[settings2_run["Filename"] == fname]
+        s2_F1_Median = s2_run["F1_Median"].values
+        s2_ARI_Median = s2_run["ARI_Median"].values
+        if s2_F1_Median >= F1_Median:
+            s2_win_performance += 1
+        elif s2_F1_Median < F1_Median:
+            s2_lose_performance += 1
+        if s2_ARI_Median >= ARI_Median:
+            s2_win_nd += 1
+        elif s2_ARI_Median < ARI_Median:
+            s2_lose_nd += 1
+    
+    print("Default: ", mean_default_nondeter_ari, mean_default_performance)
+    print("Settings1 : ", mean_settings1_nondeter, mean_settings1_performance)
+    print("Settings1 : ", mean_settings2_nondeter, mean_settings2_performance)
+    
+    print("Setting 1", end=': ')
+    print("Performance: ", s1_win_performance, s1_lose_performance)
+    print("Deter: ", s1_win_nd, s1_lose_nd)
+    
+    # print(s1_win_performance/(s1_win_performance+s1_lose_performance), end=' / ')
+    # print(s1_win_nd/(s1_win_nd+s1_lose_nd))
+    print("Setting 2", end=': ')
+    print("Performance: ", s2_win_performance, s2_lose_performance)
+    print("Deter: ", s2_win_nd, s2_lose_nd)
+    # print(s2_win_performance/(s2_win_performance+s2_lose_performance), end=' / ')
+    # print(s2_win_nd/(s2_win_nd+s2_lose_nd))
 
 
 if __name__ == '__main__':

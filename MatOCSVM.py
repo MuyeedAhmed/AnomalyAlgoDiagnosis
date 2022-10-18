@@ -114,15 +114,6 @@ def runOCSVM(filename, X, gt, params, parameter_iteration):
     fstat_ari.close()
 
 def calculate_score(allFiles, parameter, parameter_values, all_parameters, p_iter):
-    parameters.append(["ContaminationFraction", 0, ContaminationFraction])
-    parameters.append(["KernelScale", 1, KernelScale])
-    parameters.append(["Lambda", 'auto', Lambda])
-    parameters.append(["NumExpansionDimensions", 'auto', NumExpansionDimensions])
-    parameters.append(["StandardizeData", 0, StandardizeData])
-    parameters.append(["BetaTolerance", 1e-4, BetaTolerance])
-    parameters.append(["GradientTolerance", 1e-4, GradientTolerance])
-    parameters.append(["IterationLimit", 1000, IterationLimit])
-    
     i_ContaminationFraction = all_parameters[0][1]
     i_KernelScale = all_parameters[1][1]
     i_Lambda = all_parameters[2][1]

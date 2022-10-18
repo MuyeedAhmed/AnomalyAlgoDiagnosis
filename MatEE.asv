@@ -36,7 +36,7 @@ function main_function()
     NumOGKIterations.default = 2;
     NumOGKIterations.values = [1, 2, 3];
     UnivariateEstimator.name = "UnivariateEstimator"; % ogk
-    UnivariateEstimator.default = 'tauscale';
+    UnivariateEstimator.default = "tauscale";
     UnivariateEstimator.values = ["tauscale", "qn"];
     ReweightingMethod.name = "ReweightingMethod";%olivehawkins
     ReweightingMethod.default = "rfch";
@@ -154,25 +154,21 @@ function runEE(filename_with_extension, X, y, params)
     p9 = params(9).default;
     
     outliersSet = [];
-%     try
+    try
         for z = 1:10
             if strcmp(p1, "fmcd") == 1
-
+                [sig,mu,mah,outliers] = robustcov(X, Method=p1, OutlierFraction=p2, NumTrials=p3, BiasCorrection=p4);
         
             elseif strcmp(p1, "ogk") == 1
-
+                [sig,mu,mah,outliers] = robustcov(X, Method=p1, NumOGKIterations=p5, UnivariateEstimator=p6);
+            elseif strcmp(p1, "olivehawkins") == 1
+                [sig,mu,mah,outliers] = robustcov(X, Method=p1, OutlierFraction=p2, ...
+                    ReweightingMethod=p7, NumConcentrationSteps=p8, StartMethod=p9);
             end
-            if strcmp(p1, "olivehawkins") == 1 
-                
-            end
-            [sig,mu,mah,outliers] = robustcov(X, Method=p1, OutlierFraction=p2, NumTrials=p3, BiasCorrection=p4, ...
-                NumOGKIterations=p5, UnivariateEstimator=p6, ...
-                ReweightingMethod=p7, NumConcentrationSteps=p8, StartMethod=p9);
             outliersSet = [outliersSet;outliers'];
         end
-%         writefilename = sprintf('../AnomalyAlgoDiagnosis_Labels_Matlab/%s', labelFile);
         csvwrite(labelFile,outliersSet); 
-%     catch
-%         fprintf("-Failed")
-%     end
+    catch
+        fprintf("-Failed")
+    end
 end

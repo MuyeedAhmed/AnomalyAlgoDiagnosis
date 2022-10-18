@@ -36,7 +36,7 @@ function main_function()
     NumOGKIterations.default = 2;
     NumOGKIterations.values = [1, 2, 3];
     UnivariateEstimator.name = "UnivariateEstimator"; % ogk
-    UnivariateEstimator.default = 'tauscale';
+    UnivariateEstimator.default = "tauscale";
     UnivariateEstimator.values = ["tauscale", "qn"];
     ReweightingMethod.name = "ReweightingMethod";%olivehawkins
     ReweightingMethod.default = "rfch";

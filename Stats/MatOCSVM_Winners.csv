@@ -1,3 +1,4 @@
 Parameter,MWU_P,Max_F1,Min_F1_Range,Max_ARI
 ContaminationFraction,1.445830775,0.25,IF,0
-KernelScale,1.4488549834388633,auto,auto,auto
+KernelScale,1.448854983,auto,auto,auto
+Lambda,1.478588267,0.1,1,auto

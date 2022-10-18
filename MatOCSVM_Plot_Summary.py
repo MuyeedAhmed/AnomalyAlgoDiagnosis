@@ -120,7 +120,7 @@ def plot_ari_f1():
     ## Settings 1
     settings1_run = df_all[(df_all['ContaminationFraction']=='IF')&
                            (df_all['KernelScale']=='auto')&
-                           (df_all['Lambda']=='auto')&
+                           (df_all['Lambda']==str(1))&
                            (df_all['NumExpansionDimensions']=='auto')&
                            (df_all['StandardizeData']==0)&
                            (df_all['BetaTolerance']==1e-4)&
@@ -130,8 +130,8 @@ def plot_ari_f1():
     settings1_nondeter = settings1_run['ARI_Median'].values
     
     ## Settings 2
-    settings2_run = df_all[(df_all['ContaminationFraction']=='LOF')&
-                           (df_all['KernelScale']==str(1))&
+    settings2_run = df_all[(df_all['ContaminationFraction']=='IF')&
+                           (df_all['KernelScale']=="auto")&
                            (df_all['Lambda']=='auto')&
                            (df_all['NumExpansionDimensions']=='auto')&
                            (df_all['StandardizeData']==0)&

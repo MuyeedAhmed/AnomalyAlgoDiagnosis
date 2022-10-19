@@ -166,7 +166,8 @@ def plot_ari_f1():
 
     fig = plt.Figure()
     plt.plot(nondeterminism_range, performance, ".")
-    plt.plot(mean_default_nondeter_range, mean_default_performance, "d")
+    plt.plot(mean_default_nondeter_range, mean_default_performance, '.', marker = "d", color='red', markersize = 10, markeredgecolor='black', markeredgewidth=1.5)
+    plt.legend(['Custom Configurations', 'Default'])
     plt.title("Scikit-learn - Isolation Forest")
     plt.xlabel("Nondeterminism (F1 Score Range)")
     plt.ylabel("Performance (F1 Score)")
@@ -175,7 +176,8 @@ def plot_ari_f1():
 
     fig = plt.Figure()
     plt.plot(nondeterminism_ari, performance, ".")
-    plt.plot(mean_default_nondeter_ari, mean_default_performance, marker ='d')
+    plt.plot(mean_default_nondeter_ari, mean_default_performance, '.', marker ='d', color='red', markersize = 10, markeredgecolor='black', markeredgewidth=1.5)
+    plt.legend(['Custom Configurations', 'Default'])
     plt.title("Scikit-learn - Isolation Forest")
     plt.xlabel("Determinism (ARI)")
     plt.ylabel("Performance (F1 Score)")
@@ -241,11 +243,11 @@ def plot_ari_f1():
     plt.plot(settings1_nondeter, settings1_performance, '.', color = 'green', marker = 'v', markersize = 4, alpha=.5)
     plt.plot(settings2_nondeter, settings2_performance, '.', color = 'blue', marker = '^', markersize = 4, alpha=.5)
      
-    plt.plot(mean_default_nondeter_ari, mean_default_performance, '.', color='red', marker = 'd', markersize = 8, markeredgecolor='black', markeredgewidth=1.5)
-    plt.plot(mean_settings1_nondeter, mean_settings1_performance, '.', color = 'green', marker = 'v', markersize = 8, markeredgecolor='black', markeredgewidth=1.5)
-    plt.plot(mean_settings2_nondeter, mean_settings2_performance, '.', color = 'blue', marker = '^', markersize = 8, markeredgecolor='black', markeredgewidth=1.5)
+    plt.plot(mean_default_nondeter_ari, mean_default_performance, '.', color='red', marker = 'd', markersize = 12, markeredgecolor='black', markeredgewidth=1.5)
+    plt.plot(mean_settings1_nondeter, mean_settings1_performance, '.', color = 'green', marker = 'v', markersize = 12, markeredgecolor='black', markeredgewidth=1.5)
+    plt.plot(mean_settings2_nondeter, mean_settings2_performance, '.', color = 'blue', marker = '^', markersize = 12, markeredgecolor='black', markeredgewidth=1.5)
     
-    plt.legend(['Default Setting', 'Custom Setting 1', 'Custom Setting 2'])
+    plt.legend(['Default Setting', 'Custom config 1', 'Custom config 2'])
     plt.title("Scikit-learn - Isolation Forest")
     plt.xlabel("Determinism (ARI)")
     plt.ylabel("Performance (F1 Score)")
@@ -310,7 +312,7 @@ def plot_ari_f1():
     
 if __name__ == '__main__':
     # calculate()
-    # plot_ari_f1()
-    top5()
+    plot_ari_f1()
+    # top5()
         
         

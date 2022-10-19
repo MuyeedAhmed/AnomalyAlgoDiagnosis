@@ -245,7 +245,7 @@ def plot_ari_f1():
     # print(s2_win_nd/(s2_win_nd+s2_lose_nd))
 
 if __name__ == '__main__':
-    # calculate()
+    calculate()
     plot_ari_f1()
         
         

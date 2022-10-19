@@ -120,13 +120,13 @@ def plot_ari_f1():
     
     ## Settings 1
     settings1_run = df_all[(df_all['ContaminationFraction']=='IF')&
-                            (df_all['NumLearners']==100)&
+                            (df_all['NumLearners']==512)&
                             (df_all['NumObservationsPerLearner']=='auto')]
     settings1_performance = settings1_run['F1_Median'].values
     settings1_nondeter = settings1_run['ARI_Median'].values
     
     mean_settings1 = median_df[(median_df['ContaminationFraction']=='IF')&
-                                (median_df['NumLearners']==100)&
+                                (median_df['NumLearners']==512)&
                                 (median_df['NumObservationsPerLearner']=='auto')]
     mean_settings1_performance = mean_settings1['F1_Median'].values
     mean_settings1_nondeter = mean_settings1['ARI_Median'].values

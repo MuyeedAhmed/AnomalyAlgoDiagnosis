@@ -139,7 +139,7 @@ def plot_ari_f1():
                         (median_df['NumTrials']==500)&
                         (median_df['BiasCorrection']==1)&
                         (median_df['NumOGKIterations']==2)&
-                        (median_df['UnivariateEstimator']=="tauscale")&
+                        (median_df['UnivariateEstimator']=="qn")&
                         (median_df['ReweightingMethod']=="rfch")&
                         (median_df['NumConcentrationSteps']==10)&
                         (median_df['StartMethod']=="classical")]
@@ -147,42 +147,42 @@ def plot_ari_f1():
     mean_settings1_nondeter = mean_settings1['ARI_Median'].values
     
     ## Settings 2
-    # settings2_run = df_all[(df_all['Method']=="fmcd")&
-    #                     (df_all['OutlierFraction']==0.5)&
-    #                     (df_all['NumTrials']==500)&
-    #                     (df_all['BiasCorrection']==1)&
-    #                     (df_all['NumOGKIterations']==2)&
-    #                     (df_all['UnivariateEstimator']=="tauscale")&
-    #                     (df_all['ReweightingMethod']=="rfch")&
-    #                     (df_all['NumConcentrationSteps']==10)&
-    #                     (df_all['StartMethod']=="classical")]
+    settings2_run = df_all[(df_all['Method']=="fmcd")&
+                        (df_all['OutlierFraction']==0.05)&
+                        (df_all['NumTrials']==500)&
+                        (df_all['BiasCorrection']==1)&
+                        (df_all['NumOGKIterations']==2)&
+                        (df_all['UnivariateEstimator']=="tauscale")&
+                        (df_all['ReweightingMethod']=="rfch")&
+                        (df_all['NumConcentrationSteps']==10)&
+                        (df_all['StartMethod']=="classical")]
     
-    # settings2_performance = settings2_run['F1_Median'].values
-    # settings2_nondeter = settings2_run['ARI_Median'].values
+    settings2_performance = settings2_run['F1_Median'].values
+    settings2_nondeter = settings2_run['ARI_Median'].values
     
-    # mean_settings2 = median_df[(median_df['Method']=="fmcd")&
-    #                     (median_df['OutlierFraction']==0.5)&
-    #                     (median_df['NumTrials']==500)&
-    #                     (median_df['BiasCorrection']==1)&
-    #                     (median_df['NumOGKIterations']==2)&
-    #                     (median_df['UnivariateEstimator']=="tauscale")&
-    #                     (median_df['ReweightingMethod']=="rfch")&
-    #                     (median_df['NumConcentrationSteps']==10)&
-    #                     (median_df['StartMethod']=="classical")]
-    # mean_settings2_performance = mean_settings2['F1_Median'].values
-    # mean_settings2_nondeter = mean_settings2['ARI_Median'].values
+    mean_settings2 = median_df[(median_df['Method']=="fmcd")&
+                        (median_df['OutlierFraction']==0.05)&
+                        (median_df['NumTrials']==500)&
+                        (median_df['BiasCorrection']==1)&
+                        (median_df['NumOGKIterations']==2)&
+                        (median_df['UnivariateEstimator']=="tauscale")&
+                        (median_df['ReweightingMethod']=="rfch")&
+                        (median_df['NumConcentrationSteps']==10)&
+                        (median_df['StartMethod']=="classical")]
+    mean_settings2_performance = mean_settings2['F1_Median'].values
+    mean_settings2_nondeter = mean_settings2['ARI_Median'].values
     
     fig = plt.Figure()
     
     plt.plot(default_all_nondeter, default_all_performance, '.', color='red', marker = 'd', markersize = 4, alpha=.5)
     plt.plot(settings1_nondeter, settings1_performance, '.', color = 'green', marker = 'v', markersize = 4, alpha=.5)
-    # plt.plot(settings2_nondeter, settings2_performance, '.', color = 'blue', marker = '^', markersize = 4, alpha=.5)
+    plt.plot(settings2_nondeter, settings2_performance, '.', color = 'blue', marker = '^', markersize = 4, alpha=.5)
      
     plt.plot(mean_default_nondeter_ari, mean_default_performance, '.', color='red', marker = 'd', markersize = 12, markeredgecolor='black', markeredgewidth=1.5)
     plt.plot(mean_settings1_nondeter, mean_settings1_performance, '.', color = 'green', marker = 'v', markersize = 12, markeredgecolor='black', markeredgewidth=1.5)
-    # plt.plot(mean_settings2_nondeter, mean_settings2_performance, '.', color = 'blue', marker = '^', markersize = 8, markeredgecolor='black', markeredgewidth=1.5)
+    plt.plot(mean_settings2_nondeter, mean_settings2_performance, '.', color = 'blue', marker = '^', markersize = 12, markeredgecolor='black', markeredgewidth=1.5)
     
-    # plt.legend(['Default Setting', 'Custom config 1', 'Custom config 2'])
+    plt.legend(['Default Setting', 'Custom config 1', 'Custom config 2'])
     plt.title("Matlab - Robust Covariance")
     plt.xlabel("Determinism (ARI)")
     plt.ylabel("Performance (F1 Score)")
@@ -192,7 +192,7 @@ def plot_ari_f1():
     
 
 if __name__ == '__main__':
-    calculate()
+    # calculate()
     plot_ari_f1()
         
         

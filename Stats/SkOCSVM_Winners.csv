@@ -1,7 +1,6 @@
 Parameter,Friedman,Max_F1,Min_F1_Range,Max_ARI
-nu,nan,0.4,0.1,0.1
-gamma,nan,scale,scale,scale
-tol,nan,0.01,0.1,0.1
-shrinking,nan,True,True,True
-cache_size,nan,50,50,50
-max_iter,nan,-1,-1,-1
+gamma,0.4563850638247544,scale,0,0
+max_iter,0.47016474513825735,50,0,0
+tol,0.4552418651298389,1e-05,0,0
+shrinking,0.5012258212360251,False,0,0
+cache_size,0.5012258212360251,50,0,0

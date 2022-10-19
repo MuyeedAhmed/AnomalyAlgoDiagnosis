@@ -87,26 +87,20 @@ def runOCSVM(filename, X, gt, params, parameter_iteration):
         return
     
     labels = []
-    # accuracy = []
     f1 = []
-    ari = []
-    for i in range(10):
-        try:
-            clustering = OneClassSVM(kernel=params[0][1], degree=params[1][1], gamma=params[2][1], coef0=params[3][1], tol=params[4][1], nu=params[5][1], 
-                                         shrinking=params[6][1], cache_size=params[7][1], max_iter=params[8][1]).fit(X)
-        except:
-            return
     
-        l = clustering.predict(X)
-        l = [0 if x == 1 else 1 for x in l]
-        labels.append(l)
+    try:
+        clustering = OneClassSVM(kernel=params[0][1], degree=params[1][1], gamma=params[2][1], coef0=params[3][1], tol=params[4][1], nu=params[5][1], 
+                                     shrinking=params[6][1], cache_size=params[7][1], max_iter=params[8][1]).fit(X)
+    except:
+        return
+    
+    l = clustering.predict(X)
+    l = [0 if x == 1 else 1 for x in l]
+    labels.append(l)
 
-        # accuracy.append(metrics.accuracy_score(gt, l))
-        f1.append(metrics.f1_score(gt, l))
+    f1.append(metrics.f1_score(gt, l))
         
-    for i in range(len(labels)):
-        for j in range(i+1, len(labels)):
-          ari.append(adjusted_rand_score(labels[i], labels[j]))      
     if os.path.exists("../AnomalyAlgoDiagnosis_Labels/Labels_Sk_OCSVM_"+labelFile+".csv") == 0:
         fileLabels=open("../AnomalyAlgoDiagnosis_Labels/Labels_Sk_OCSVM_"+labelFile+".csv", 'a')
         for l in labels:
@@ -122,10 +116,6 @@ def runOCSVM(filename, X, gt, params, parameter_iteration):
     fstat_f1.write(','.join(str(s) for s in f1) + '\n')
     fstat_f1.close()
     
-    fstat_ari=open("Stats/SkOCSVM_ARI.csv", "a")
-    fstat_ari.write(filename+','+ str(params[0][1]) + ','+ str(params[1][1]) + ',' + str(params[2][1]) + ',' + str(params[3][1]) + ',' + str(params[4][1]) + ',' + str(params[5][1]) + ',' + str(params[6][1]) + ',' + str(params[7][1]) + ',' + str(params[8][1]) + ',' + str(parameter_iteration) + ',')
-    fstat_ari.write(','.join(str(s) for s in ari) + '\n')
-    fstat_ari.close()
 
 def calculate_score(allFiles, parameter, parameter_values, all_parameters):
     i_kernel=all_parameters[0][1]
@@ -140,18 +130,12 @@ def calculate_score(allFiles, parameter, parameter_values, all_parameters):
     
     # dfacc = pd.read_csv("Stats/SkOCSVM_Accuracy.csv")
     dff1 = pd.read_csv("Stats/SkOCSVM_F1.csv")
-    dfari =  pd.read_csv("Stats/SkOCSVM_ARI.csv")
     
     f1_runs = []
     for i in range(10):
         f1_runs.append(('R'+str(i)))
 
-    ari_runs = []
-    for i in range(45):
-        ari_runs.append(('R'+str(i)))
 
-    # accuracy_range_all = []
-    # accuracy_med_all = []
     f1_range_all = []
     f1_med_all = []
     ari_all = []
@@ -190,58 +174,26 @@ def calculate_score(allFiles, parameter, parameter_values, all_parameters):
                             (dff1['max_iter']==i_max_iter)]
             if f1.empty:
                 continue
-            ari = dfari[(dfari['Filename']==filename)&
-                            (dfari['kernel']==i_kernel)&
-                            (dfari['degree']==i_degree)&
-                            (dfari['gamma']==i_gamma)&
-                            (dfari['coef0']==i_coef0)&
-                            (dfari['tol']==i_tol)&
-                            (dfari['nu']==i_nu)&
-                            (dfari['shrinking']==i_shrinking)&
-                            (dfari['cache_size']==i_cache_size)&
-                            (dfari['max_iter']==i_max_iter)]
-                        
-            f1_values = f1[f1_runs].to_numpy()[0]
-            ari_values = ari[ari_runs].to_numpy()[0]
+                       
+            f1_values = f1["R"].to_numpy()[0]
             
-            # accDiff = (np.percentile(accuracy_values, 75) - np.percentile(accuracy_values, 25))/(np.percentile(accuracy_values, 75) + np.percentile(accuracy_values, 25))
-            # accuracy_range_all.append([filename, p, accDiff])
-            # accuracy_med_all.append([filename, p, np.percentile(accuracy_values, 50)])
             
-            f1Diff = (np.percentile(f1_values, 75) - np.percentile(f1_values, 25))/(np.percentile(f1_values, 75) + np.percentile(f1_values, 25))
-            f1_range_all.append([filename, p, f1Diff])
             f1_med_all.append([filename, p, np.percentile(f1_values, 50)])
             
-            ari_all.append([filename, p, np.percentile(ari_values, 50)])
             
-    # df_acc_r = pd.DataFrame(accuracy_range_all, columns = ['Filename', parameter, 'Accuracy_Range'])
-    # df_acc_m = pd.DataFrame(accuracy_med_all, columns = ['Filename', parameter, 'Accuracy_Median'])
-    df_f1_r = pd.DataFrame(f1_range_all, columns = ['Filename', parameter, 'F1Score_Range'])
+
     df_f1_m = pd.DataFrame(f1_med_all, columns = ['Filename', parameter, 'F1Score_Median'])
-    df_ari_m = pd.DataFrame(ari_all, columns = ['Filename', parameter, 'ARI'])
 
-
-    ### Friedman Test
-    
-    # friedman_test_f1_m = pg.friedman(data=df_f1_m, dv="F1Score_Median", within=parameter, subject="Filename")
-    # p_f_f1_m = friedman_test_f1_m['p-unc']['Friedman']
-    
-    # friedman_test_f1_r = pg.friedman(data=df_f1_r, dv="F1Score_Range", within=parameter, subject="Filename")
-    # p_f_f1_r = friedman_test_f1_r['p-unc']['Friedman']
-    
-    # friedman_test_f1_m = pg.friedman(data=df_f1_m, dv="F1Score_Median", within=parameter, subject="Filename")
-    # p_f_ari = friedman_test_f1_m['p-unc']['Friedman']
-    
     
     ### Mann–Whitney U test
 
     mwu_f1_range = [[0 for i in range(len(parameter_values))] for j in range(len(parameter_values))]
     i = 0
     for p1 in parameter_values:
-        p1_values = df_f1_r[df_f1_r[parameter] == p1]['F1Score_Range'].to_numpy()
+        p1_values = df_f1_m[df_f1_m[parameter] == p1]['F1Score_Median'].to_numpy()
         j = 0
         for p2 in parameter_values:
-            p2_values = df_f1_r[df_f1_r[parameter] == p2]['F1Score_Range'].to_numpy()
+            p2_values = df_f1_m[df_f1_m[parameter] == p2]['F1Score_Median'].to_numpy()
             if len(p1_values) == 0 or len(p2_values) == 0:
                 mwu_f1_range[i][j] = None
                 continue
@@ -250,7 +202,7 @@ def calculate_score(allFiles, parameter, parameter_values, all_parameters):
         i += 1
     mwu_df_f1_range = pd.DataFrame(mwu_f1_range, columns = parameter_values)
     mwu_df_f1_range.index = parameter_values
-    mwu_df_f1_range.to_csv("Mann–Whitney U test/MWU_SkOCSVM_F1_Range_"+parameter+".csv")
+    mwu_df_f1_range.to_csv("Mann–Whitney U test/MWU_SkOCSVM_F1_Median_"+parameter+".csv")
     
     try:
         mwu_geomean = gmean(gmean(mwu_f1_range))
@@ -260,63 +212,11 @@ def calculate_score(allFiles, parameter, parameter_values, all_parameters):
         mwu_min = 11
     
     f1_m_grouped = df_f1_m.groupby(parameter)[["F1Score_Median"]].median().reset_index()
-    f1_r_grouped = df_f1_r.groupby(parameter)[["F1Score_Range"]].median().reset_index()
-    ari_m_grouped = df_ari_m.groupby(parameter)[["ARI"]].median().reset_index()
     
     parameter_value_max_f1_median = f1_m_grouped[parameter].loc[f1_m_grouped["F1Score_Median"].idxmax()]
-    parameter_value_min_f1_range = f1_r_grouped[parameter].loc[f1_r_grouped["F1Score_Range"].idxmin()]  
-    parameter_value_max_ari = ari_m_grouped[parameter].loc[ari_m_grouped["ARI"].idxmax()]
     
-    return mwu_geomean, mwu_min, parameter_value_max_f1_median, parameter_value_min_f1_range, parameter_value_max_ari
+    return mwu_geomean, mwu_min, parameter_value_max_f1_median, 0, 0
 
-
-def plot_acc_range():
-    df = pd.read_csv("Stats/SkOCSVM_F1.csv")
-    runs = []
-    for i in range(10):
-        runs.append(('R'+str(i)))
-    
-    df["Performance"] = 0
-    df["Nondeterminism"] = 0
-    for i in range(df.shape[0]):
-        run_values = df.loc[i, runs].tolist()
-        
-        range_ = (np.percentile(run_values, 75) - np.percentile(run_values, 25))/(np.percentile(run_values, 75) + np.percentile(run_values, 25))
-        
-        df.iloc[i, df.columns.get_loc('Performance')] =  np.mean(run_values)
-        df.iloc[i, df.columns.get_loc('Nondeterminism')] = range_
-    
-    median_df = df.groupby(["kernel", "degree", "gamma", "coef0", "tol", "nu", "shrinking", "cache_size", "max_iter"])[["Performance", "Nondeterminism"]].median()
-    median_df = median_df.reset_index()
-    
-    print(median_df.iloc[median_df["Performance"].idxmax()])
-    print(median_df.iloc[median_df["Nondeterminism"].idxmin()])
-    
-    
-    default_run = median_df[(median_df['kernel']=='rbf')&
-                                    (median_df['degree']==3)&
-                                    (median_df['gamma']=='scale')&
-                                    (median_df['coef0']==0.0)&
-                                    (median_df['tol']==1e-3)&
-                                    (median_df['nu']==0.5)&
-                                    (median_df['shrinking']==True)&
-                                    (median_df['cache_size']==200)&
-                                    (median_df['max_iter']==-1)]
-    default_performance = default_run['Performance'].values[0]
-    default_nondeter = default_run['Nondeterminism'].values[0]
-        
-    
-    performance = median_df["Performance"].values
-    nondeterminism = median_df["Nondeterminism"].values
-
-    fig = plt.Figure()
-    plt.plot(nondeterminism, performance, ".")
-    plt.plot(default_nondeter, default_performance, "o")
-    plt.title("F1 Score")
-    plt.xlabel("Nondeterminism")
-    plt.ylabel("Performance")
-    plt.savefig("Fig/OCSVM_Sk_F1_Iter2.pdf", bbox_inches="tight", pad_inches=0)
-    plt.show()
 
 
 if __name__ == '__main__':
@@ -351,29 +251,15 @@ if __name__ == '__main__':
     parameters.append(["cache_size", 200, cache_size])
     parameters.append(["max_iter", -1, max_iter])
     
-    R = ""
-    for i in range(9):
-        R += "R"+str(i)+","
-    R+="R9"
-    ARI_R = ""
-    for i in range(44):
-        ARI_R += "R"+str(i)+","
-    ARI_R+="R44"
     
-    if os.path.exists("Stats/SkOCSVM_Accuracy.csv") == 0:
-        fstat_acc=open("Stats/SkOCSVM_Accuracy.csv", "w")
-        fstat_acc.write('Filename,kernel,degree,gamma,coef0,tol,nu,shrinking,cache_size,max_iter,Parameter_Iteration,'+R+"\n")
-        fstat_acc.close()
+    
         
     if os.path.exists("Stats/SkOCSVM_F1.csv") == 0: 
         fstat_f1=open("Stats/SkOCSVM_F1.csv", "w")
-        fstat_f1.write('Filename,kernel,degree,gamma,coef0,tol,nu,shrinking,cache_size,max_iter,Parameter_Iteration,'+R+"\n")
+        fstat_f1.write("Filename,kernel,degree,gamma,coef0,tol,nu,shrinking,cache_size,max_iter,Parameter_Iteration,R\n")
         fstat_f1.close()
 
-    if os.path.exists("Stats/SkOCSVM_ARI.csv") == 0:    
-        fstat_ari=open("Stats/SkOCSVM_ARI.csv", "w")
-        fstat_ari.write('Filename,kernel,degree,gamma,coef0,tol,nu,shrinking,cache_size,max_iter,Parameter_Iteration,'+ARI_R+"\n")
-        fstat_ari.close()
+    
     if os.path.exists("Stats/SkOCSVM_Winners.csv") == 0:  
         fstat_winner=open("Stats/SkOCSVM_Winners.csv", "w")
         fstat_winner.write('Parameter,Friedman,Max_F1,Min_F1_Range,Max_ARI\n')
@@ -402,8 +288,8 @@ if __name__ == '__main__':
             print("MWU_min: ", end='')
             print(MWU_min)
             break
-        parameters[index_min][1] = f1_range[index_min]
-        parameters[index_min][2] = [f1_range[index_min]]
+        parameters[index_min][1] = f1_median[index_min]
+        parameters[index_min][2] = [f1_median[index_min]]
         
         fstat_winner=open("Stats/SkOCSVM_Winners.csv", "a")
         fstat_winner.write(parameters[index_min][0]+','+str(MWU_geo[index_min])+','+str(f1_median[index_min])+','+str(f1_range[index_min])+','+str(ari[index_min])+'\n')
@@ -411,7 +297,6 @@ if __name__ == '__main__':
         
         print(parameters)              
 
-    plot_acc_range()
 
 
         

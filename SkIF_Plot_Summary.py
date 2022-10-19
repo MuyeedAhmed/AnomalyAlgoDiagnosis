@@ -65,7 +65,7 @@ def calculate():
     df_ari= df_ari.drop(columns=runs_ari, axis=1)
     
     
-    parameter_names = ["n_estimators", "max_samples", "contamination", "max_features", "bootstrap", "n_jobs", "warm_start", "Parameter_Iteration"]
+    parameter_names = ["n_estimators", "max_samples", "contamination", "max_features", "bootstrap", "n_jobs", "warm_start"]
     join_on =["Filename", "n_estimators", "max_samples", "contamination", "max_features", "bootstrap", "n_jobs", "warm_start", "Parameter_Iteration"]
 
     df_all = pd.merge(df_f1, df_ari,  how='left', left_on=join_on, right_on =join_on)
@@ -89,10 +89,10 @@ def top5():
                         (df_all['n_jobs']=="None")&
                         (df_all['warm_start']==False)]
     settings2_run = df_all[(df_all['n_estimators']==512)&
-                        (df_all['max_samples']==str(0.4))&
+                        (df_all['max_samples']=='auto')&
                         (df_all['max_features']==0.7)&
                         (df_all['bootstrap']==False)&
-                        (df_all['n_jobs']==str(None))&
+                        (df_all['n_jobs']=="None")&
                         (df_all['warm_start']==False)]
     
     df = pd.DataFrame(columns = ['Filename', 'Determinism_Default', 'Performance_Default', 'Determinism_CS2', 'Performance_CS2', 'Performance_Improve', 'Determinism_Improve'])
@@ -209,17 +209,17 @@ def plot_ari_f1():
     settings1_nondeter = settings1_run['ARI_Median'].values
     
     mean_settings1 = median_df[(median_df['n_estimators']==512)&
-                                    (median_df['max_samples']==str(1.0))&
-                                    (median_df['max_features']==0.7)&
-                                    (median_df['bootstrap']==False)&
-                                    (median_df['n_jobs']==str(None))&
-                                    (median_df['warm_start']==False)]
+                                (median_df['max_samples']==str(1.0))&
+                                (median_df['max_features']==0.7)&
+                                (median_df['bootstrap']==False)&
+                                (median_df['n_jobs']==str(None))&
+                                (median_df['warm_start']==False)]
     mean_settings1_performance = mean_settings1['F1_Median'].values
     mean_settings1_nondeter = mean_settings1['ARI_Median'].values
     
     ## Settings 2
     settings2_run = df_all[(df_all['n_estimators']==512)&
-                        (df_all['max_samples']==str(0.4))&
+                        (df_all['max_samples']=='auto')&
                         (df_all['max_features']==0.7)&
                         (df_all['bootstrap']==False)&
                         (df_all['n_jobs']==str(None))&
@@ -229,10 +229,10 @@ def plot_ari_f1():
     settings2_nondeter = settings2_run['ARI_Median'].values
     
     mean_settings2 = median_df[(median_df['n_estimators']==512)&
-                                    (median_df['max_samples']==str(0.4))&
-                                    (median_df['max_features']==0.7)&
-                                    (median_df['bootstrap']==False)&
-                                    (median_df['n_jobs']==str(None))&
+                                (median_df['max_samples']=='auto')&
+                                (median_df['max_features']==0.7)&
+                                (median_df['bootstrap']==False)&
+                                (median_df['n_jobs']==str(None))&
                                     (median_df['warm_start']==False)]
     mean_settings2_performance = mean_settings2['F1_Median'].values
     mean_settings2_nondeter = mean_settings2['ARI_Median'].values
@@ -295,7 +295,7 @@ def plot_ari_f1():
     
     print("Default: ", mean_default_nondeter_ari, mean_default_performance)
     print("Settings1 : ", mean_settings1_nondeter, mean_settings1_performance)
-    print("Settings1 : ", mean_settings2_nondeter, mean_settings2_performance)
+    print("Settings2 : ", mean_settings2_nondeter, mean_settings2_performance)
     
     print("Setting 1", end=': ')
     print("Performance: ", s1_win_performance, s1_lose_performance)
@@ -311,8 +311,8 @@ def plot_ari_f1():
     
     
 if __name__ == '__main__':
-    # calculate()
+    calculate()
     plot_ari_f1()
-    # top5()
+    top5()
         
         

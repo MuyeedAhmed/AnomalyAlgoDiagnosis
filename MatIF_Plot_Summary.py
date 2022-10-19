@@ -64,13 +64,15 @@ def calculate():
     
     median_df.to_csv("Stats/MatIF_Grouped_Median.csv", index=False)
 
+
+
 def plot_ari_f1():
     median_df = pd.read_csv("Stats/MatIF_Grouped_Median.csv")    
     df_all = pd.read_csv("Stats/MatIF_Merged.csv")
     '''
     Plot Group Summary
     '''
-    i_ContaminationFraction=0
+    i_ContaminationFraction=0.1
     i_NumLearners=100
     i_NumObservationsPerLearner='auto'
    
@@ -112,7 +114,7 @@ def plot_ari_f1():
     Plot For All Dataset
     '''
     ## Default
-    default_run_all = df_all[(df_all['ContaminationFraction']==str(0))&
+    default_run_all = df_all[(df_all['ContaminationFraction']==str(0.1))&
                     (df_all['NumLearners']==100)&
                     (df_all['NumObservationsPerLearner']=='auto')]
     default_all_performance = default_run_all['F1_Median'].values
@@ -203,7 +205,7 @@ def plot_ari_f1():
     
     print("Default: ", mean_default_nondeter_ari, mean_default_performance)
     print("Settings1 : ", mean_settings1_nondeter, mean_settings1_performance)
-    print("Settings1 : ", mean_settings2_nondeter, mean_settings2_performance)
+    print("Settings2 : ", mean_settings2_nondeter, mean_settings2_performance)
     
     print("Setting 1", end=': ')
     print("Performance: ", s1_win_performance, s1_lose_performance)
@@ -217,10 +219,41 @@ def plot_ari_f1():
     # print(s2_win_performance/(s2_win_performance+s2_lose_performance), end=' / ')
     # print(s2_win_nd/(s2_win_nd+s2_lose_nd))
 
+def top5():
+    df_all = pd.read_csv("Stats/MatIF_Merged.csv")
+    
+    default_run_all = df_all[(df_all['ContaminationFraction']==str(0.1))&
+                    (df_all['NumLearners']==100)&
+                    (df_all['NumObservationsPerLearner']=='auto')]
+    
+    settings1_run = df_all[(df_all['ContaminationFraction']=='IF')&
+                            (df_all['NumLearners']==512)&
+                            (df_all['NumObservationsPerLearner']=='auto')]
+    
+    df = pd.DataFrame(columns = ['Filename', 'Determinism_Default', 'Performance_Default', 'Determinism_CS2', 'Performance_CS2', 'Performance_Improve', 'Determinism_Improve'])
+    for i in range(default_run_all.shape[0]):
+        fname = default_run_all.iloc[i]["Filename"]
+        F1_Median = default_run_all.iloc[i]["F1_Median"]
+        ARI_Median = default_run_all.iloc[i]["ARI_Median"]
+        
 
+        s1_run = settings1_run[settings1_run["Filename"] == fname]
+        s1_F1_Median = s1_run["F1_Median"].values[0]
+        s1_ARI_Median = s1_run["ARI_Median"].values[0]
+        
+        df = df.append({'Filename' : fname,
+                        'Determinism_Default' : ARI_Median, 
+                        'Performance_Default' : F1_Median, 
+                        'Determinism_CS2' : s1_ARI_Median, 
+                        'Performance_CS2' : s1_F1_Median,
+                        'Performance_Improve' : (s1_F1_Median - F1_Median), 
+                        'Determinism_Improve' :(s1_ARI_Median - ARI_Median)}, ignore_index=True)
+
+    df.to_csv("Stats/MatIF_DefaultVSCS1.csv", index = False)
 if __name__ == '__main__':
-    calculate()
-    plot_ari_f1()
+    # calculate()
+    # plot_ari_f1()
+    top5()
         
         
         

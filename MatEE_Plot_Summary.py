@@ -58,7 +58,47 @@ def calculate():
     median_df = median_df.reset_index()
     
     median_df.to_csv("Stats/MatEE_Grouped_Median.csv", index=False)
+
+def top5():
+    df_all = pd.read_csv("Stats/MatEE_Merged.csv")
+    default_run_all = df_all[(df_all['Method']=="fmcd")&
+                            (df_all['OutlierFraction']==0.5)&
+                            (df_all['NumTrials']==500)&
+                            (df_all['BiasCorrection']==1)&
+                            (df_all['NumOGKIterations']==2)&
+                            (df_all['UnivariateEstimator']=="tauscale")&
+                            (df_all['ReweightingMethod']=="rfch")&
+                            (df_all['NumConcentrationSteps']==10)&
+                            (df_all['StartMethod']=="classical")]
+    settings2_run = df_all[(df_all['Method']=="ogk")&
+                            (df_all['OutlierFraction']==0.5)&
+                            (df_all['NumTrials']==500)&
+                            (df_all['BiasCorrection']==1)&
+                            (df_all['NumOGKIterations']==2)&
+                            (df_all['UnivariateEstimator']=="tauscale")&
+                            (df_all['ReweightingMethod']=="rfch")&
+                            (df_all['NumConcentrationSteps']==10)&
+                            (df_all['StartMethod']=="classical")]
     
+    df = pd.DataFrame(columns = ['Filename', 'Determinism_Default', 'Performance_Default', 'Determinism_CS2', 'Performance_CS2', 'Performance_Improve', 'Determinism_Improve'])
+    for i in range(default_run_all.shape[0]):
+        fname = default_run_all.iloc[i]["Filename"]
+        F1_Median = default_run_all.iloc[i]["F1_Median"]
+        ARI_Median = default_run_all.iloc[i]["ARI_Median"]
+ 
+        s2_run = settings2_run[settings2_run["Filename"] == fname]
+        s2_F1_Median = s2_run["F1_Median"].values[0]
+        s2_ARI_Median = s2_run["ARI_Median"].values[0]
+        
+        df = df.append({'Filename' : fname,
+                        'Determinism_Default' : ARI_Median, 
+                        'Performance_Default' : F1_Median, 
+                        'Determinism_CS2' : s2_ARI_Median, 
+                        'Performance_CS2' : s2_F1_Median,
+                        'Performance_Improve' : (s2_F1_Median - F1_Median), 
+                        'Determinism_Improve' :(s2_ARI_Median - ARI_Median)}, ignore_index=True)
+ 
+    df.to_csv("Stats/MatEE_DefaultVSCS1.csv", index = False)
     
 def plot_ari_f1():
     median_df = pd.read_csv("Stats/MatEE_Grouped_Median.csv")    
@@ -110,65 +150,65 @@ def plot_ari_f1():
     '''
     ## Default
     default_run_all = df_all[(df_all['Method']=="fmcd")&
-                        (df_all['OutlierFraction']==0.5)&
-                        (df_all['NumTrials']==500)&
-                        (df_all['BiasCorrection']==1)&
-                        (df_all['NumOGKIterations']==2)&
-                        (df_all['UnivariateEstimator']=="tauscale")&
-                        (df_all['ReweightingMethod']=="rfch")&
-                        (df_all['NumConcentrationSteps']==10)&
-                        (df_all['StartMethod']=="classical")]
+                            (df_all['OutlierFraction']==0.5)&
+                            (df_all['NumTrials']==500)&
+                            (df_all['BiasCorrection']==1)&
+                            (df_all['NumOGKIterations']==2)&
+                            (df_all['UnivariateEstimator']=="tauscale")&
+                            (df_all['ReweightingMethod']=="rfch")&
+                            (df_all['NumConcentrationSteps']==10)&
+                            (df_all['StartMethod']=="classical")]
     default_all_performance = default_run_all['F1_Median'].values
     default_all_nondeter = default_run_all['ARI_Median'].values
     
     ## Settings 1
     settings1_run = df_all[(df_all['Method']=="ogk")&
-                        (df_all['OutlierFraction']==0.5)&
-                        (df_all['NumTrials']==500)&
-                        (df_all['BiasCorrection']==1)&
-                        (df_all['NumOGKIterations']==2)&
-                        (df_all['UnivariateEstimator']=="tauscale")&
-                        (df_all['ReweightingMethod']=="rfch")&
-                        (df_all['NumConcentrationSteps']==10)&
-                        (df_all['StartMethod']=="classical")]
+                            (df_all['OutlierFraction']==0.5)&
+                            (df_all['NumTrials']==500)&
+                            (df_all['BiasCorrection']==1)&
+                            (df_all['NumOGKIterations']==2)&
+                            (df_all['UnivariateEstimator']=="tauscale")&
+                            (df_all['ReweightingMethod']=="rfch")&
+                            (df_all['NumConcentrationSteps']==10)&
+                            (df_all['StartMethod']=="classical")]
     settings1_performance = settings1_run['F1_Median'].values
     settings1_nondeter = settings1_run['ARI_Median'].values
     
     mean_settings1 = median_df[(median_df['Method']=="ogk")&
-                        (median_df['OutlierFraction']==0.5)&
-                        (median_df['NumTrials']==500)&
-                        (median_df['BiasCorrection']==1)&
-                        (median_df['NumOGKIterations']==2)&
-                        (median_df['UnivariateEstimator']=="qn")&
-                        (median_df['ReweightingMethod']=="rfch")&
-                        (median_df['NumConcentrationSteps']==10)&
-                        (median_df['StartMethod']=="classical")]
+                                (median_df['OutlierFraction']==0.5)&
+                                (median_df['NumTrials']==500)&
+                                (median_df['BiasCorrection']==1)&
+                                (median_df['NumOGKIterations']==2)&
+                                (median_df['UnivariateEstimator']=="qn")&
+                                (median_df['ReweightingMethod']=="rfch")&
+                                (median_df['NumConcentrationSteps']==10)&
+                                (median_df['StartMethod']=="classical")]
     mean_settings1_performance = mean_settings1['F1_Median'].values
     mean_settings1_nondeter = mean_settings1['ARI_Median'].values
     
     ## Settings 2
     settings2_run = df_all[(df_all['Method']=="fmcd")&
-                        (df_all['OutlierFraction']==0.05)&
-                        (df_all['NumTrials']==500)&
-                        (df_all['BiasCorrection']==1)&
-                        (df_all['NumOGKIterations']==2)&
-                        (df_all['UnivariateEstimator']=="tauscale")&
-                        (df_all['ReweightingMethod']=="rfch")&
-                        (df_all['NumConcentrationSteps']==10)&
-                        (df_all['StartMethod']=="classical")]
+                            (df_all['OutlierFraction']==0.05)&
+                            (df_all['NumTrials']==500)&
+                            (df_all['BiasCorrection']==1)&
+                            (df_all['NumOGKIterations']==2)&
+                            (df_all['UnivariateEstimator']=="tauscale")&
+                            (df_all['ReweightingMethod']=="rfch")&
+                            (df_all['NumConcentrationSteps']==10)&
+                            (df_all['StartMethod']=="classical")]
     
     settings2_performance = settings2_run['F1_Median'].values
     settings2_nondeter = settings2_run['ARI_Median'].values
     
     mean_settings2 = median_df[(median_df['Method']=="fmcd")&
-                        (median_df['OutlierFraction']==0.05)&
-                        (median_df['NumTrials']==500)&
-                        (median_df['BiasCorrection']==1)&
-                        (median_df['NumOGKIterations']==2)&
-                        (median_df['UnivariateEstimator']=="tauscale")&
-                        (median_df['ReweightingMethod']=="rfch")&
-                        (median_df['NumConcentrationSteps']==10)&
-                        (median_df['StartMethod']=="classical")]
+                                (median_df['OutlierFraction']==0.05)&
+                                (median_df['NumTrials']==500)&
+                                (median_df['BiasCorrection']==1)&
+                                (median_df['NumOGKIterations']==2)&
+                                (median_df['UnivariateEstimator']=="tauscale")&
+                                (median_df['ReweightingMethod']=="rfch")&
+                                (median_df['NumConcentrationSteps']==10)&
+                                (median_df['StartMethod']=="classical")]
     mean_settings2_performance = mean_settings2['F1_Median'].values
     mean_settings2_nondeter = mean_settings2['ARI_Median'].values
     
@@ -188,12 +228,66 @@ def plot_ari_f1():
     plt.ylabel("Performance (F1 Score)")
     plt.savefig("Fig/MatEE_D_F1_ARI.pdf", bbox_inches="tight", pad_inches=0)
     plt.show()
-
     
+    ## Calculate Percentage
+    
+    s1_win_performance = 0
+    s1_lose_performance = 0
+    s1_win_nd = 0
+    s1_lose_nd = 0
+    s2_win_performance = 0
+    s2_lose_performance = 0
+    s2_win_nd = 0
+    s2_lose_nd = 0
 
+    for i in range(default_run_all.shape[0]):
+        fname = default_run_all.iloc[i]["Filename"]
+        F1_Median = default_run_all.iloc[i]["F1_Median"]
+        ARI_Median = default_run_all.iloc[i]["ARI_Median"]
+        s1_run = settings1_run[settings1_run["Filename"] == fname]
+        s1_F1_Median = s1_run["F1_Median"].values[0]
+        s1_ARI_Median = s1_run["ARI_Median"].values[0]
+        if s1_F1_Median >= F1_Median:
+            s1_win_performance += 1
+        elif s1_F1_Median < F1_Median:
+            s1_lose_performance += 1
+        if s1_ARI_Median >= ARI_Median:
+            s1_win_nd += 1
+        elif s1_ARI_Median < ARI_Median:
+            s1_lose_nd += 1
+
+        s2_run = settings2_run[settings2_run["Filename"] == fname]
+        s2_F1_Median = s2_run["F1_Median"].values
+        s2_ARI_Median = s2_run["ARI_Median"].values
+        if s2_F1_Median >= F1_Median:
+            s2_win_performance += 1
+        elif s2_F1_Median < F1_Median:
+            s2_lose_performance += 1
+        if s2_ARI_Median >= ARI_Median:
+            s2_win_nd += 1
+        elif s2_ARI_Median < ARI_Median:
+            s2_lose_nd += 1
+    
+    print("Default: ", mean_default_nondeter_ari, mean_default_performance)
+    print("Settings1 : ", mean_settings1_nondeter, mean_settings1_performance)
+    print("Settings2 : ", mean_settings2_nondeter, mean_settings2_performance)
+    
+    print("Setting 1", end=': ')
+    print("Performance: ", s1_win_performance, s1_lose_performance)
+    print("Deter: ", s1_win_nd, s1_lose_nd)
+    
+    print("Setting 2", end=': ')
+    print("Performance: ", s2_win_performance, s2_lose_performance)
+    print("Deter: ", s2_win_nd, s2_lose_nd)
+    
+    print(f"Default & {mean_default_nondeter_ari} & -  & -  & {mean_default_performance}  & -  & -  \\\\ \\hline")
+    print(f"Custom & {mean_settings1_nondeter[0]} & {s1_win_nd}  & {s2_lose_nd}  & {mean_settings1_performance[0]}  & {s1_win_performance}  & {s1_lose_performance} \\\\ ")
+    print(f"Custom & {mean_settings2_nondeter[0]} & {s2_win_nd}  & {s2_lose_nd}  & {mean_settings2_performance[0]}  & {s2_win_performance}  & {s2_lose_performance} \\\\ ")
+    
 if __name__ == '__main__':
     # calculate()
-    plot_ari_f1()
+    # plot_ari_f1()
+    top5()
         
         
         

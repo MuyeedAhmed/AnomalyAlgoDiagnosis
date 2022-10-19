@@ -62,6 +62,37 @@ def calculate():
     
     # print(median_df.iloc[median_df["Performance"].idxmax()])
     # print(median_df.iloc[median_df["Nondeterminism"].idxmin()])
+def top5():
+    df_all = pd.read_csv("Stats/SkEE_Merged.csv")
+    default_run_all = df_all[(df_all['store_precision']==True)&
+                        (df_all['assume_centered']==False)&
+                        (df_all['support_fraction']==str(None))&
+                        (df_all['contamination']==str(0.1))]
+    settings2_run = df_all[(df_all['store_precision']==True)&
+                        (df_all['assume_centered']==False)&
+                        (df_all['support_fraction']==str(0.6))&
+                        (df_all['contamination']==str(0.2))]
+    
+    df = pd.DataFrame(columns = ['Filename', 'Determinism_Default', 'Performance_Default', 'Determinism_CS2', 'Performance_CS2', 'Performance_Improve', 'Determinism_Improve'])
+    for i in range(default_run_all.shape[0]):
+        fname = default_run_all.iloc[i]["Filename"]
+        F1_Median = default_run_all.iloc[i]["F1_Median"]
+        ARI_Median = default_run_all.iloc[i]["ARI_Median"]
+ 
+        s2_run = settings2_run[settings2_run["Filename"] == fname]
+        s2_F1_Median = s2_run["F1_Median"].values[0]
+        s2_ARI_Median = s2_run["ARI_Median"].values[0]
+        
+        df = df.append({'Filename' : fname,
+                        'Determinism_Default' : ARI_Median, 
+                        'Performance_Default' : F1_Median, 
+                        'Determinism_CS2' : s2_ARI_Median, 
+                        'Performance_CS2' : s2_F1_Median,
+                        'Performance_Improve' : (s2_F1_Median - F1_Median), 
+                        'Determinism_Improve' :(s2_ARI_Median - ARI_Median)}, ignore_index=True)
+ 
+    df.to_csv("Stats/SkEE_DefaultVSCS2.csv", index = False)
+    
     
 def plot_ari_f1():
     median_df = pd.read_csv("Stats/SkEE_Grouped_Median.csv")    
@@ -202,24 +233,25 @@ def plot_ari_f1():
     
     print("Default: ", mean_default_nondeter_ari, mean_default_performance)
     print("Settings1 : ", mean_settings1_nondeter, mean_settings1_performance)
-    print("Settings1 : ", mean_settings2_nondeter, mean_settings2_performance)
+    print("Settings2 : ", mean_settings2_nondeter, mean_settings2_performance)
     
     print("Setting 1", end=': ')
     print("Performance: ", s1_win_performance, s1_lose_performance)
     print("Deter: ", s1_win_nd, s1_lose_nd)
     
-    # print(s1_win_performance/(s1_win_performance+s1_lose_performance), end=' / ')
-    # print(s1_win_nd/(s1_win_nd+s1_lose_nd))
     print("Setting 2", end=': ')
     print("Performance: ", s2_win_performance, s2_lose_performance)
     print("Deter: ", s2_win_nd, s2_lose_nd)
-    # print(s2_win_performance/(s2_win_performance+s2_lose_performance), end=' / ')
-    # print(s2_win_nd/(s2_win_nd+s2_lose_nd))
     
+    
+    print(f"Default & {mean_default_nondeter_ari} & -  & -  & {mean_default_performance}  & -  & -  \\\\ \\hline")
+    print(f"Custom & {mean_settings1_nondeter[0]} & {s1_win_nd}  & {s2_lose_nd}  & {mean_settings1_performance[0]}  & {s1_win_performance}  & {s1_lose_performance} \\\\ ")
+    print(f"Custom & {mean_settings2_nondeter[0]} & {s2_win_nd}  & {s2_lose_nd}  & {mean_settings2_performance[0]}  & {s2_win_performance}  & {s2_lose_performance} \\\\ ")
     
 if __name__ == '__main__':
-    calculate()
-    plot_ari_f1()
+    # calculate()
+    # plot_ari_f1()
+    top5()
         
         
         

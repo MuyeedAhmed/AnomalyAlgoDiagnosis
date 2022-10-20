@@ -4,7 +4,7 @@ library(rmatio)
 library(dbscan)
 library(MLmetrics)
 library(rio)
-library(raveio)
+# library(raveio)
 library(rlang)
 library(e1071)
 library(pdfCluster)
@@ -54,7 +54,7 @@ isolationforest = function(filename, parameters){
       print("Too Large")
       return()
     }
-    df = read_mat(paste(folderpath,filename,".mat",sep = "")[1])
+    df = read.mat(paste(folderpath,filename,".mat",sep = "")[1])
     gt = df$y
     X = df$X
     if (any(is.na(X))){
@@ -112,12 +112,12 @@ runif = function(filename,X,gt,params){
   
   labels_df = data.frame()
   for (i in 1:c(10)){
-    tryCatch({
+    # tryCatch({
       clustering = isolation.forest(X,ntrees = params[[1]][[2]],standardize_data = params[[2]][[2]], sample_size = p3, ncols_per_tree = p4, seed = sample(c(1:100),1))
-    }, error = function(err){
-      print(err)
-      return()
-    })
+    # }, error = function(err){
+    #   print(err)
+    #   return()
+    # })
     l = predict(clustering,X)
     list_pred = to_vec(for(j in c(1:length(l))) if(l[j] > 0.5) l[j] = 1 else l[j] = 0)
     #    for (j in c(1:length(l))){
@@ -129,18 +129,11 @@ runif = function(filename,X,gt,params){
     #      }
     #    }
     labels = c(labels,list(list_pred))
-    f1score = F1_Score(gt,list_pred)
-    f1 = c(f1,f1score)
+    
     labels_df = rbind(labels_df, data.frame(t(sapply(list_pred,c))))
   }
   write.csv(labels_df,paste('IF_R/',labelfile,".csv",sep=""))
-  #ari
-  for (i in c(1:length(labels))){
-    for (j in c(i+1:length(labels))){
-      ari_score = adjustedRandIndex(labels[i],labels[j])
-      ari = c(ari,ari_score)
-    }
-  }
+  
   
 }
 

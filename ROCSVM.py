@@ -59,7 +59,7 @@ def ocsvm(filename, parameters, parameter_iteration):
     else:
         print("File doesn't exist")
         return
-
+    # print(parameters)
     for p in range(len(parameters)):
         passing_param = deepcopy(parameters)
         print(parameters[p][0], end=': ')
@@ -73,29 +73,32 @@ def ocsvm(filename, parameters, parameter_iteration):
     
     
 def runOCSVM(filename, X, gt, params, parameter_iteration):
-        
-    labelFile = filename + "_" + str(params[0][1]) + "_" + str(params[1][1]) + "_" + str(params[1][1]) + "_" + str(params[3][1]) + "_" + str(params[4][1]) + "_" + str(params[5][1]) + "_" + str(params[6][1]) + "_" + str(params[7][1]) + "_" + str(params[8][1])
+    # print(params)
+    if params[4][1] == 0.0:
+        params[4][1] = "0"
+    if params[4][1] == 0.0:
+        params[4][1] = "0"
+    labelFile = filename + "_" + str(params[0][1]) + "_" + str(params[1][1]) + "_" + str(params[2][1]) + "_" + str(params[3][1]) + "_" + str(params[4][1]) + "_" + str(params[5][1]) + "_" + str(params[6][1]) + "_" + str(params[7][1]) + "_" + str(params[8][1])
 
     if os.path.exists("OCSVM_R/"+labelFile+".csv") == 0:
         # print(labelFile)
         return
-    else:
-        print(labelFile)
-        return
-    if os.path.exists("OCSVM_R_Done/Labels_R_OCSVM_"+labelFile+".csv"):
+    if os.path.exists("OCSVM_R_Done/"+labelFile+".csv"):
         return
     
     labels = []
     f1 = []
     
     
-    labels = pd.read_csv("OCSVM_R/Labels_R_OCSVM_"+labelFile+".csv", header=None).to_numpy()
+    labels = pd.read_csv("OCSVM_R/"+labelFile+".csv").to_numpy()
+    # print(labels[0])
+    labels = np.int64((labels[0][1:])*1)
     
-    f1.append(metrics.f1_score(gt, labels[0]))
+    f1.append(metrics.f1_score(gt, labels))
         
    
           
-    flabel_done=open("OCSVM_R_Done/Labels_R_OCSVM_"+labelFile+".csv", 'a')
+    flabel_done=open("OCSVM_R_Done/"+labelFile+".csv", 'a')
     flabel_done.write("Done")
     flabel_done.close()
     
@@ -217,29 +220,27 @@ if __name__ == '__main__':
     kernel = ['linear', 'polynomial', 'radial', 'sigmoid']
     degree = [3, 4, 5, 6]
     gamma = ['scale', 'auto']
-    coef0 = [0.0, 0.1, 0.2, 0.3, 0.4]
+    coef0 = [0, 0.1, 0.2, 0.3, 0.4]
     tolerance = [0.1, 0.01, 0.001, 0.0001, 0.00001]
     nu = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
-    shrinking = [True, False]
+    shrinking = ["TRUE", "FALSE"]
     cachesize = [50, 100, 200, 400]
     epsilon = [0.1, 0.2, 0.01, 0.05]
     
     parameters.append(["kernel", 'radial', kernel])
     parameters.append(["degree", 3, degree])
-    parameters.append(["gamma","auto",gamma])
-    parameters.append(["coef0", 0.0, coef0])
+    parameters.append(["gamma","scale",gamma])
+    parameters.append(["coef0", 0, coef0])
     parameters.append(["tolerance", 0.001, tolerance])
-    parameters.append(["nu", 0.5, nu])
-    parameters.append(["shrinking", True, shrinking])
+    parameters.append(["nu", "IF", nu])
+    parameters.append(["shrinking", "TRUE", shrinking])
     parameters.append(["cachesize", 200, cachesize])
     parameters.append(["epsilon",0.1,epsilon])
         
     
-    R="R"
-        
     if os.path.exists("Stats/ROCSVM_F1.csv") == 0: 
         fstat_f1=open("Stats/ROCSVM_F1.csv", "w")
-        fstat_f1.write('Filename,kernel,degree,gamma,coef0,tolerance,nu,shrinking,cachesize,epsilon,Parameter_Iteration,'+R+"\n")
+        fstat_f1.write("Filename,kernel,degree,gamma,coef0,tolerance,nu,shrinking,cachesize,epsilon,Parameter_Iteration,R\n")
         fstat_f1.close()
         
         
@@ -265,7 +266,7 @@ if __name__ == '__main__':
     for FileNumber in range(len(master_files)):
         print(FileNumber, end=' ')
         ocsvm(master_files[FileNumber], parameters, 0)
-        break
+        
 
     # MWU_geo = [10]*len(parameters)
     # MWU_min = [10]*len(parameters)

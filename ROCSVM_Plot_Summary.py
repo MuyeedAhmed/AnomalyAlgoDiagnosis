@@ -10,13 +10,7 @@ import math
 def calculate():
     df_f1 = pd.read_csv("Stats/ROCSVM_F1.csv")
     
-    runs_r = []
-    runs_ari = []
-    
-    for i in range(10):
-        runs_r.append(('R'+str(i)))
-    for i in range(45):
-        runs_ari.append(('R'+str(i)))
+    runs_r = 'R'
 
     df_f1["F1_Median"] = 0
     
@@ -28,7 +22,6 @@ def calculate():
             range_ = 0
             
         df_f1.iloc[i, df_f1.columns.get_loc('F1_Median')] =  np.mean(run_values)
-        df_f1.iloc[i, df_f1.columns.get_loc('F1_Range')] = range_
     df_f1 = df_f1.drop(columns=runs_r, axis=1)
         
     parameter_names = ["kernel","degree","gamma","coef0","tolerance","nu","shrinking","cachesize","epsilon"]

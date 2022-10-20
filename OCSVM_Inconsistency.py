@@ -57,6 +57,7 @@ def get_ari_sk_r(filename, param_sk, param_r):
     if os.path.exists("../AnomalyAlgoDiagnosis_Labels/OCSVM_Sk/Labels_Sk_OCSVM_"+labelFile_sk+".csv") == 0:
         # print(labelFile_sk)
         return 0
+    
 
     labels_sk =  pd.read_csv("../AnomalyAlgoDiagnosis_Labels/OCSVM_Sk/Labels_Sk_OCSVM_"+labelFile_sk+".csv", header=None).to_numpy()    
     
@@ -73,6 +74,9 @@ def get_ari_r_mat(filename, param_mat, param_r):
     labelFile_mat = filename + "_" + str(param_mat[0][1]) + "_" + str(param_mat[1][1]) + "_" + str(param_mat[2][1]) + "_" + str(param_mat[3][1]) + "_" + str(param_mat[4][1]) + "_" + str(param_mat[5][1]) + "_" + str(param_mat[6][1]) + "_" + str(param_mat[7][1])
 
     if os.path.exists("OCSVM_Matlab/Labels_Mat_OCSVM_"+labelFile_mat+".csv") == 0:
+        # print(labelFile_sk)
+        return 0
+    if os.path.exists("OCSVM_R/"+labelFile_r+".csv") == 0:
         # print(labelFile_sk)
         return 0
 
@@ -148,65 +152,62 @@ def run_mat_r():
         ari = get_ari_r_mat(file, parameters_mat, parameters_r)
         if ari == 0:
             continue
-        ari_mean = ari
+        ari_mean = np.mean(ari)
+        ari_min = np.min(ari)
         
         df = df.append({'Filename' : file,
                         'Configuration' : "Default", 
                         'Mean ARI' : ari_mean, 
-                        'Min ARI' : 0}, ignore_index=True)
+                        'Min ARI' : ari_min}, ignore_index=True)
     
     
-    # parameters_r[5][1] = 0.2
-    # parameters_mat[5][1] = 0.2
-    # for file in master_files:
-    #     ari = get_ari_r_mat(file, parameters_mat, parameters_r)
-    #     if ari == 0:
-    #         continue
-    #     ari_mean = ari
+    parameters_mat[0][1] = 0.2
+    parameters_r[5][1] = 0.2
+    for file in master_files:
+        ari = get_ari_r_mat(file, parameters_mat, parameters_r)
+        if ari == 0:
+            continue
+        ari_mean = np.mean(ari)
+        ari_min = np.min(ari)
         
-    #     df = df.append({'Filename' : file,
-    #                     'Configuration' : "Configure 1", 
-    #                     'Mean ARI' : ari_mean, 
-    #                     'Min ARI' : 0}, ignore_index=True)
+        df = df.append({'Filename' : file,
+                        'Configuration' : "Configure 1", 
+                        'Mean ARI' : ari_mean, 
+                        'Min ARI' : ari_min}, ignore_index=True)
         
-    # parameters_r[2][1] = "auto"
-    # parameters_r[5][1] = "IF"
-    # parameters_mat[5][1] = "IF"
-    # for file in master_files:
-    #     ari = get_ari_r_mat(file, parameters_mat, parameters_r)
-    #     if ari == 0:
-    #         continue
-        
-    #     df = df.append({'Filename' : file,
-    #                     'Configuration' : "Configure 2",
-    #                     'Mean ARI' : ari,
-    #                     'Min ARI' : 0}, ignore_index=True)
     
-    # parameters_r[2][1] = "scale"
-    # parameters_r[0][1] = "polynomial"
-    # for file in master_files:
-    #     ari = get_ari_r_mat(file, parameters_mat, parameters_r)
-    #     if ari == 0:
-    #         continue
+    parameters_mat[0][1] = "IF"
+    parameters_mat[1][1] = 'auto'
+    parameters_r[2][1] = "auto"
+    parameters_r[5][1] = "IF"
+    for file in master_files:
+        ari = get_ari_r_mat(file, parameters_mat, parameters_r)
+        if ari == 0:
+            continue
+        ari_mean = np.mean(ari)
+        ari_min = np.min(ari)
         
-    #     df = df.append({'Filename' : file,
-    #                     'Configuration' : "Configure 3",
-    #                     'Mean ARI' : ari,
-    #                     'Min ARI' : 0}, ignore_index=True)
-
-    # parameters_r[5][1] = 0.2
-    # parameters_mat[5][1] = 0.2
+        df = df.append({'Filename' : file,
+                        'Configuration' : "Configure 2", 
+                        'Mean ARI' : ari_mean, 
+                        'Min ARI' : ari_min}, ignore_index=True)
     
-    # # parameters_mat[0][1] = "poly"
-    # for file in master_files:
-    #     ari = get_ari_r_mat(file, parameters_mat, parameters_r)
-    #     if ari == 0:
-    #         continue
+    
+    parameters_r[2][1] = "scale"
+    parameters_r[0][1] = "polynomial"
+    for file in master_files:
+        ari = get_ari_r_mat(file, parameters_mat, parameters_r)
+        if ari == 0:
+            continue
+        ari_mean = np.mean(ari)
+        ari_min = np.min(ari)
         
-    #     df = df.append({'Filename' : file,
-    #                     'Configuration' : "Configure 4", 
-    #                     'Mean ARI' : ari,
-    #                     'Min ARI' : 0}, ignore_index=True)
+        df = df.append({'Filename' : file,
+                        'Configuration' : "Configure 3", 
+                        'Mean ARI' : ari_mean, 
+                        'Min ARI' : ari_min}, ignore_index=True)
+    
+        
     
     
     
@@ -214,15 +215,15 @@ def run_mat_r():
     axmean = sns.boxplot(x="Configuration", y="Mean ARI", data=df)
     axmean.set(xlabel=None)
     plt.title("One Class SVM - Matlab VS R")
-    # plt.savefig("Fig/BoxPlot/OCSVM_MatR_MeanARI.pdf", bbox_inches="tight", pad_inches=0)
-    # plt.clf()
+    plt.savefig("Fig/BoxPlot/OCSVM_MatR_MeanARI.pdf", bbox_inches="tight", pad_inches=0)
+    plt.clf()
     
-    # fig = plt.Figure()
-    # axmin = sns.boxplot(x="Configuration", y="Min ARI", data=df)
-    # axmin.set(xlabel=None)
-    # plt.title("One Class SVM - Matlab VS R")
-    # plt.savefig("Fig/BoxPlot/OCSVM_MatR_MinARI.pdf", bbox_inches="tight", pad_inches=0)
-    # plt.clf()
+    fig = plt.Figure()
+    axmin = sns.boxplot(x="Configuration", y="Min ARI", data=df)
+    axmin.set(xlabel=None)
+    plt.title("One Class SVM - Matlab VS R")
+    plt.savefig("Fig/BoxPlot/OCSVM_MatR_MinARI.pdf", bbox_inches="tight", pad_inches=0)
+    plt.clf()
     
 def run_sk_r():
     folderpath = datasetFolderDir

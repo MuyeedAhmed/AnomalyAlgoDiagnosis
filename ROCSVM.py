@@ -59,7 +59,6 @@ def ocsvm(filename, parameters, parameter_iteration):
     else:
         print("File doesn't exist")
         return
-    # print(parameters)
     for p in range(len(parameters)):
         passing_param = deepcopy(parameters)
         print(parameters[p][0], end=': ')
@@ -81,7 +80,6 @@ def runOCSVM(filename, X, gt, params, parameter_iteration):
     labelFile = filename + "_" + str(params[0][1]) + "_" + str(params[1][1]) + "_" + str(params[2][1]) + "_" + str(params[3][1]) + "_" + str(params[4][1]) + "_" + str(params[5][1]) + "_" + str(params[6][1]) + "_" + str(params[7][1]) + "_" + str(params[8][1])
 
     if os.path.exists("OCSVM_R/"+labelFile+".csv") == 0:
-        # print(labelFile)
         return
     if os.path.exists("OCSVM_R_Done/"+labelFile+".csv"):
         return

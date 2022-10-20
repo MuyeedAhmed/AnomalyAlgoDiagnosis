@@ -29,7 +29,7 @@ import math
 datasetFolderDir = 'Dataset/'
 
 
-def get_ari(filename, param_sk, param_mat):
+def get_ari_sk_mat(filename, param_sk, param_mat):
     labelFile_sk = filename + "_" + str(param_sk[0][1]) + "_" + str(param_sk[1][1]) + "_" + str(param_sk[2][1]) + "_" + str(param_sk[3][1]) + "_" + str(param_sk[4][1]) + "_" + str(param_sk[5][1]) + "_" + str(param_sk[6][1])
     labelFile_mat = filename + "_" + str(param_mat[0][1]) + "_" + str(param_mat[1][1]) + "_" + str(param_mat[2][1])
 
@@ -92,35 +92,22 @@ if __name__ == '__main__':
     df = pd.DataFrame(columns = ['Filename', 'Configuration', 'Mean ARI', 'Min ARI'])
     
     
-    
-    
-                                    
-    
-    
-    # ari_all = []
-    # ari_mean_all = []
-    # ari_min_all = []
     for file in master_files:
-        ari = get_ari(file, parameters_sk, parameters_mat)
+        ari = get_ari_sk_mat(file, parameters_sk, parameters_mat)
         if ari == 0:
             continue
         ari_mean = np.mean(ari)
         ari_min = np.min(ari)
-        # ari_all.append(ari)
-        # ari_mean_all.append(ari_mean)
-        # ari_min_all.append(ari_min)
         
         df = df.append({'Filename' : file,
                         'Configuration' : "Default", 
                         'Mean ARI' : ari_mean, 
                         'Min ARI' : ari_min}, ignore_index=True)
-        
-    # ari_all_flat = [item for sublist in ari_all for item in sublist]
     
     
     parameters_mat[0][1] = 0.1
     for file in master_files:
-        ari = get_ari(file, parameters_sk, parameters_mat)
+        ari = get_ari_sk_mat(file, parameters_sk, parameters_mat)
         if ari == 0:
             continue
         ari_mean = np.mean(ari)
@@ -134,7 +121,7 @@ if __name__ == '__main__':
     
     parameters_mat[0][1] = "IF"
     for file in master_files:
-        ari = get_ari(file, parameters_sk, parameters_mat)
+        ari = get_ari_sk_mat(file, parameters_sk, parameters_mat)
         if ari == 0:
             continue
         ari_mean = np.mean(ari)
@@ -149,7 +136,7 @@ if __name__ == '__main__':
     parameters_sk[0][1] = 512
     parameters_mat[1][1] = 512
     for file in master_files:
-        ari = get_ari(file, parameters_sk, parameters_mat)
+        ari = get_ari_sk_mat(file, parameters_sk, parameters_mat)
         if ari == 0:
             continue
         ari_mean = np.mean(ari)
@@ -164,7 +151,7 @@ if __name__ == '__main__':
     parameters_sk[1][1] = 0.4
     parameters_sk[3][1] = 0.7
     for file in master_files:
-        ari = get_ari(file, parameters_sk, parameters_mat)
+        ari = get_ari_sk_mat(file, parameters_sk, parameters_mat)
         if ari == 0:
             continue
         ari_mean = np.mean(ari)
@@ -191,9 +178,3 @@ if __name__ == '__main__':
     
     
     
-    
-# (median_df['max_samples']==str(1.0))&
-# (median_df['max_features']==0.7)&
-
-# (df_all['max_samples']==str(0.4))&
-# (df_all['max_features']==0.7)&

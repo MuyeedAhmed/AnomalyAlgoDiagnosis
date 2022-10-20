@@ -67,7 +67,7 @@ def plot_ari_f1():
     Plot Group Summary
     '''
    
-    default_run_mean = median_df[(median_df['ContaminationFraction']==str(0))&
+    default_run_mean = median_df[(median_df['ContaminationFraction']==str(0.1))&
                             (median_df['KernelScale']==str(1))&
                             (median_df['Lambda']=='auto')&
                             (median_df['NumExpansionDimensions']=='auto')&
@@ -109,7 +109,7 @@ def plot_ari_f1():
     Plot For All Dataset
     '''
     ## Default
-    default_run_all = df_all[(df_all['ContaminationFraction']==str(0))&
+    default_run_all = df_all[(df_all['ContaminationFraction']==str(0.1))&
                             (df_all['KernelScale']==str(1))&
                             (df_all['Lambda']=='auto')&
                             (df_all['NumExpansionDimensions']=='auto')&
@@ -236,13 +236,13 @@ def plot_ari_f1():
     print("Performance: ", s1_win_performance, s1_lose_performance)
     print("Deter: ", s1_win_nd, s1_lose_nd)
     
-    # print(s1_win_performance/(s1_win_performance+s1_lose_performance), end=' / ')
-    # print(s1_win_nd/(s1_win_nd+s1_lose_nd))
     print("Setting 2", end=': ')
     print("Performance: ", s2_win_performance, s2_lose_performance)
     print("Deter: ", s2_win_nd, s2_lose_nd)
-    # print(s2_win_performance/(s2_win_performance+s2_lose_performance), end=' / ')
-    # print(s2_win_nd/(s2_win_nd+s2_lose_nd))
+    
+    print(f"Default & {mean_default_nondeter_ari} & -  & -  & {mean_default_performance}  & -  & -  \\\\ \\hline")
+    print(f"Custom & {mean_settings1_nondeter[0]} & {s1_win_nd}  & {s2_lose_nd}  & {mean_settings1_performance[0]}  & {s1_win_performance}  & {s1_lose_performance} \\\\ ")
+    print(f"Custom & {mean_settings2_nondeter[0]} & {s2_win_nd}  & {s2_lose_nd}  & {mean_settings2_performance[0]}  & {s2_win_performance}  & {s2_lose_performance} \\\\ ")
 
 if __name__ == '__main__':
     calculate()

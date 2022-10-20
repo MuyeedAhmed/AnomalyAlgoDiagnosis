@@ -119,8 +119,8 @@ if __name__ == '__main__':
                         'Min ARI' : ari_min}, ignore_index=True)
     
     
-    parameters_mat[0][1] = "IF"
-    parameters_mat[1][1] = 'auto'
+    parameters_mat[0][1] = 0.2
+    parameters_mat[1][1] = 1
     for file in master_files:
         ari = get_ari(file, parameters_sk, parameters_mat)
         if ari == 0:
@@ -134,7 +134,9 @@ if __name__ == '__main__':
                         'Min ARI' : ari_min}, ignore_index=True)
         
     
-    parameters_mat[0][1] = "LOF"
+    parameters_mat[0][1] = "IF"
+    parameters_mat[1][1] = 'auto'
+    parameters_sk[5][1] = "IF"
     for file in master_files:
         ari = get_ari(file, parameters_sk, parameters_mat)
         if ari == 0:
@@ -149,6 +151,8 @@ if __name__ == '__main__':
 
 
     parameters_mat[2][1] = 0.2
+    parameters_mat[0][1] = "LOF"
+    parameters_sk[5][1] = "LOF"
     for file in master_files:
         ari = get_ari(file, parameters_sk, parameters_mat)
         if ari == 0:
@@ -162,32 +166,33 @@ if __name__ == '__main__':
                         'Min ARI' : ari_min}, ignore_index=True)
     
     
-    # parameters_sk[1][1] = 0.4
-    # parameters_sk[3][1] = 0.7
-    # for file in master_files:
-    #     ari = get_ari(file, parameters_sk, parameters_mat)
-    #     if ari == 0:
-    #         continue
-    #     ari_mean = np.mean(ari)
-    #     ari_min = np.min(ari)
+    parameters_mat[2][1] = 'auto'
+    parameters_mat[0][1] = "LOF"
+    parameters_sk[5][1] = "LOF"
+    for file in master_files:
+        ari = get_ari(file, parameters_sk, parameters_mat)
+        if ari == 0:
+            continue
+        ari_mean = np.mean(ari)
+        ari_min = np.min(ari)
         
-    #     df = df.append({'Filename' : file,
-    #                     'Configuration' : "Configure 4", 
-    #                     'Mean ARI' : ari_mean,
-    #                     'Min ARI' : ari_min}, ignore_index=True)
+        df = df.append({'Filename' : file,
+                        'Configuration' : "Configure 4", 
+                        'Mean ARI' : ari_mean,
+                        'Min ARI' : ari_min}, ignore_index=True)
     
     fig = plt.Figure()
     axmean = sns.boxplot(x="Configuration", y="Mean ARI", data=df)
     axmean.set(xlabel=None)
     plt.title("Isolation Forest - Scikit-learn VS Matlab")
-    # plt.savefig("Fig/BoxPlot/OCSVM_SkMat_MeanARI.pdf", bbox_inches="tight", pad_inches=0)
-    # plt.clf()
+    plt.savefig("Fig/BoxPlot/OCSVM_SkMat_MeanARI.pdf", bbox_inches="tight", pad_inches=0)
+    plt.clf()
     
-    # fig = plt.Figure()
-    # axmin = sns.boxplot(x="Configuration", y="Min ARI", data=df)
-    # axmin.set(xlabel=None)
-    # plt.title("Isolation Forest - Scikit-learn VS Matlab")
-    # plt.savefig("Fig/BoxPlot/OCSVM_SkMat_MinARI.pdf", bbox_inches="tight", pad_inches=0)
-    # plt.clf()
+    fig = plt.Figure()
+    axmin = sns.boxplot(x="Configuration", y="Min ARI", data=df)
+    axmin.set(xlabel=None)
+    plt.title("Isolation Forest - Scikit-learn VS Matlab")
+    plt.savefig("Fig/BoxPlot/OCSVM_SkMat_MinARI.pdf", bbox_inches="tight", pad_inches=0)
+    plt.clf()
     
     

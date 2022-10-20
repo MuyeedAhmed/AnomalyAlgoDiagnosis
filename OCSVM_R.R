@@ -40,7 +40,7 @@ parameters = append(parameters,list(list("kernel", 'radial', kernel)))
 parameters = append(parameters, list(list("degree", 3, degree)))
 parameters = append(parameters,list(list("coef0", 0.0, coef0)))
 parameters = append(parameters,list(list("tolerance", 0.001, tolerance)))
-parameters = append(parameters,list(list("nu", 0.2, nu)))
+parameters = append(parameters,list(list("nu", 'IF', nu)))
 parameters = append(parameters,list(list("shrinking", TRUE, shrinking)))
 parameters = append(parameters,list(list("cachesize", 200, cachesize)))
 parameters = append(parameters,list(list("epsilon",0.1,epsilon)))
@@ -128,9 +128,16 @@ runocsvm = function(filename,X,gt,params){
   }else{
     g = 1 / (dim(X)[2]*mean(var(X)))
   }
+  nu_m = params[[5]][[2]]
+  if (params[[5]][[2]] == "IF"){
+    df_anomaly = read.csv(paste('Stats/SkPercentage.csv',sep="")[1])
+    master_files = df_anomaly$Filename
+    nu_m = df_anomaly[df_anomaly$Filename == filename, ]$IF
+  }
+  
   
   tryCatch({
-    clustering = svm(X,kernel = params[[1]][[2]], degree = params[[2]][[2]], gamma = g,coef0 = params[[3]][[2]],tolerance = params[[4]][[2]],nu = params[[5]][[2]],shrinking = params[[6]][[2]],cachesize = params[[7]][[2]],epsilon = params[[8]][[2]])
+    clustering = svm(X,kernel = params[[1]][[2]], degree = params[[2]][[2]], gamma = g,coef0 = params[[3]][[2]],tolerance = params[[4]][[2]],nu = nu_m,shrinking = params[[6]][[2]],cachesize = params[[7]][[2]],epsilon = params[[8]][[2]])
   }, error = function(err){
     print(err)
     return()

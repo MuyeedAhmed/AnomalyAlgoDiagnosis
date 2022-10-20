@@ -16,7 +16,8 @@ from scipy.io import loadmat
 from sklearn.ensemble import IsolationForest
 import numpy as np
 from sklearn.neighbors import LocalOutlierFactor
-
+from sklearn.svm import OneClassSVM
+import random
 
 datasetFolderDir = 'Dataset/'
 
@@ -25,6 +26,9 @@ def algo(filename):
     folderpath = datasetFolderDir
     
     if os.path.exists(folderpath+filename+".mat") == 1:
+        if os.path.getsize(folderpath+filename+".mat") > 200000: # 10MB
+            print("Didn\'t run -> Too large - ", filename)    
+            return
         try:
             df = loadmat(folderpath+filename+".mat")
         except NotImplementedError:
@@ -38,7 +42,7 @@ def algo(filename):
             return
         
     elif os.path.exists(folderpath+filename+".csv") == 1:
-        if os.path.getsize(folderpath+filename+".csv") > 1000000: # 10MB
+        if os.path.getsize(folderpath+filename+".csv") > 200000: # 10MB
             print("Didn\'t run -> Too large - ", filename)    
             return
         X = pd.read_csv(folderpath+filename+".csv")
@@ -59,31 +63,40 @@ def algo(filename):
     
 def runALGO(filename, X, gt):
     labels = []
-    _, counts_act = np.unique(gt, return_counts=True)
-    act = min(counts_act)/len(gt)
+    # _, counts_act = np.unique(gt, return_counts=True)
+    # act = min(counts_act)/len(gt)
     
-    for i in range(10):
-        clustering = IsolationForest().fit(X)
+    # for i in range(10):
+    #     clustering = IsolationForest().fit(X)
     
-        l = clustering.predict(X)
-        l = [0 if x == 1 else 1 for x in l]
-        labels.append(l)
-    _, counts_if = np.unique(labels, return_counts=True)
-    if_per = min(counts_if)/(len(gt)*10)
+    #     l = clustering.predict(X)
+    #     l = [0 if x == 1 else 1 for x in l]
+    #     labels.append(l)
+    # _, counts_if = np.unique(labels, return_counts=True)
+    # if_per = min(counts_if)/(len(gt)*10)
 
     
-    labels_lof = LocalOutlierFactor().fit_predict(X)
-    _, counts_lof = np.unique(labels_lof, return_counts=True)
-    lof_per = min(counts_lof)/(len(gt))
+    # labels_lof = LocalOutlierFactor().fit_predict(X)
+    # _, counts_lof = np.unique(labels_lof, return_counts=True)
+    # lof_per = min(counts_lof)/(len(gt))
     
-    if if_per == 1:
-        if_per = 0
-    if lof_per == 1:
-        lof_per = 0
+    
+    nu_s = random.uniform(0, .5)
+    clustering = OneClassSVM(nu = nu_s).fit(X)
+    labels_ocsvm = clustering.predict(X)
+    _, counts_ocsvm = np.unique(labels_ocsvm, return_counts=True)
+    ocsvm_per = min(counts_ocsvm)/(len(gt))
+    print(nu_s, ocsvm_per)
+    # if if_per == 1:
+    #     if_per = 0
+    # if lof_per == 1:
+    #     lof_per = 0
+    # if ocsvm_per == 1:
+    #     ocsvm_per = 0
         
-    fp=open("Stats/SkPercentage.csv", 'a')
-    fp.write(filename+','+str(act)+','+str(if_per)+','+str(lof_per)+'\n')
-    fp.close()
+    # fp=open("Stats/SkPercentage.csv", 'a')
+    # fp.write(filename+','+str(act)+','+str(if_per)+','+str(lof_per)+','+str(ocsvm_per)+'\n')
+    # fp.close()
 
 
 if __name__ == '__main__':
@@ -97,9 +110,9 @@ if __name__ == '__main__':
     master_files.sort()
     
 
-    fp=open("Stats/SkPercentage.csv", "w")
-    fp.write('Filename,Actual,IF,LOF\n')
-    fp.close()
+    # fp=open("Stats/SkPercentage.csv", "w")
+    # fp.write('Filename,Actual,IF,LOF,OCSVM\n')
+    # fp.close()
         
     
     for FileNumber in range(len(master_files)):

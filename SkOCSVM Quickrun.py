@@ -89,8 +89,16 @@ def runOCSVM(filename, X, gt, params, parameter_iteration):
     labels = []
     f1 = []
     
+    nu_contamination = params[5][1]
+    if nu_contamination == "LOF":
+        percentage_file = pd.read_csv("Stats/SkPercentage.csv")
+        nu_contamination  = percentage_file[percentage_file["Filename"] == filename]["LOF"].to_numpy()[0]
+    if nu_contamination == "IF":
+        percentage_file = pd.read_csv("Stats/SkPercentage.csv")
+        nu_contamination  = percentage_file[percentage_file["Filename"] == filename]["IF"].to_numpy()[0]
+        
     try:
-        clustering = OneClassSVM(kernel=params[0][1], degree=params[1][1], gamma=params[2][1], coef0=params[3][1], tol=params[4][1], nu=params[5][1], 
+        clustering = OneClassSVM(kernel=params[0][1], degree=params[1][1], gamma=params[2][1], coef0=params[3][1], tol=params[4][1], nu=nu_contamination, 
                                      shrinking=params[6][1], cache_size=params[7][1], max_iter=params[8][1]).fit(X)
     except:
         return
@@ -101,8 +109,8 @@ def runOCSVM(filename, X, gt, params, parameter_iteration):
 
     f1.append(metrics.f1_score(gt, l))
         
-    if os.path.exists("../AnomalyAlgoDiagnosis_Labels/Labels_Sk_OCSVM_"+labelFile+".csv") == 0:
-        fileLabels=open("../AnomalyAlgoDiagnosis_Labels/Labels_Sk_OCSVM_"+labelFile+".csv", 'a')
+    if os.path.exists("../AnomalyAlgoDiagnosis_Labels/OCSVM_Sk/Labels_Sk_OCSVM_"+labelFile+".csv") == 0:
+        fileLabels=open("../AnomalyAlgoDiagnosis_Labels/OCSVM_Sk/Labels_Sk_OCSVM_"+labelFile+".csv", 'a')
         for l in labels:
             fileLabels.write(','.join(str(s) for s in l) + '\n')
         fileLabels.close()
@@ -236,7 +244,7 @@ if __name__ == '__main__':
     gamma = ['scale', 'auto'] # Kernel ‘rbf’, ‘poly’ and ‘sigmoid’
     coef0 = [0.0, 0.1, 0.2, 0.3, 0.4] # Kernel ‘poly’ and ‘sigmoid’
     tol = [1e-1, 1e-2, 1e-3, 1e-4, 1e-5]
-    nu = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+    nu = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 'IF', 'LOF']
     shrinking = [True, False]
     cache_size = [50, 100, 200, 400]
     max_iter = [50, 100, 150, 200, 250, 300, -1]
@@ -246,7 +254,7 @@ if __name__ == '__main__':
     parameters.append(["gamma", 'scale', gamma])
     parameters.append(["coef0", 0.0, coef0])
     parameters.append(["tol", 1e-3, tol])
-    parameters.append(["nu", 0.5, nu])
+    parameters.append(["nu", 'IF', nu])
     parameters.append(["shrinking", True, shrinking])
     parameters.append(["cache_size", 200, cache_size])
     parameters.append(["max_iter", -1, max_iter])

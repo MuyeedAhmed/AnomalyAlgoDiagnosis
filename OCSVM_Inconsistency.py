@@ -148,7 +148,7 @@ if __name__ == '__main__':
                         'Min ARI' : ari_min}, ignore_index=True)
 
 
-    parameters_sk[0][1] = 512
+    parameters_mat[2][1] = 0.2
     for file in master_files:
         ari = get_ari(file, parameters_sk, parameters_mat)
         if ari == 0:

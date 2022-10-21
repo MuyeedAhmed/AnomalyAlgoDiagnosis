@@ -68,7 +68,7 @@ def get_ari_sk_r(filename, param_sk, param_r):
     ari = []
     
     for i in range(len(labels_sk)):
-        for j in range(len(labelFile_r)):
+        for j in range(len(labels_r)):
             ari.append(adjusted_rand_score(labels_sk[i], np.int64((labels_r[j][1:])*1)))
             
     return ari
@@ -335,15 +335,15 @@ def run_sk_r():
     axmean = sns.boxplot(x="Configuration", y="Mean ARI", data=df)
     axmean.set(xlabel=None)
     plt.title("Isolation Forest - Scikit-learn VS R")
-    # plt.savefig("Fig/BoxPlot/IF_SkR_MeanARI.pdf", bbox_inches="tight", pad_inches=0)
-    # plt.clf()
+    plt.savefig("Fig/BoxPlot/IF_SkR_MeanARI.pdf", bbox_inches="tight", pad_inches=0)
+    plt.clf()
     
-    # fig = plt.Figure()
-    # axmin = sns.boxplot(x="Configuration", y="Min ARI", data=df)
-    # axmin.set(xlabel=None)
-    # plt.title("Isolation Forest - Scikit-learn VS R")
-    # plt.savefig("Fig/BoxPlot/IF_SkR_MinARI.pdf", bbox_inches="tight", pad_inches=0)
-    # plt.clf()
+    fig = plt.Figure()
+    axmin = sns.boxplot(x="Configuration", y="Min ARI", data=df)
+    axmin.set(xlabel=None)
+    plt.title("Isolation Forest - Scikit-learn VS R")
+    plt.savefig("Fig/BoxPlot/IF_SkR_MinARI.pdf", bbox_inches="tight", pad_inches=0)
+    plt.clf()
 
 def run_sk_mat():
     folderpath = datasetFolderDir

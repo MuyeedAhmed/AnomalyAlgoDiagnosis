@@ -68,7 +68,7 @@ def calculateAccuracy(filename, Algo):
     #     print("Didn\'t run -> NaN")
     #     return
     
-    X_embedded = TSNE(n_components=2, learning_rate='auto',perplexity = 5,
+    X_embedded = TSNE(n_components=2, learning_rate='auto',perplexity = 250,
                        init='random', random_state=(0)).fit_transform(X)
     
     X_embedded = pd.DataFrame(X_embedded)
@@ -341,9 +341,9 @@ if __name__ == '__main__':
     # for Algo in Algos:    
     #     for FileNumber in range(len(master_files)):
     #         calculateAccuracy(master_files[FileNumber], Algo)
-    # calculateAccuracy("appendicitis", "IF")
+    calculateAccuracy("arsenic-male-lung", "IF")
         
-    calculateAccuracy("breastw", "IF")
+    # calculateAccuracy("breastw", "IF")
         
 
 

@@ -1,0 +1,8 @@
+ParameterName,MWU_Score
+n_estimators,1
+max_samples,3
+contamination,7
+max_features,4
+bootstrap,5
+n_jobs,6
+warm_start,2

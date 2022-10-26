@@ -66,21 +66,23 @@ def isolationforest(filename, parameters, parameter_iteration, parameter_ranking
         print("File doesn't exist")
         return
     
-    ari_total = []
+    # get_blind_route(X, gt, filename, deepcopy(parameters), parameter_iteration, parameter_rankings)
+    get_guided_route(X, gt, filename, deepcopy(parameters), parameter_iteration, parameter_rankings)
+    
+def get_blind_route(X, gt, filename, parameters_this_file, parameter_iteration, parameter_rankings):
+    blind_route = []
     
     for p_i in range(len(parameters_this_file)):
         p = np.where(parameter_rankings == p_i)
         p = p[0][0]
-    #     continue
-    # return
-    # if True:
-        ari_param = []
+        
+        parameter_route = []
         ari_scores = []
         passing_param = deepcopy(parameters_this_file)
 
-        default_ari = runIF(filename, X, gt, passing_param, parameter_iteration)
+        default_f1, default_ari = runIF(filename, X, gt, passing_param, parameter_iteration)
 
-        ari_param.append([passing_param[p][1], default_ari])
+        parameter_route.append([passing_param[p][1], default_ari, default_f1])
         ari_scores.append(default_ari)
         # print(parameters[p][0], end=': ')
         i_def = passing_param[p][2].index(passing_param[p][1])
@@ -90,22 +92,22 @@ def isolationforest(filename, parameters, parameter_iteration, parameter_ranking
             i_pv = i_def+1
         
         while True:
-            print(ari_param)
             if i_pv >= len(parameters_this_file[p][2]):
                 break
             if i_pv < 0:
                 break
             # print(parameters[p][2][i_pv], end = '- ')
-            
-            
+
             passing_param[p][1] = parameters_this_file[p][2][i_pv]
-            ari_score = runIF(filename, X, gt, passing_param, parameter_iteration)
-            if i_pv > i_def:
-                ari_param.append([passing_param[p][1], ari_score])
+            f1_score, ari_score = runIF(filename, X, gt, passing_param, parameter_iteration)
+
+            if ari_score >= np.max(ari_scores):
+                # if i_pv > i_def:
+                parameter_route.append([passing_param[p][1], ari_score, f1_score])
                 ari_scores.append(ari_score)
-            else:
-                ari_param.insert(0, [passing_param[p][1], ari_score])
-                ari_scores.insert(0, ari_score)
+                # else:
+                #     parameter_route.insert(0, [passing_param[p][1], ari_score])
+                #     ari_scores.insert(0, ari_score)
             
             if ari_score != np.max(ari_scores):
                 
@@ -120,36 +122,181 @@ def isolationforest(filename, parameters, parameter_iteration, parameter_ranking
                     i_pv += 1
                 else:
                     i_pv -= 1
-        print()
+        # print()
         max_index = ari_scores.index(max(ari_scores))
         default_index = ari_scores.index(default_ari)
-        parameters_this_file[p][1] = ari_param[max_index][0]
-        ari_total.append([parameters_this_file[p][0], max_index, default_index, ari_param])
-    print(ari_total)
-    param_names = []
-    for i in range(len(ari_total)):
-        param_names.append(ari_total[i][0])
+        parameters_this_file[p][1] = parameter_route[max_index][0]
+        blind_route.append([parameters_this_file[p][0], max_index, default_index, parameter_route])
+    print(blind_route)
+    # param_names = []
+    # for i in range(len(blind_route)):
+    #     param_names.append(blind_route[i][0])
+    
+    ## Without F1 Score
     fig = plt.Figure()
     start = end = 0
-    for i in range(len(ari_total)):
-        default = ari_total[i][2]
+    for i in range(len(blind_route)):
+        default = blind_route[i][2]
         start = end
-        end = ari_total[i][1] - (default-start)
+        end = blind_route[i][1] - (default-start)
         
-        ari_p = ari_total[i][3]
+        ari_p = blind_route[i][3]
         # print()
         ari_scores = []
         ari_x = []
         for j in range(len(ari_p)):
             ari_scores.append(ari_p[j][1])
             ari_x.append(j-(default-start))
-        # print(ari_scores, ari_x)
-        plt.plot(ari_x, ari_scores, 'o-')
-    
-    plt.legend(param_names)
-    
-    plt.savefig("Fig/GD/SkIF"+filename+".pdf", bbox_inches="tight", pad_inches=0)
+        for k in range(len(ari_scores)-1):
+            plt.plot(ari_x[k+1], ari_scores[k+1], marker=(3, 0, get_angle(ari_x[k+1], ari_scores[k+1], ari_x[k], ari_scores[k])), color='black')
+        plt.plot(ari_x, ari_scores, '-')
+        
+        if i == 0:
+            plt.annotate(blind_route[i][0]+" = "+str(blind_route[i][3][blind_route[i][2]][0]), (0.1, blind_route[i][3][blind_route[i][2]][1]), ha='left')
+
+        if start != end:
+            plt.annotate(blind_route[i][0]+" = "+str(blind_route[i][3][blind_route[i][1]][0]), (end+0.1, blind_route[i][3][blind_route[i][1]][1]), ha='left')
+    # plt.legend(param_names)
+    plt.ylabel("Cross-run ARI")
+    plt.xticks(ticks= [])
+    plt.title(filename)
+    plt.savefig("Fig/GD/SkIF_"+filename+"_Trajectory.pdf", bbox_inches="tight", pad_inches=0)
     plt.show()
+    
+    ## With F1 Score
+    fig = plt.Figure()
+    start = end = 0
+    for i in range(len(blind_route)):
+        default = blind_route[i][2]
+        start = end
+        end = blind_route[i][1] - (default-start)
+        
+        ari_p = blind_route[i][3]
+        ari_scores = []
+        ari_x = []
+        for j in range(len(ari_p)):
+            ari_scores.append(ari_p[j][1])
+            ari_x.append(ari_p[j][2])
+        for k in range(len(ari_scores)-1):
+            plt.plot(ari_x[k+1], ari_scores[k+1], marker=(3, 0, get_angle(ari_x[k+1], ari_scores[k+1], ari_x[k], ari_scores[k])), color='black')
+        plt.plot(ari_x, ari_scores, '-')
+        
+        if i == 0:
+            plt.annotate(blind_route[i][0]+" = "+str(blind_route[i][3][blind_route[i][2]][0]), (blind_route[i][3][blind_route[i][2]][2], blind_route[i][3][blind_route[i][2]][1]), ha='left')
+
+        if start != end:
+            plt.annotate(blind_route[i][0]+" = "+str(blind_route[i][3][blind_route[i][1]][0]), (blind_route[i][3][blind_route[i][1]][2], blind_route[i][3][blind_route[i][1]][1]), ha='left')
+    # plt.legend(param_names)
+    plt.ylabel("Cross-run ARI")
+    plt.xlabel("F1 Score")
+    
+    plt.title(filename)
+    plt.savefig("Fig/GD/SkIF_"+filename+"_Trajectory_W_F1.pdf", bbox_inches="tight", pad_inches=0)
+    plt.show()
+    
+def get_guided_route(X, gt, filename, parameters_this_file, parameter_iteration, parameter_rankings):
+    guided_route = []
+    
+    for p_i in range(len(parameters_this_file)):
+        p = np.where(parameter_rankings == p_i)
+        p = p[0][0]
+        
+        parameter_route = []
+        ari_scores = []
+        f1_scores = []
+        passing_param = deepcopy(parameters_this_file)
+
+        default_f1, default_ari = runIF(filename, X, gt, passing_param, parameter_iteration)
+
+        parameter_route.append([passing_param[p][1], default_ari, default_f1])
+        ari_scores.append(default_ari)
+        f1_scores.append(default_f1)
+        # print(parameters[p][0], end=': ')
+        i_def = passing_param[p][2].index(passing_param[p][1])
+        if i_def+1 == len(parameters_this_file[p][2]):
+            i_pv = i_def-1    
+        else:
+            i_pv = i_def+1
+        
+        while True:
+            if i_pv >= len(parameters_this_file[p][2]):
+                break
+            if i_pv < 0:
+                break
+            # print(parameters[p][2][i_pv], end = '- ')
+
+            passing_param[p][1] = parameters_this_file[p][2][i_pv]
+            f1_score, ari_score = runIF(filename, X, gt, passing_param, parameter_iteration)
+
+            if ari_score >= np.max(ari_scores) and f1_score >= np.max(f1_scores):
+                # if i_pv > i_def:
+                parameter_route.append([passing_param[p][1], ari_score, f1_score])
+                ari_scores.append(ari_score)
+                # else:
+                #     parameter_route.insert(0, [passing_param[p][1], ari_score])
+                #     ari_scores.insert(0, ari_score)
+            
+            if ari_score != np.max(ari_scores):
+                
+                if i_pv - 1 > i_def:
+                    break
+                elif i_pv - 1 == i_def:
+                    i_pv = i_def - 1
+                else:
+                    break
+            else:
+                if i_pv > i_def:
+                    i_pv += 1
+                else:
+                    i_pv -= 1
+        # print()
+        max_index = ari_scores.index(max(ari_scores))
+        default_index = ari_scores.index(default_ari)
+        parameters_this_file[p][1] = parameter_route[max_index][0]
+        guided_route.append([parameters_this_file[p][0], max_index, default_index, parameter_route])
+    print(guided_route)
+    
+    ## With F1 Score
+    fig = plt.Figure()
+    start = end = 0
+    for i in range(len(guided_route)):
+        default = guided_route[i][2]
+        start = end
+        end = guided_route[i][1] - (default-start)
+        
+        ari_p = guided_route[i][3]
+        ari_scores = []
+        ari_x = []
+        for j in range(len(ari_p)):
+            ari_scores.append(ari_p[j][1])
+            ari_x.append(ari_p[j][2])
+        for k in range(len(ari_scores)-1):
+            plt.plot(ari_x[k+1], ari_scores[k+1], marker=(3, 0, get_angle(ari_x[k+1], ari_scores[k+1], ari_x[k], ari_scores[k])), color='black')
+        plt.plot(ari_x, ari_scores, '-')
+        
+        if i == 0:
+            plt.annotate(guided_route[i][0]+" = "+str(guided_route[i][3][guided_route[i][2]][0]), (guided_route[i][3][guided_route[i][2]][2], guided_route[i][3][guided_route[i][2]][1]), ha='left')
+
+        if start != end:
+            plt.annotate(guided_route[i][0]+" = "+str(guided_route[i][3][guided_route[i][1]][0]), (guided_route[i][3][guided_route[i][2]][2], guided_route[i][3][guided_route[i][1]][1]), ha='left')
+    # plt.legend(param_names)
+    plt.ylabel("Cross-run ARI")
+    plt.xlabel("F1 Score")
+    
+    plt.title(filename)
+    plt.savefig("Fig/GD/SkIF_"+filename+"_Guided_Trajectory_W_F1.pdf", bbox_inches="tight", pad_inches=0)
+    plt.show()    
+    
+def get_angle(p1x, p1y, p2x, p2y):
+    """Get the angle of this line with the horizontal axis."""
+    dx = p2x - p1x
+    dy = p2y - p1y
+    theta = math.atan2(dy, dx)
+    angle = math.degrees(theta)  # angle is in (-180, 180]
+    if angle < 0:
+        angle = 360 + angle
+    return angle
+
 def runIF(filename, X, gt, params, parameter_iteration):
 
     labelFile = filename + "_" + str(params[0][1]) + "_" + str(params[1][1]) + "_" + str(params[2][1]) + "_" + str(params[3][1]) + "_" + str(params[4][1]) + "_" + str(params[5][1]) + "_" + str(params[6][1])
@@ -171,16 +318,35 @@ def runIF(filename, X, gt, params, parameter_iteration):
                     (dfari['bootstrap']==i_bootstrap)&
                     (dfari['n_jobs']==str(i_n_jobs))&
                     (dfari['warm_start']==i_warm_start)]
-        if ari.empty == 0:
+        
+        dff1 =  pd.read_csv("Stats/SkIF_F1.csv")
+        i_n_estimators=params[0][1]
+        i_max_samples=params[1][1]
+        i_contamination=params[2][1]
+        i_max_features=params[3][1]
+        i_bootstrap=params[4][1]
+        i_n_jobs=params[5][1]
+        i_warm_start = params[6][1]
+        f1 = dff1[(dff1['Filename']==filename)&
+                    (dff1['n_estimators']==i_n_estimators)&
+                    (dff1['max_samples']==str(i_max_samples))&
+                    (dff1['max_features']==i_max_features)&
+                    (dff1['bootstrap']==i_bootstrap)&
+                    (dff1['n_jobs']==str(i_n_jobs))&
+                    (dff1['warm_start']==i_warm_start)]
+        if ari.empty == 0 and f1.empty == 0:
             runs_ari = []
             for i in range(45):
                 runs_ari.append(('R'+str(i)))
-            run_values = ari[runs_ari].to_numpy()
-               
-            return np.mean(np.mean(run_values))
+            run_ari_values = ari[runs_ari].to_numpy()
+            
+            runs_f1 = []
+            for i in range(10):
+                runs_f1.append(('R'+str(i)))
+            run_f1_values = f1[runs_f1].to_numpy()
+            
+            return np.mean(np.mean(run_f1_values)), np.mean(np.mean(run_ari_values))
   
-    # return 0
-        
     
     labels = []
     f1 = []
@@ -218,7 +384,7 @@ def runIF(filename, X, gt, params, parameter_iteration):
     fstat_ari.write(','.join(str(s) for s in ari) + '\n')
     fstat_ari.close()
     
-    return np.mean(ari)
+    return np.mean(f1), np.mean(ari)
 
 def calculate_score(allFiles, parameter, parameter_values, all_parameters, p_iter):
     i_n_estimators=all_parameters[0][1]

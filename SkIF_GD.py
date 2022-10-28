@@ -66,7 +66,7 @@ def isolationforest(filename, parameters, parameter_iteration, parameter_ranking
         print("File doesn't exist")
         return
     
-    # get_blind_route(X, gt, filename, deepcopy(parameters), parameter_iteration, parameter_rankings)
+    get_blind_route(X, gt, filename, deepcopy(parameters), parameter_iteration, parameter_rankings)
     get_guided_route(X, gt, filename, deepcopy(parameters), parameter_iteration, parameter_rankings)
     
 def get_blind_route(X, gt, filename, parameters_this_file, parameter_iteration, parameter_rankings):
@@ -232,11 +232,12 @@ def get_guided_route(X, gt, filename, parameters_this_file, parameter_iteration,
                 # if i_pv > i_def:
                 parameter_route.append([passing_param[p][1], ari_score, f1_score])
                 ari_scores.append(ari_score)
+                f1_scores.append(f1_score)
                 # else:
                 #     parameter_route.insert(0, [passing_param[p][1], ari_score])
                 #     ari_scores.insert(0, ari_score)
             
-            if ari_score != np.max(ari_scores):
+            if ari_score != np.max(ari_scores) and f1_score != np.max(f1_scores):
                 
                 if i_pv - 1 > i_def:
                     break
@@ -278,7 +279,7 @@ def get_guided_route(X, gt, filename, parameters_this_file, parameter_iteration,
             plt.annotate(guided_route[i][0]+" = "+str(guided_route[i][3][guided_route[i][2]][0]), (guided_route[i][3][guided_route[i][2]][2], guided_route[i][3][guided_route[i][2]][1]), ha='left')
 
         if start != end:
-            plt.annotate(guided_route[i][0]+" = "+str(guided_route[i][3][guided_route[i][1]][0]), (guided_route[i][3][guided_route[i][2]][2], guided_route[i][3][guided_route[i][1]][1]), ha='left')
+            plt.annotate(guided_route[i][0]+" = "+str(guided_route[i][3][guided_route[i][1]][0]), (guided_route[i][3][guided_route[i][1]][2], guided_route[i][3][guided_route[i][1]][1]), ha='left')
     # plt.legend(param_names)
     plt.ylabel("Cross-run ARI")
     plt.xlabel("F1 Score")
@@ -364,8 +365,8 @@ def runIF(filename, X, gt, params, parameter_iteration):
     for i in range(len(labels)):
         for j in range(i+1, len(labels)):
           ari.append(adjusted_rand_score(labels[i], labels[j]))      
-    if os.path.exists("../AnomalyAlgoDiagnosis_Labels/Labels_Sk_IF_"+labelFile+".csv") == 0:
-        fileLabels=open("../AnomalyAlgoDiagnosis_Labels/Labels_Sk_IF_"+labelFile+".csv", 'a')
+    if os.path.exists("../AnomalyAlgoDiagnosis_Labels/IF_Sk/Labels_Sk_IF_"+labelFile+".csv") == 0:
+        fileLabels=open("../AnomalyAlgoDiagnosis_Labels/IF_Sk/Labels_Sk_IF_"+labelFile+".csv", 'a')
         for l in labels:
             fileLabels.write(','.join(str(s) for s in l) + '\n')
         fileLabels.close()
@@ -589,8 +590,8 @@ if __name__ == '__main__':
     for FileNumber in range(len(master_files)):
         print(FileNumber, end=' ')
         isolationforest(master_files[FileNumber], parameters, 0, parameter_rankings["Ranking"].to_numpy())
-        if FileNumber == 5:
-            break
+        # if FileNumber == 5:
+        #     break
             
 
         # MWU_geo = [10]*len(parameters)

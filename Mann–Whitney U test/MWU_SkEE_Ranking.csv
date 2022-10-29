@@ -1,0 +1,5 @@
+ParameterName,MWU_Score
+store_precision,3
+assume_centered,4
+support_fraction,2
+contamination,1

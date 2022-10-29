@@ -75,10 +75,10 @@ def runIF(filename, X, gt, params, parameter_iteration):
     
     labelFile = filename + "_" + str(params[0][1]) + "_" + str(params[1][1]) + "_" + str(params[2][1]) + "_" + str(params[3][1])
 
-    if os.path.exists("IF_R/"+labelFile+".csv") == 0:
+    if os.path.exists("Labels/IF_R/"+labelFile+".csv") == 0:
         print(labelFile)
         return
-    if os.path.exists("IF_R_Done/"+labelFile+".csv"):
+    if os.path.exists("Labels/IF_R_Done/"+labelFile+".csv"):
         return
     
     
@@ -87,7 +87,7 @@ def runIF(filename, X, gt, params, parameter_iteration):
     ari = []
     
     
-    labels =  pd.read_csv("IF_R/"+labelFile+".csv").to_numpy()
+    labels =  pd.read_csv("Labels/IF_R/"+labelFile+".csv").to_numpy()
     for i in range(10):
         f1.append(metrics.f1_score(gt, np.int64((labels[i][1:])*1)))
         
@@ -95,7 +95,7 @@ def runIF(filename, X, gt, params, parameter_iteration):
         for j in range(i+1, len(labels)):
           ari.append(adjusted_rand_score(np.int64((labels[i][1:])*1), np.int64((labels[j][1:])*1)))
           
-    flabel_done=open("IF_R_Done/"+labelFile+".csv", 'a')
+    flabel_done=open("Labels/IF_R_Done/"+labelFile+".csv", 'a')
     flabel_done.write("Done")
     flabel_done.close()
     

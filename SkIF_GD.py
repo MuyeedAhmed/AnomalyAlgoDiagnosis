@@ -25,6 +25,8 @@ sns.set_theme(style="whitegrid")
 import scipy.stats as stats
 from scipy.stats import gmean
 import math
+import scipy.stats as ss
+import bisect 
 
 datasetFolderDir = 'Dataset/'
 
@@ -66,8 +68,30 @@ def isolationforest(filename, parameters, parameter_iteration, parameter_ranking
         print("File doesn't exist")
         return
     
-    get_blind_route(X, gt, filename, deepcopy(parameters), parameter_iteration, parameter_rankings)
-    get_guided_route(X, gt, filename, deepcopy(parameters), parameter_iteration, parameter_rankings)
+    ## Rearrange "Auto"
+    mod_parameters = deepcopy(parameters)
+    auto_1 = min(256, X.shape[0])/X.shape[0]
+    bisect.insort(mod_parameters[1][2], auto_1)
+    mod_parameters[1][2][mod_parameters[1][2].index(auto_1)] = 'auto'
+    ##
+    
+    blind_route = get_blind_route(X, gt, filename, deepcopy(mod_parameters), parameter_iteration, parameter_rankings)
+    guided_route = get_guided_route(X, gt, filename, deepcopy(mod_parameters), parameter_iteration, parameter_rankings)
+    
+    DefaultARI = str(blind_route[0][3][0][1])
+    DefaultF1 = str(blind_route[0][3][0][2])
+    
+    UninformedARI = str(blind_route[-1][3][-1][1])
+    UninformedF1 = str(blind_route[-1][3][-1][2])
+    
+    InformedARI = str(guided_route[-1][3][-1][1])
+    InformedF1 = str(guided_route[-1][3][-1][2])
+    
+    f_Route_Scores=open("Stats/SkIF_Route_Scores.csv", "a")
+    f_Route_Scores.write(filename+','+DefaultARI+","+DefaultF1+","+UninformedARI+","+UninformedF1+","+InformedARI+","+InformedF1+"\n")
+    f_Route_Scores.close()
+    
+    
     
 def get_blind_route(X, gt, filename, parameters_this_file, parameter_iteration, parameter_rankings):
     blind_route = []
@@ -101,7 +125,7 @@ def get_blind_route(X, gt, filename, parameters_this_file, parameter_iteration, 
             passing_param[p][1] = parameters_this_file[p][2][i_pv]
             f1_score, ari_score = runIF(filename, X, gt, passing_param, parameter_iteration)
 
-            if ari_score >= np.max(ari_scores):
+            if ari_score > np.max(ari_scores):
                 # if i_pv > i_def:
                 parameter_route.append([passing_param[p][1], ari_score, f1_score])
                 ari_scores.append(ari_score)
@@ -193,6 +217,7 @@ def get_blind_route(X, gt, filename, parameters_this_file, parameter_iteration, 
     plt.title(filename)
     plt.savefig("Fig/GD/SkIF_"+filename+"_Trajectory_W_F1.pdf", bbox_inches="tight", pad_inches=0)
     plt.show()
+    return blind_route
     
 def get_guided_route(X, gt, filename, parameters_this_file, parameter_iteration, parameter_rankings):
     guided_route = []
@@ -228,7 +253,7 @@ def get_guided_route(X, gt, filename, parameters_this_file, parameter_iteration,
             passing_param[p][1] = parameters_this_file[p][2][i_pv]
             f1_score, ari_score = runIF(filename, X, gt, passing_param, parameter_iteration)
 
-            if ari_score >= np.max(ari_scores) and f1_score >= np.max(f1_scores):
+            if ari_score > np.max(ari_scores) and f1_score > np.max(f1_scores):
                 # if i_pv > i_def:
                 parameter_route.append([passing_param[p][1], ari_score, f1_score])
                 ari_scores.append(ari_score)
@@ -256,7 +281,7 @@ def get_guided_route(X, gt, filename, parameters_this_file, parameter_iteration,
         parameters_this_file[p][1] = parameter_route[max_index][0]
         guided_route.append([parameters_this_file[p][0], max_index, default_index, parameter_route])
     print(guided_route)
-    
+    print(guided_route[-1][3][-1][1], guided_route[-1][3][-1][2])
     ## With F1 Score
     fig = plt.Figure()
     start = end = 0
@@ -288,6 +313,8 @@ def get_guided_route(X, gt, filename, parameters_this_file, parameter_iteration,
     plt.savefig("Fig/GD/SkIF_"+filename+"_Guided_Trajectory_W_F1.pdf", bbox_inches="tight", pad_inches=0)
     plt.show()    
     
+    return guided_route
+    
 def get_angle(p1x, p1y, p2x, p2y):
     """Get the angle of this line with the horizontal axis."""
     dx = p2x - p1x
@@ -302,9 +329,7 @@ def runIF(filename, X, gt, params, parameter_iteration):
 
     labelFile = filename + "_" + str(params[0][1]) + "_" + str(params[1][1]) + "_" + str(params[2][1]) + "_" + str(params[3][1]) + "_" + str(params[4][1]) + "_" + str(params[5][1]) + "_" + str(params[6][1])
 
-    if os.path.exists("IF/Labels_Sk_IF_"+labelFile+".csv") == 1:
-        
-        dfari =  pd.read_csv("Stats/SkIF_ARI.csv")
+    if os.path.exists("Labels/IF_Sk_Done/Labels_Sk_IF_"+labelFile+".csv") == 1:
         i_n_estimators=params[0][1]
         i_max_samples=params[1][1]
         i_contamination=params[2][1]
@@ -312,6 +337,8 @@ def runIF(filename, X, gt, params, parameter_iteration):
         i_bootstrap=params[4][1]
         i_n_jobs=params[5][1]
         i_warm_start = params[6][1]
+        
+        dfari =  pd.read_csv("Stats/SkIF_ARI.csv")
         ari = dfari[(dfari['Filename']==filename)&
                     (dfari['n_estimators']==i_n_estimators)&
                     (dfari['max_samples']==str(i_max_samples))&
@@ -321,13 +348,6 @@ def runIF(filename, X, gt, params, parameter_iteration):
                     (dfari['warm_start']==i_warm_start)]
         
         dff1 =  pd.read_csv("Stats/SkIF_F1.csv")
-        i_n_estimators=params[0][1]
-        i_max_samples=params[1][1]
-        i_contamination=params[2][1]
-        i_max_features=params[3][1]
-        i_bootstrap=params[4][1]
-        i_n_jobs=params[5][1]
-        i_warm_start = params[6][1]
         f1 = dff1[(dff1['Filename']==filename)&
                     (dff1['n_estimators']==i_n_estimators)&
                     (dff1['max_samples']==str(i_max_samples))&
@@ -371,7 +391,7 @@ def runIF(filename, X, gt, params, parameter_iteration):
             fileLabels.write(','.join(str(s) for s in l) + '\n')
         fileLabels.close()
     
-    flabel_done=open("IF/Labels_Sk_IF_"+labelFile+".csv", 'a')
+    flabel_done=open("Labels/IF_Sk_Done/Labels_Sk_IF_"+labelFile+".csv", 'a')
     flabel_done.write("Done")
     flabel_done.close()
     
@@ -387,141 +407,55 @@ def runIF(filename, X, gt, params, parameter_iteration):
     
     return np.mean(f1), np.mean(ari)
 
-def calculate_score(allFiles, parameter, parameter_values, all_parameters, p_iter):
-    i_n_estimators=all_parameters[0][1]
-    i_max_samples=all_parameters[1][1]
-    i_contamination=all_parameters[2][1]
-    i_max_features=all_parameters[3][1]
-    i_bootstrap=all_parameters[4][1]
-    i_n_jobs=all_parameters[5][1]
-    i_warm_start = all_parameters[6][1]
-    
-    # dfacc = pd.read_csv("Stats/SkIF_Accuracy.csv")
-    dff1 = pd.read_csv("Stats/SkIF_F1.csv")
-    dfari =  pd.read_csv("Stats/SkIF_ARI.csv")
-    
-    f1_runs = []
-    for i in range(10):
-        f1_runs.append(('R'+str(i)))
 
-    ari_runs = []
-    for i in range(45):
-        ari_runs.append(('R'+str(i)))
-
-    # accuracy_range_all = []
-    # accuracy_med_all = []
-    f1_range_all = []
-    f1_med_all = []
-    ari_all = []
+def plot_ari_f1():
+    SkIF_Route_Scores = pd.read_csv("Stats/SkIF_Route_Scores.csv")
     
-    for filename in allFiles:
-        for p in parameter_values:
-            if parameter == 'n_estimators':
-                i_n_estimators = p
-            elif parameter == 'max_samples':
-                i_max_samples = p
-            elif parameter == 'max_features':
-                i_max_features = p
-            elif parameter == 'bootstrap':
-                i_bootstrap = p
-            elif parameter == 'n_jobs':
-                i_n_jobs = p
-            elif parameter == 'warm_start':
-                i_warm_start = p
-                        
-            # accuracy = dfacc[(dfacc['Filename']==filename)&
-            #                 (dfacc['n_estimators']==i_n_estimators)&
-            #                 (dfacc['max_samples']==str(i_max_samples))&
-            #                 (dfacc['max_features']==i_max_features)&
-            #                 (dfacc['bootstrap']==i_bootstrap)&
-            #                 (dfacc['n_jobs']==str(i_n_jobs))&
-            #                 (dfacc['warm_start']==i_warm_start)]
-                
-
-            f1 = dff1[(dff1['Filename']==filename)&
-                            (dff1['n_estimators']==i_n_estimators)&
-                            (dff1['max_samples']==str(i_max_samples))&
-                            (dff1['max_features']==i_max_features)&
-                            (dff1['bootstrap']==i_bootstrap)&
-                            (dff1['n_jobs']==str(i_n_jobs))&
-                            (dff1['warm_start']==i_warm_start)]
-            if f1.empty:
-                continue
-            ari = dfari[(dfari['Filename']==filename)&
-                            (dfari['n_estimators']==i_n_estimators)&
-                            (dfari['max_samples']==str(i_max_samples))&
-                            (dfari['max_features']==i_max_features)&
-                            (dfari['bootstrap']==i_bootstrap)&
-                            (dfari['n_jobs']==str(i_n_jobs))&
-                            (dfari['warm_start']==i_warm_start)]
-            
-            # accuracy_values = accuracy[runs].to_numpy()[0]
-            
-            f1_values = f1[f1_runs].to_numpy()[0]
-            ari_values = ari[ari_runs].to_numpy()[0]
-            
-            # accDiff = (np.percentile(accuracy_values, 75) - np.percentile(accuracy_values, 25))/(np.percentile(accuracy_values, 75) + np.percentile(accuracy_values, 25))
-            # accuracy_range_all.append([filename, p, accDiff])
-            # accuracy_med_all.append([filename, p, np.percentile(accuracy_values, 50)])
-            
-            f1Diff = (np.percentile(f1_values, 75) - np.percentile(f1_values, 25))/(np.percentile(f1_values, 75) + np.percentile(f1_values, 25))
-            if math.isnan(f1Diff):
-                f1Diff = 0
-            f1_range_all.append([filename, p, f1Diff])
-            f1_med_all.append([filename, p, np.percentile(f1_values, 50)])
-            
-            ari_all.append([filename, p, np.percentile(ari_values, 50)])
-            
-    # df_acc_r = pd.DataFrame(accuracy_range_all, columns = ['Filename', parameter, 'Accuracy_Range'])
-    # df_acc_m = pd.DataFrame(accuracy_med_all, columns = ['Filename', parameter, 'Accuracy_Median'])
-    df_f1_r = pd.DataFrame(f1_range_all, columns = ['Filename', parameter, 'F1Score_Range'])
-    df_f1_m = pd.DataFrame(f1_med_all, columns = ['Filename', parameter, 'F1Score_Median'])
-    df_ari_m = pd.DataFrame(ari_all, columns = ['Filename', parameter, 'ARI'])
-
-    if parameter == 'n_jobs':
-        df_f1_r = df_f1_r.fillna(0)
-        df_f1_m = df_f1_m.fillna(0)
-        df_ari_m = df_ari_m.fillna(0)
-        df_f1_r[parameter] = df_f1_r[parameter].astype(int)
-        df_f1_m[parameter] = df_f1_m[parameter].astype(int)
-        df_ari_m[parameter] = df_ari_m[parameter].astype(int)
-        parameter_values = [1, 0]
-
-
-    mwu_f1_range = [[0 for i in range(len(parameter_values))] for j in range(len(parameter_values))]
-    i = 0
-    for p1 in parameter_values:
-        p1_values = df_f1_r[df_f1_r[parameter] == p1]['F1Score_Range'].to_numpy()
-        j = 0
-        for p2 in parameter_values:
-            p2_values = df_f1_r[df_f1_r[parameter] == p2]['F1Score_Range'].to_numpy()
-            if len(p1_values) == 0 or len(p2_values) == 0:
-                mwu_f1_range[i][j] = None
-                continue
-            _, mwu_f1_range[i][j] = stats.mannwhitneyu(x=p1_values, y=p2_values, alternative = 'greater')
-            j += 1
-        i += 1
-    mwu_df_f1_range = pd.DataFrame(mwu_f1_range, columns = parameter_values)
-    mwu_df_f1_range.index = parameter_values
-    mwu_df_f1_range.to_csv("Mann–Whitney U test/MWU_SkIF_F1_Range_"+parameter+"_"+str(p_iter)+".csv")
+    # fig = plt.Figure()
     
-    try:
-        mwu_f1_range = [[z+1 for z in y] for y in mwu_f1_range]
-        mwu_geomean = gmean(gmean(mwu_f1_range))
-        mwu_min = np.min(mwu_f1_range)
-    except:
-        mwu_geomean = 11
-        mwu_min = 11
+    # plt.plot(SkIF_Route_Scores["DefaultF1"], SkIF_Route_Scores["DefaultARI"], '.', color='red', marker = 'd', markersize = 4, alpha=.5)
+    # plt.plot(SkIF_Route_Scores["UninformedF1"], SkIF_Route_Scores["UninformedARI"], '.', color = 'green', marker = 'v', markersize = 4, alpha=.5)
+    # plt.plot(SkIF_Route_Scores["InformedF1"], SkIF_Route_Scores["InformedARI"], '.', color = 'blue', marker = '^', markersize = 4, alpha=.5)
+     
+    # plt.plot(SkIF_Route_Scores["DefaultF1"].mean(), SkIF_Route_Scores["DefaultARI"].mean(), '.', color='red', marker = 'd', markersize = 12, markeredgecolor='black', markeredgewidth=1.5)
+    # plt.plot(SkIF_Route_Scores["UninformedF1"].mean(), SkIF_Route_Scores["UninformedARI"].mean(), '.', color = 'green', marker = 'v', markersize = 12, markeredgecolor='black', markeredgewidth=1.5)
+    # plt.plot(SkIF_Route_Scores["InformedF1"].mean(), SkIF_Route_Scores["InformedARI"].mean(), '.', color = 'blue', marker = '^', markersize = 12, markeredgecolor='black', markeredgewidth=1.5)
     
-    f1_m_grouped = df_f1_m.groupby(parameter)[["F1Score_Median"]].median().reset_index()
-    f1_r_grouped = df_f1_r.groupby(parameter)[["F1Score_Range"]].median().reset_index()
-    ari_m_grouped = df_ari_m.groupby(parameter)[["ARI"]].median().reset_index()
+    # plt.legend(['Default Setting', 'Uninformed Route', 'Informed Route'])
+    # plt.title("Scikit-learn - Isolation Forest")
+    # plt.xlabel("Performance (F1 Score)")
+    # plt.ylabel("Determinism (ARI)")
+    # plt.savefig("Fig/SkIF_GD_Comparison.pdf", bbox_inches="tight", pad_inches=0)
+    # plt.show()
     
-    parameter_value_max_f1_median = f1_m_grouped[parameter].loc[f1_m_grouped["F1Score_Median"].idxmax()]
-    parameter_value_min_f1_range = f1_r_grouped[parameter].loc[f1_r_grouped["F1Score_Range"].idxmin()]  
-    parameter_value_max_ari = ari_m_grouped[parameter].loc[ari_m_grouped["ARI"].idxmax()]
+    # ## Calculate Percentage
     
-    return mwu_geomean, mwu_min, parameter_value_max_f1_median, parameter_value_min_f1_range, parameter_value_max_ari
+    ui_win_performance = 0
+    ui_lose_performance = 0
+    ui_win_nd = 0
+    i_win_performance = 0
+    i_win_nd = 0
+    
+    
+    for index, row in SkIF_Route_Scores.iterrows():
+        if row["UninformedF1"] > row["DefaultF1"]:
+            ui_win_performance += 1
+        elif row["UninformedF1"] < row["DefaultF1"]:
+            ui_lose_performance += 1
+        if row["UninformedARI"] > row["DefaultARI"]:
+            ui_win_nd += 1
+    
+        if row["InformedF1"] > row["DefaultF1"]:
+            i_win_performance += 1
+        if row["InformedARI"] > row["DefaultARI"]:
+            i_win_nd += 1
+
+    print(f"Default & {SkIF_Route_Scores['DefaultARI'].mean()} & -  & -  & {SkIF_Route_Scores['DefaultF1'].mean()}  & -  & -  \\\\ \\hline")
+    print(f"Uninformed & {SkIF_Route_Scores['UninformedARI'].mean()} & {ui_win_nd}  & 0  & {SkIF_Route_Scores['UninformedF1'].mean()}  & {ui_win_performance}  & {ui_lose_performance} \\\\ ")
+    print(f"Informed & {SkIF_Route_Scores['InformedARI'].mean()} & {i_win_nd}  & 0  & {SkIF_Route_Scores['InformedF1'].mean()}  & {i_win_performance}  & 0 \\\\ ")
+    
+    
+    
     
 if __name__ == '__main__':
     folderpath = datasetFolderDir
@@ -533,95 +467,62 @@ if __name__ == '__main__':
     
     master_files.sort()
     
-    parameters = []
-    
-    n_estimators = [2, 4, 8, 16, 32, 64, 100, 128, 256, 512]##
-    max_samples = ['auto', 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
-    contamination = ['auto'] 
-    max_features = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
-    bootstrap = [True, False]
-    n_jobs = [1, None] 
-    warm_start = [True, False]
-    
-    parameters.append(["n_estimators", 100, n_estimators])
-    parameters.append(["max_samples", 'auto', max_samples])
-    parameters.append(["contamination", 'auto', contamination])
-    parameters.append(["max_features", 1.0, max_features])
-    parameters.append(["bootstrap", False, bootstrap])
-    parameters.append(["n_jobs", None, n_jobs])
-    parameters.append(["warm_start", False, warm_start])
-    
-    # R = ""
-    # for i in range(9):
-    #     R += "R"+str(i)+","
-    # R+="R9"
-    # ARI_R = ""
-    # for i in range(44):
-    #     ARI_R += "R"+str(i)+","
-    # ARI_R+="R44"
-
-        
     # if os.path.exists("Stats/SkIF_F1.csv") == 0: 
+    #     R = ""
+    #     for i in range(9):
+    #         R += "R"+str(i)+","
+    #     R+="R9"
     #     fstat_f1=open("Stats/SkIF_F1.csv", "w")
     #     fstat_f1.write('Filename,n_estimators,max_samples,contamination,max_features,bootstrap,n_jobs,warm_start,Parameter_Iteration,'+R+"\n")
     #     fstat_f1.close()
 
-    # if os.path.exists("Stats/SkIF_ARI.csv") == 0:    
+    # if os.path.exists("Stats/SkIF_ARI.csv") == 0:
+    #     ARI_R = ""
+    #     for i in range(44):
+    #         ARI_R += "R"+str(i)+","
+    #     ARI_R+="R44"
     #     fstat_ari=open("Stats/SkIF_ARI.csv", "w")
     #     fstat_ari.write('Filename,n_estimators,max_samples,contamination,max_features,bootstrap,n_jobs,warm_start,Parameter_Iteration,'+ARI_R+"\n")
     #     fstat_ari.close()
-    # if os.path.exists("Stats/SkIF_Winners.csv") == 0:  
-    #     fstat_winner=open("Stats/SkIF_Winners.csv", "w")
-    #     fstat_winner.write('Parameter,MWU_P,Max_F1,Min_F1_Range,Max_ARI\n')
-    #     fstat_winner.close()
     
     
-    # for param_iteration in range(len(parameters)):
     
-    parameter_rankings = pd.read_csv("Mann–Whitney U test/MWU_SkIF_Ranking.csv")
-    import scipy.stats as ss
-    parameter_rankings["Ranking"] = (ss.rankdata(parameter_rankings["MWU_Score"])-1)
-    # print(type(parameter_rankings["Ranking"].to_numpy()))
-    # print(np.array(parameter_rankings["Ranking"]))
-    for i in range(len(parameters)):
-        param_rank = parameter_rankings[parameter_rankings["ParameterName"] == parameters[i][0]]["Ranking"].to_numpy()
-        parameters[i].append(int(param_rank[0]))
-    # print(parameters)
-    for FileNumber in range(len(master_files)):
-        print(FileNumber, end=' ')
-        isolationforest(master_files[FileNumber], parameters, 0, parameter_rankings["Ranking"].to_numpy())
-        # if FileNumber == 5:
-        #     break
-            
+    
+    # parameters = []
+    
+    # n_estimators = [2, 4, 8, 16, 32, 64, 100, 128, 256, 512]##
+    # max_samples = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+    # contamination = ['auto'] 
+    # max_features = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+    # bootstrap = [True, False]
+    # n_jobs = [1, None] 
+    # warm_start = [True, False]
+    
+    # parameters.append(["n_estimators", 100, n_estimators])
+    # parameters.append(["max_samples", 'auto', max_samples])
+    # parameters.append(["contamination", 'auto', contamination])
+    # parameters.append(["max_features", 1.0, max_features])
+    # parameters.append(["bootstrap", False, bootstrap])
+    # parameters.append(["n_jobs", None, n_jobs])
+    # parameters.append(["warm_start", False, warm_start])
+    
+    # f_Route_Scores=open("Stats/SkIF_Route_Scores.csv", "w")
+    # f_Route_Scores.write('Filename,DefaultARI,DefaultF1,UninformedARI,UninformedF1,InformedARI,InformedF1\n')
+    # f_Route_Scores.close()
 
-        # MWU_geo = [10]*len(parameters)
-        # MWU_min = [10]*len(parameters)
-        # f1_range = [0]*len(parameters)
-        # f1_median =[0]*len(parameters) 
-        # ari = [0]*len(parameters)
-        # for i in range(len(parameters)):
-        #     if len(parameters[i][2]) > 1:
-        #         mwu_geomean, mwu_min, f1_median[i], f1_range[i], ari[i] = calculate_score(master_files, parameters[i][0], parameters[i][2], parameters, param_iteration)
-                
-        #         MWU_geo[i] = mwu_geomean
-        #         MWU_min[i] = mwu_min
-        # index_min = np.argmin(MWU_geo)
+    # ## Ranking
+    # parameter_rankings = pd.read_csv("Mann–Whitney U test/MWU_SkIF_Ranking.csv")
+    # parameter_rankings["Ranking"] = (ss.rankdata(parameter_rankings["MWU_Score"])-1)
+    # for i in range(len(parameters)):
+    #     param_rank = parameter_rankings[parameter_rankings["ParameterName"] == parameters[i][0]]["Ranking"].to_numpy()
+    #     parameters[i].append(int(param_rank[0]))
+    # ##
+        
+    # for FileNumber in range(len(master_files)):
+    #     print(FileNumber, end=' ')
+    #     isolationforest(master_files[FileNumber], parameters, 0, parameter_rankings["Ranking"].to_numpy())
 
-        # if index_min == 5 and f1_range[index_min] == 0:
-        #     f1_range[index_min] = None
-        # if MWU_min[index_min] > 2:
-        #     print("MWU_min: ", end='')
-        #     print(MWU_min)
-        #     break
-        # parameters[index_min][1] = f1_range[index_min]
-        # parameters[index_min][2] = [f1_range[index_min]]
-        
-        # fstat_winner=open("Stats/SkIF_Winners.csv", "a")
-        # fstat_winner.write(parameters[index_min][0]+','+str(MWU_geo[index_min])+','+str(f1_median[index_min])+','+str(f1_range[index_min])+','+str(ari[index_min])+'\n')
-        # fstat_winner.close()
-        
-        # print(parameters)        
-        
+    plot_ari_f1() 
         
         
         

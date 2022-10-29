@@ -69,20 +69,13 @@ def isolationforest(filename, parameters, parameter_iteration, parameter_ranking
     
     # ## Rearrange "IF" and "LOF" on index 0 and "auto" in index 2
     mod_parameters = deepcopy(parameters)
-    percentage_file = pd.read_csv("Stats/SkPercentage.csv")
-    lof_cont = percentage_file[percentage_file["Filename"] == filename]["LOF"].to_numpy()[0]
-    bisect.insort(mod_parameters[0][2], lof_cont)
-    if_cont = percentage_file[percentage_file["Filename"] == filename]["IF"].to_numpy()[0]   
-    bisect.insort(mod_parameters[0][2], if_cont)
     
-    mod_parameters[0][2][mod_parameters[0][2].index(lof_cont)] = 'LOF'
-    mod_parameters[0][2][mod_parameters[0][2].index(if_cont)] = 'IF'
     
-    auto_1 = min(256, X.shape[0])/X.shape[0]
-    bisect.insort(mod_parameters[2][2], auto_1)
-    mod_parameters[2][2][mod_parameters[2][2].index(auto_1)] = 'auto'
+    # auto_1 = min(256, X.shape[0])/X.shape[0]
+    # bisect.insort(mod_parameters[3][2], auto_1)
+    # mod_parameters[3][2][mod_parameters[3][2].index(auto_1)] = 'def'
     
-    print(mod_parameters)
+    # print(mod_parameters)
     
     
     # ##
@@ -329,23 +322,26 @@ def runIF(filename, X, gt, params, parameter_iteration):
 
     labelFile = filename + "_" + str(params[0][1]) + "_" + str(params[1][1]) + "_" + str(params[2][1]) + "_" + str(params[3][1])
 
-    if os.path.exists("Labels/IF_R_Done/Labels_R_IF_"+labelFile+".csv") == 1:
-        i_ContaminationFraction=params[0][1]
-        i_NumLearners=params[1][1]
-        i_NumObservationsPerLearner=params[2][1]
+    if os.path.exists("Labels/IF_R_Done/"+labelFile+".csv") == 1:
+        i_ntrees=params[0][1]
+        i_standardize_data=params[1][1]
+        i_sample_size=params[2][1]
+        i_ncols_per_tree=params[3][1]
         
         dfari =  pd.read_csv("Stats/RIF_ARI.csv")
         
         ari = dfari[(dfari['Filename']==filename)&
-                    (dfari['ContaminationFraction']==str(i_ContaminationFraction))&
-                    (dfari['NumLearners']==i_NumLearners)&
-                    (dfari['NumObservationsPerLearner']==str(i_NumObservationsPerLearner))]
+                    (dfari['ntrees']==i_ntrees)&
+                    (dfari['standardize_data']==i_standardize_data)&
+                    (dfari['sample_size']==str(i_sample_size))&
+                    (dfari['ncols_per_tree']==str(i_ncols_per_tree))]
         
         dff1 =  pd.read_csv("Stats/RIF_F1.csv")
         f1 = dff1[(dff1['Filename']==filename)&
-                    (dff1['ContaminationFraction']==str(i_ContaminationFraction))&
-                    (dff1['NumLearners']==i_NumLearners)&
-                    (dff1['NumObservationsPerLearner']==str(i_NumObservationsPerLearner))]
+                    (dff1['ntrees']==i_ntrees)&
+                    (dff1['standardize_data']==i_standardize_data)&
+                    (dff1['sample_size']==str(i_sample_size))&
+                    (dff1['ncols_per_tree']==str(i_ncols_per_tree))]
         
         if ari.empty == 0 and f1.empty == 0:
             runs_ari = []
@@ -362,11 +358,11 @@ def runIF(filename, X, gt, params, parameter_iteration):
 
     
 
-    if os.path.exists("Labels/IF_R/Labels_R_IF_"+labelFile+".csv") == 0:
+    if os.path.exists("Labels/IF_R/"+labelFile+".csv") == 0:
     # else:
         
         frr=open("GD_ReRun/RIF.csv", "a")
-        frr.write(filename+","+str(params[0][1])+","+str(params[1][1])+","+str(params[2][1])+'\n')
+        frr.write(filename+","+str(params[0][1])+","+str(params[1][1])+","+str(params[2][1])+","+str(params[3][1])+'\n')
         frr.close()
         return 0, 0
     
@@ -376,7 +372,7 @@ def runIF(filename, X, gt, params, parameter_iteration):
     ari = []
     
     
-    labels =  pd.read_csv("Labels/IF_R/"+labelFile+".csv", header=None).to_numpy()
+    labels =  pd.read_csv("Labels/IF_R/"+labelFile+".csv").to_numpy()
     for i in range(10):
         f1.append(metrics.f1_score(gt, np.int64((labels[i][1:])*1)))
         
@@ -465,7 +461,7 @@ if __name__ == '__main__':
     ntrees = [2, 4, 8, 16, 32, 64, 100, 128, 256, 512]
     standardize_data = ["TRUE","FALSE"]
     sample_size = ['auto',0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,"NULL"]
-    ncols_per_tree = ['def',0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+    ncols_per_tree = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9,'def']
     
     parameters.append(["ntrees",512,ntrees])
     parameters.append(["standardize_data","TRUE",standardize_data])
@@ -491,10 +487,9 @@ if __name__ == '__main__':
         
     for FileNumber in range(len(master_files)):
         print(FileNumber, end=' ')
-        # isolationforest(master_files[FileNumber], parameters, 0, parameter_rankings["Ranking"].to_numpy())
-        isolationforest(master_files[FileNumber], parameters, 0, [0,1,2,3])
+        isolationforest(master_files[FileNumber], parameters, 0, parameter_rankings["Ranking"].to_numpy())
         
-    # plot_ari_f1() 
+    plot_ari_f1() 
         
         
         

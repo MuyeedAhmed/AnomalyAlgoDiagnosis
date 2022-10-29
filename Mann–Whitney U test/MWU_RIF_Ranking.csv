@@ -1,0 +1,5 @@
+ParameterName,MWU_Score
+ntrees,3
+standardize_data,4
+sample_size,2
+ncols_per_tree,1

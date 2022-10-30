@@ -79,7 +79,6 @@ def ocsvm(filename, parameters, parameter_iteration):
     
     
 def runOCSVM(filename, X, gt, params, parameter_iteration):
-    
     labelFile = filename + "_" + str(params[0][1]) + "_" + str(params[1][1]) + "_" + str(params[2][1]) + "_" + str(params[3][1]) + "_" + str(params[4][1]) + "_" + str(params[5][1]) + "_" + str(params[6][1]) + "_" + str(params[7][1])
 
     if os.path.exists("OCSVM_Matlab/Labels_Mat_OCSVM_"+labelFile+".csv") == 0:

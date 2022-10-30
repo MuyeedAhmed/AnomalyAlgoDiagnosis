@@ -415,12 +415,12 @@ def runEE(filename, X, gt, params, parameter_iteration):
     flabel_done.close()
     
     fstat_f1=open("Stats/MatEE_F1.csv", "a")
-    fstat_f1.write(filename+','+ str(params[0][1]) + ','+ str(params[1][1]) + ',' + str(params[2][1]) + ',' + str(parameter_iteration) + ',')
+    fstat_f1.write(filename+','+ str(params[0][1]) + ','+ str(params[1][1]) + ',' + str(params[2][1]) + ',' + str(params[3][1]) + ',' + str(params[4][1]) + ',' + str(params[5][1]) + ',' + str(params[6][1]) + ',' + str(params[7][1]) + ',' + str(params[8][1]) + ',' + str(parameter_iteration) + ',')
     fstat_f1.write(','.join(str(s) for s in f1) + '\n')
     fstat_f1.close()
     
     fstat_ari=open("Stats/MatEE_ARI.csv", "a")
-    fstat_ari.write(filename+','+ str(params[0][1]) + ','+ str(params[1][1]) + ',' + str(params[2][1]) + ',' + str(parameter_iteration) + ',')
+    fstat_ari.write(filename+','+ str(params[0][1]) + ','+ str(params[1][1]) + ',' + str(params[2][1]) + ',' + str(params[3][1]) + ',' + str(params[4][1]) + ',' + str(params[5][1]) + ',' + str(params[6][1]) + ',' + str(params[7][1]) + ',' + str(params[8][1]) + ',' + str(parameter_iteration) + ',')
     fstat_ari.write(','.join(str(s) for s in ari) + '\n')
     fstat_ari.close()
 
@@ -508,7 +508,25 @@ if __name__ == '__main__':
     parameters.append(["NumConcentrationSteps", 10, NumConcentrationSteps])
     parameters.append(["StartMethod", "classical", StartMethod])
     
-    
+    R = ""
+    for i in range(9):
+        R += "R"+str(i)+","
+    R+="R9"
+    ARI_R = ""
+    for i in range(44):
+        ARI_R += "R"+str(i)+","
+    ARI_R+="R44"
+        
+    if os.path.exists("Stats/MatEE_F1.csv") == 0: 
+        fstat_f1=open("Stats/MatEE_F1.csv", "w")
+        fstat_f1.write('Filename,Method,OutlierFraction,NumTrials,BiasCorrection,NumOGKIterations,UnivariateEstimator,ReweightingMethod,NumConcentrationSteps,StartMethod,Parameter_Iteration,'+R+"\n")
+        fstat_f1.close()
+        
+    if os.path.exists("Stats/MatEE_ARI.csv") == 0:    
+        fstat_ari=open("Stats/MatEE_ARI.csv", "w")
+        fstat_ari.write('Filename,Method,OutlierFraction,NumTrials,BiasCorrection,NumOGKIterations,UnivariateEstimator,ReweightingMethod,NumConcentrationSteps,StartMethod,Parameter_Iteration,'+ARI_R+"\n")
+        fstat_ari.close()
+        
     f_Route_Scores=open("Stats/MatEE_Route_Scores.csv", "w")
     f_Route_Scores.write('Filename,DefaultARI,DefaultF1,UninformedARI,UninformedF1,InformedARI,InformedF1\n')
     f_Route_Scores.close()

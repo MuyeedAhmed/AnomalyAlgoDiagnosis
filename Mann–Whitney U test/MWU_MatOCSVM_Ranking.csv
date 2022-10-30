@@ -1,0 +1,9 @@
+ParameterName,MWU_Score
+ContaminationFraction,1
+KernelScale,2
+Lambda,3
+NumExpansionDimensions,4
+StandardizeData,5
+BetaTolerance,6
+GradientTolerance,7
+IterationLimit,8

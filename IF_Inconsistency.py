@@ -62,7 +62,7 @@ def get_ari_sk_r(filename, param_sk, param_r):
     labels_sk =  pd.read_csv("../AnomalyAlgoDiagnosis_Labels/IF_Sk/Labels_Sk_IF_"+labelFile_sk+".csv", header=None).to_numpy()    
     
     
-    labels_r =  pd.read_csv("IF_R/"+labelFile_r+".csv").to_numpy()
+    labels_r =  pd.read_csv("Labels/IF_R/"+labelFile_r+".csv").to_numpy()
 
     
     ari = []
@@ -81,11 +81,11 @@ def get_ari_r_mat(filename, param_r, param_mat):
     if os.path.exists("IF_Matlab/Labels_Mat_IF_"+labelFile_mat+".csv") == 0:
         # print(labelFile_sk)
         return 0
-    if os.path.exists("IF_R/"+labelFile_r+".csv") == 0:
+    if os.path.exists("Labels/IF_R/"+labelFile_r+".csv") == 0:
         # print(labelFile_sk)
         return 0
 
-    labels_r = pd.read_csv("IF_R/"+labelFile_r+".csv").to_numpy()
+    labels_r = pd.read_csv("Labels/IF_R/"+labelFile_r+".csv").to_numpy()
     # labels_r = np.int64((labels_r[0][1:])*1)
     # print(labels_r)
     labels_mat =  pd.read_csv("IF_Matlab/Labels_Mat_IF_"+labelFile_mat+".csv", header=None).to_numpy()

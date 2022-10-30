@@ -1,0 +1,10 @@
+ParameterName,MWU_Score
+Method,1
+OutlierFraction,3
+NumTrials,7
+BiasCorrection,4
+NumOGKIterations,5
+UnivariateEstimator,6
+ReweightingMethod,2
+NumConcentrationSteps,8
+StartMethod,9

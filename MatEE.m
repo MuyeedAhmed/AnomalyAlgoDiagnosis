@@ -21,8 +21,7 @@ function main_function()
     parameters = [];
 
     Method.name = "Method";
-    Method.default = "ogk";
-%     Method.default = "fmcd";
+    Method.default = "fmcd";
     Method.values = ["fmcd", "ogk", "olivehawkins"];
     OutlierFraction.name = "OutlierFraction";% fcmd, olivehawkins
     OutlierFraction.default = 0.5;
@@ -136,7 +135,7 @@ function EE(filename, parameters)
     end
 end
 
-%% Run OCSVM
+%% Run EE
 function runEE(filename_with_extension, X, y, params)
     filename_char = convertStringsToChars(filename_with_extension);
     filename = filename_char(1:end-4);

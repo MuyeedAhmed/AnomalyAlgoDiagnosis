@@ -517,14 +517,14 @@ def runEE(filename, X, gt, param_sk, param_mat):
     labelFile_sk = filename + "_" + str(param_sk[0][1]) + "_" + str(param_sk[1][1]) + "_" + str(param_sk[2][1]) + "_" + str(param_sk[3][1])
     labelFile_mat = filename + "_" + str(param_mat[0][1]) + "_" + str(param_mat[1][1]) + "_" + str(param_mat[2][1]) + "_" + str(param_mat[3][1]) + "_" + str(param_mat[4][1]) + "_" + str(param_mat[5][1]) + "_" + str(param_mat[6][1]) + "_" + str(param_mat[7][1]) + "_" + str(param_mat[8][1])
 
-    if os.path.exists("../AnomalyAlgoDiagnosis_Labels/EE_Sk/Labels_Sk_EE_"+labelFile_sk+".csv") == 0:
+    if os.path.exists("Labels/EE_Sk/Labels_Sk_EE_"+labelFile_sk+".csv") == 0:
         get_sk_f1(filename, param_sk, X, gt)
     if os.path.exists("Labels/EE_Matlab/Labels_Mat_EE_"+labelFile_mat+".csv") == 0:        
         frr=open("GD_ReRun/MatEE.csv", "a")
         frr.write(filename+","+str(param_mat[0][1])+","+str(param_mat[1][1])+","+str(param_mat[2][1])+","+str(param_mat[3][1])+","+str(param_mat[4][1])+","+str(param_mat[5][1])+","+str(param_mat[6][1])+","+str(param_mat[7][1])+","+str(param_mat[8][1])+'\n')
         frr.close()
         return -1, -1, -1
-    labels_sk =  pd.read_csv("../AnomalyAlgoDiagnosis_Labels/EE_Sk/Labels_Sk_EE_"+labelFile_sk+".csv", header=None).to_numpy()
+    labels_sk =  pd.read_csv("Labels/EE_Sk/Labels_Sk_EE_"+labelFile_sk+".csv", header=None).to_numpy()
 
 
     labels_mat =  pd.read_csv("Labels/EE_Matlab/Labels_Mat_EE_"+labelFile_mat+".csv", header=None).to_numpy()
@@ -587,8 +587,8 @@ def get_sk_f1(filename, param_sk, X, gt):
     for i in range(len(labels)):
         for j in range(i+1, len(labels)):
           ari.append(adjusted_rand_score(labels[i], labels[j]))      
-    if os.path.exists("../AnomalyAlgoDiagnosis_Labels/EE_Sk/Labels_Sk_EE_"+labelFile+".csv") == 0:
-        fileLabels=open("../AnomalyAlgoDiagnosis_Labels/EE_Sk/Labels_Sk_EE_"+labelFile+".csv", 'a')
+    if os.path.exists("Labels/EE_Sk/Labels_Sk_EE_"+labelFile+".csv") == 0:
+        fileLabels=open("Labels/EE_Sk/Labels_Sk_EE_"+labelFile+".csv", 'a')
         for l in labels:
             fileLabels.write(','.join(str(s) for s in l) + '\n')
         fileLabels.close()

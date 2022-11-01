@@ -262,7 +262,7 @@ def get_blind_route(X, gt, filename, paramaters_r_copy,paramaters_mat_copy, para
         blind_route_sk = route_sk
         i_def = passing_param_r[p_r][2].index(passing_param_r[p_r][1])
         if i_def+1 == len(passing_param_r[p_r][2]):
-            i_pv_r = i_def-1    
+            i_pv_r = i_def-1
         else:
             i_pv_r = i_def+1
         
@@ -1016,7 +1016,7 @@ if __name__ == '__main__':
     for FileNumber in range(len(master_files)):
         print(FileNumber, end=' ')
         isolationforest(master_files[FileNumber], parameters_r, parameters_mat, parameters_sk)
-        break
+
     # plot_ari_f1() 
 
     

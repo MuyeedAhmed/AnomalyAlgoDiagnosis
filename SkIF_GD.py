@@ -488,39 +488,39 @@ if __name__ == '__main__':
     
     
     
-    # parameters = []
+    parameters = []
     
-    # n_estimators = [2, 4, 8, 16, 32, 64, 100, 128, 256, 512]##
-    # max_samples = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
-    # contamination = ['auto'] 
-    # max_features = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
-    # bootstrap = [True, False]
-    # n_jobs = [1, None] 
-    # warm_start = [True, False]
+    n_estimators = [2, 4, 8, 16, 32, 64, 100, 128, 256, 512]##
+    max_samples = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+    contamination = ['auto'] 
+    max_features = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+    bootstrap = [True, False]
+    n_jobs = [1, None] 
+    warm_start = [True, False]
     
-    # parameters.append(["n_estimators", 100, n_estimators])
-    # parameters.append(["max_samples", 'auto', max_samples])
-    # parameters.append(["contamination", 'auto', contamination])
-    # parameters.append(["max_features", 1.0, max_features])
-    # parameters.append(["bootstrap", False, bootstrap])
-    # parameters.append(["n_jobs", None, n_jobs])
-    # parameters.append(["warm_start", False, warm_start])
+    parameters.append(["n_estimators", 100, n_estimators])
+    parameters.append(["max_samples", 'auto', max_samples])
+    parameters.append(["contamination", 'auto', contamination])
+    parameters.append(["max_features", 1.0, max_features])
+    parameters.append(["bootstrap", False, bootstrap])
+    parameters.append(["n_jobs", None, n_jobs])
+    parameters.append(["warm_start", False, warm_start])
     
-    # f_Route_Scores=open("Stats/SkIF_Route_Scores.csv", "w")
-    # f_Route_Scores.write('Filename,DefaultARI,DefaultF1,UninformedARI,UninformedF1,InformedARI,InformedF1\n')
-    # f_Route_Scores.close()
+    f_Route_Scores=open("Stats/SkIF_Route_Scores.csv", "w")
+    f_Route_Scores.write('Filename,DefaultARI,DefaultF1,UninformedARI,UninformedF1,InformedARI,InformedF1\n')
+    f_Route_Scores.close()
 
-    # ## Ranking
-    # parameter_rankings = pd.read_csv("Mann–Whitney U test/MWU_SkIF_Ranking.csv")
-    # parameter_rankings["Ranking"] = (ss.rankdata(parameter_rankings["MWU_Score"])-1)
-    # for i in range(len(parameters)):
-    #     param_rank = parameter_rankings[parameter_rankings["ParameterName"] == parameters[i][0]]["Ranking"].to_numpy()
-    #     parameters[i].append(int(param_rank[0]))
-    # ##
+    ## Ranking
+    parameter_rankings = pd.read_csv("Mann–Whitney U test/MWU_SkIF_Ranking.csv")
+    parameter_rankings["Ranking"] = (ss.rankdata(parameter_rankings["MWU_Score"])-1)
+    for i in range(len(parameters)):
+        param_rank = parameter_rankings[parameter_rankings["ParameterName"] == parameters[i][0]]["Ranking"].to_numpy()
+        parameters[i].append(int(param_rank[0]))
+    ##
         
-    # for FileNumber in range(len(master_files)):
-    #     print(FileNumber, end=' ')
-    #     isolationforest(master_files[FileNumber], parameters, 0, parameter_rankings["Ranking"].to_numpy())
+    for FileNumber in range(len(master_files)):
+        print(FileNumber, end=' ')
+        isolationforest(master_files[FileNumber], parameters, 0, parameter_rankings["Ranking"].to_numpy())
 
     plot_ari_f1() 
         

@@ -5,6 +5,10 @@ Created on Sun Oct 30 21:24:10 2022
 
 @author: muyeedahmed
 """
+
+import warnings
+warnings.filterwarnings('ignore')
+
 import os
 import glob
 import pandas as pd
@@ -92,14 +96,14 @@ def ee(filename, parameters_mat, parameters_sk):
     InformedF1_sk = str(informed_route_sk[-1][3][-1][2])
     InformedF1_mat = str(informed_route_mat[-1][3][-1][3])
     
-    # draw_graph_1(filename, blind_route_sk)
-    # draw_graph_2(filename, blind_route_mat)
+    draw_graph(filename, blind_route_sk,informed_route_sk, 'S')
+    draw_graph(filename, blind_route_mat,informed_route_mat, 'M')
     
     f_Route_Scores=open("Stats/EE_SvM_Route_Scores.csv", "a")
     f_Route_Scores.write(filename+','+str(DefaultARI)+","+str(DefaultF1_sk)+","+str(DefaultF1_mat)+","+UninformedARI+","+UninformedF1_sk+","+UninformedF1_mat+","+InformedARI+","+InformedF1_sk+","+InformedF1_mat+"\n")
     f_Route_Scores.close()
     
-def draw_graph_1(filename, blind_route):
+def draw_graph(filename, blind_route, informed_route, tool):
     ## Without F1 Score
     fig = plt.Figure()
     
@@ -130,7 +134,7 @@ def draw_graph_1(filename, blind_route):
     plt.ylabel("Cross-run ARI")
     plt.xticks(ticks= [])
     plt.title(filename)
-    # plt.savefig("Fig/GD/Routes/"+filename+"_MatEE_Trajectory.pdf", bbox_inches="tight", pad_inches=0)
+    plt.savefig("Fig/GD/Routes_Inconsistency/"+filename+"_EE_SvM_"+tool+"_Trajectory.pdf", bbox_inches="tight", pad_inches=0)
     plt.show()
     ## With F1 Score
     fig = plt.Figure()
@@ -143,10 +147,12 @@ def draw_graph_1(filename, blind_route):
         ari_p = blind_route[i][3]
         ari_scores = []
         ari_x = []
-        print(ari_p)
         for j in range(len(ari_p)):
             ari_scores.append(ari_p[j][1])
-            ari_x.append(ari_p[j][2])
+            if tool == 'S':
+                ari_x.append(ari_p[j][2])
+            elif tool == 'M':
+                ari_x.append(ari_p[j][3])
         plt.plot(ari_x, ari_scores, '-')
         for k in range(len(ari_scores)-1):
             plt.plot(ari_x[k+1], ari_scores[k+1], marker=(3, 0, get_angle(ari_x[k], ari_scores[k], ari_x[k+1], ari_scores[k+1])-90), color='black', markersize=8)
@@ -160,75 +166,43 @@ def draw_graph_1(filename, blind_route):
     plt.xlabel("F1 Score")
     
     plt.title(filename)
-    # plt.savefig("Fig/GD/Routes/"+filename+"_EE_SvM___Trajectory_W_F1.pdf", bbox_inches="tight", pad_inches=0)
+    plt.savefig("Fig/GD/Routes_Inconsistency/"+filename+"_EE_SvM_"+tool+"_Trajectory_W_F1.pdf", bbox_inches="tight", pad_inches=0)
     plt.show()
-def draw_graph_2(filename, blind_route):
-    ## Without F1 Score
-    fig = plt.Figure()
     
+    ## Informed F1 Score
+    fig = plt.Figure()
     start = end = 0
-    for i in range(len(blind_route)):
-        default = blind_route[i][2]
+    for i in range(len(informed_route)):
+        default = informed_route[i][2]
         start = end
-        end = blind_route[i][1] - (default-start)
+        end = informed_route[i][1] - (default-start)
         
-        ari_p = blind_route[i][3]
-        # print()
+        ari_p = informed_route[i][3]
         ari_scores = []
         ari_x = []
         for j in range(len(ari_p)):
             ari_scores.append(ari_p[j][1])
-            ari_x.append(j-(default-start))
+            if tool == 'S':
+                ari_x.append(ari_p[j][2])
+            elif tool == 'M':
+                ari_x.append(ari_p[j][3])
         plt.plot(ari_x, ari_scores, '-')
+        
         for k in range(len(ari_scores)-1):
             plt.plot(ari_x[k+1], ari_scores[k+1], marker=(3, 0, get_angle(ari_x[k], ari_scores[k], ari_x[k+1], ari_scores[k+1])-90), color='black', markersize=8)
-        
+
         
         # if i == 0:
-        #     plt.annotate(blind_route[i][0]+" = "+str(blind_route[i][3][blind_route[i][2]][0]), (0.1, blind_route[i][3][blind_route[i][2]][1]), ha='left')
+        #     plt.annotate(informed_route[i][0]+" = "+str(informed_route[i][3][informed_route[i][2]][0]), (informed_route[i][3][informed_route[i][2]][2], informed_route[i][3][informed_route[i][2]][1]), ha='left')
 
         # if start != end:
-        #     plt.annotate(blind_route[i][0]+" = "+str(blind_route[i][3][blind_route[i][1]][0]), (end+0.1, blind_route[i][3][blind_route[i][1]][1]), ha='left')
+        #     plt.annotate(informed_route[i][0]+" = "+str(informed_route[i][3][informed_route[i][1]][0]), (informed_route[i][3][guided_route[i][1]][2], informed_route[i][3][informed_route[i][1]][1]), ha='left')
     # plt.legend(param_names)
     plt.ylabel("Cross-run ARI")
-    plt.xticks(ticks= [])
-    plt.title(filename)
-    # plt.savefig("Fig/GD/Routes/"+filename+"_MatEE_Trajectory.pdf", bbox_inches="tight", pad_inches=0)
-    plt.show()
-    ## With F1 Score
-    fig = plt.Figure()
-    start = end = 0
-    ari_scores = []
-    ari_x = []
-    for i in range(len(blind_route)):
-        default = blind_route[i][2]
-        start = end
-        end = blind_route[i][1] - (default-start)
-        
-        ari_p = blind_route[i][3]        
-        for j in range(len(ari_p)):
-            if len(ari_scores) > 0:
-                if ari_p[j][1] < max(ari_scores):
-                    continue
-                if ari_p[j][1] == ari_scores[-1] and ari_p[j][3] == ari_x[-1]:
-                    continue
-            ari_scores.append(ari_p[j][1])
-            ari_x.append(ari_p[j][3])
-        for k in range(len(ari_scores)-1):
-            plt.plot(ari_x[k+1], ari_scores[k+1], marker=(3, 0, get_angle(ari_x[k], ari_scores[k], ari_x[k+1], ari_scores[k+1])-90), color='black', markersize=8)
-    
-    plt.plot(ari_x, ari_scores, '-')
-        
-        # if i == 0:
-        #     plt.annotate(blind_route[i][0]+" = "+str(blind_route[i][3][blind_route[i][2]][0]), (blind_route[i][3][blind_route[i][2]][2], blind_route[i][3][blind_route[i][2]][1]), ha='left')
-
-        # if start != end:
-        #     plt.annotate(blind_route[i][0]+" = "+str(blind_route[i][3][blind_route[i][1]][0]), (blind_route[i][3][blind_route[i][1]][2], blind_route[i][3][blind_route[i][1]][1]), ha='left')
-    plt.ylabel("Cross-run ARI")
     plt.xlabel("F1 Score")
     
     plt.title(filename)
-    # plt.savefig("Fig/GD/Routes/"+filename+"_MatEE_Trajectory_W_F1.pdf", bbox_inches="tight", pad_inches=0)
+    plt.savefig("Fig/GD/Routes_Inconsistency/"+filename+"_EE_SvM_"+tool+"_Guided_Trajectory_W_F1.pdf", bbox_inches="tight", pad_inches=0)
     plt.show()
     
 def get_angle(p1x, p1y, p2x, p2y):
@@ -238,8 +212,6 @@ def get_angle(p1x, p1y, p2x, p2y):
     angle = math.degrees(theta)  # angle is in (-180, 180]
     if angle < 0:
         angle = 360 + angle
-    print(p1x, p1y, p2x, p2y)
-    print(angle)
     return angle
 
 def get_blind_route(X, gt, filename, paramaters_sk_copy,paramaters_mat_copy_pre):
@@ -518,7 +490,9 @@ def runEE(filename, X, gt, param_sk, param_mat):
     labelFile_mat = filename + "_" + str(param_mat[0][1]) + "_" + str(param_mat[1][1]) + "_" + str(param_mat[2][1]) + "_" + str(param_mat[3][1]) + "_" + str(param_mat[4][1]) + "_" + str(param_mat[5][1]) + "_" + str(param_mat[6][1]) + "_" + str(param_mat[7][1]) + "_" + str(param_mat[8][1])
 
     if os.path.exists("Labels/EE_Sk/Labels_Sk_EE_"+labelFile_sk+".csv") == 0:
-        get_sk_f1(filename, param_sk, X, gt)
+        skf1 = get_sk_f1(filename, param_sk, X, gt)
+        if skf1 == -1:
+            return -1, -1, -1
     if os.path.exists("Labels/EE_Matlab/Labels_Mat_EE_"+labelFile_mat+".csv") == 0:        
         frr=open("GD_ReRun/MatEE.csv", "a")
         frr.write(filename+","+str(param_mat[0][1])+","+str(param_mat[1][1])+","+str(param_mat[2][1])+","+str(param_mat[3][1])+","+str(param_mat[4][1])+","+str(param_mat[5][1])+","+str(param_mat[6][1])+","+str(param_mat[7][1])+","+str(param_mat[8][1])+'\n')
@@ -571,7 +545,8 @@ def get_sk_f1(filename, param_sk, X, gt):
     if cont == "IF":
         percentage_file = pd.read_csv("Stats/SkPercentage.csv")
         cont  = percentage_file[percentage_file["Filename"] == filename]["IF"].to_numpy()[0]
-        
+    if cont == 0:
+        return -1
     labels = []
     f1 = []
     ari = []
@@ -683,6 +658,10 @@ def get_mat_f1(filename, param_mat, X, gt):
 def plot_ari_f1():
     Route_Scores = pd.read_csv("Stats/EE_SvM_Route_Scores.csv")
     
+    Route_Scores['DefaultF1'] = Route_Scores[['DefaultF1_sk', 'DefaultF1_mat']].mean(axis=1)
+    Route_Scores['UninformedF1'] = Route_Scores[['UninformedF1_sk', 'UninformedF1_mat']].mean(axis=1)
+    Route_Scores['InformedF1'] = Route_Scores[['InformedF1_sk', 'InformedF1_mat']].mean(axis=1)
+    
     fig = plt.Figure()
     
     plt.plot(Route_Scores["DefaultF1"], Route_Scores["DefaultARI"], '.', color='red', marker = 'd', markersize = 4, alpha=.5)
@@ -694,37 +673,49 @@ def plot_ari_f1():
     plt.plot(Route_Scores["InformedF1"].mean(), Route_Scores["InformedARI"].mean(), '.', color = 'blue', marker = '^', markersize = 12, markeredgecolor='black', markeredgewidth=1.5)
     
     plt.legend(['Default Setting', 'Uninformed Route', 'Informed Route'])
-    plt.title("Matlab - Robust Covariance")
-    plt.xlabel("Performance (F1 Score)")
+    plt.title("Robust Covariance - Inconsistency")
+    plt.xlabel("Average Performance (F1 Score)")
     plt.ylabel("Determinism (ARI)")
-    plt.savefig("Fig/MatEE_GD_Comparison.pdf", bbox_inches="tight", pad_inches=0)
+    plt.savefig("Fig/EE_SvM_GD_Comparison.pdf", bbox_inches="tight", pad_inches=0)
     plt.show()
     
     # ## Calculate Percentage
     
-    ui_win_performance = 0
-    ui_lose_performance = 0
+    ui_win_performance_sk = 0
+    ui_lose_performance_sk = 0
+    i_win_performance_sk = 0    
+    ui_win_performance_mat = 0
+    ui_lose_performance_mat = 0
+    i_win_performance_mat = 0
+    
     ui_win_nd = 0
-    i_win_performance = 0
     i_win_nd = 0
     
-    
     for index, row in Route_Scores.iterrows():
-        if row["UninformedF1"] > row["DefaultF1"]:
-            ui_win_performance += 1
-        elif row["UninformedF1"] < row["DefaultF1"]:
-            ui_lose_performance += 1
+        if row["UninformedF1_sk"] > row["DefaultF1_sk"]:
+            ui_win_performance_sk += 1
+        elif row["UninformedF1_sk"] < row["DefaultF1_sk"]:
+            ui_lose_performance_sk += 1
+        if row["UninformedF1_mat"] > row["DefaultF1_mat"]:
+            ui_win_performance_mat += 1
+        elif row["UninformedF1_mat"] < row["DefaultF1_mat"]:
+            ui_lose_performance_mat += 1    
+        
         if row["UninformedARI"] > row["DefaultARI"]:
             ui_win_nd += 1
     
-        if row["InformedF1"] > row["DefaultF1"]:
-            i_win_performance += 1
+        if row["InformedF1_sk"] > row["DefaultF1_sk"]:
+            i_win_performance_sk += 1
+        if row["InformedF1_mat"] > row["DefaultF1_mat"]:
+            i_win_performance_mat += 1
         if row["InformedARI"] > row["DefaultARI"]:
             i_win_nd += 1
+        
+        
 
-    print(f"Default & {Route_Scores['DefaultARI'].mean()} & -  & -  & {Route_Scores['DefaultF1'].mean()}  & -  & -  \\\\ \\hline")
-    print(f"Uninformed & {Route_Scores['UninformedARI'].mean()} & {ui_win_nd}  & 0  & {Route_Scores['UninformedF1'].mean()}  & {ui_win_performance}  & {ui_lose_performance} \\\\ ")
-    print(f"Informed & {Route_Scores['InformedARI'].mean()} & {i_win_nd}  & 0  & {Route_Scores['InformedF1'].mean()}  & {i_win_performance}  & 0 \\\\ ")
+    print(f"Default & {Route_Scores['DefaultARI'].mean()} & -  & -  & {Route_Scores['DefaultF1_sk'].mean()}  & -  & -  & {Route_Scores['DefaultF1_mat'].mean()}  & -  & -  \\\\ \\hline")
+    print(f"Uninformed & {Route_Scores['UninformedARI'].mean()} & {ui_win_nd}  & 0  & {Route_Scores['UninformedF1_sk'].mean()}  & {ui_win_performance_sk}  & {ui_lose_performance_sk} & {Route_Scores['UninformedF1_mat'].mean()}  & {ui_win_performance_mat}  & {ui_lose_performance_mat} \\\\ ")
+    print(f"Informed & {Route_Scores['InformedARI'].mean()} & {i_win_nd}  & 0  & {Route_Scores['InformedF1_sk'].mean()}  & {i_win_performance_sk}  & 0 & {Route_Scores['InformedF1_mat'].mean()}  & {i_win_performance_mat}  & 0 \\\\ ")
     
     
 
@@ -788,10 +779,16 @@ if __name__ == '__main__':
     
     for FileNumber in range(len(master_files)):
         print(FileNumber, end=' ')
-        # ee("annthyroid", parameters_mat, parameters_sk)
+        MatEE_Route_Scores = pd.read_csv("Stats/MatEE_Route_Scores.csv")
+        fileroute = MatEE_Route_Scores[MatEE_Route_Scores["Filename"] == master_files[FileNumber]]
+        
+        if fileroute.empty:
+            continue
+        if fileroute["UninformedF1"].values[0] == 0 and fileroute["InformedF1"].values[0] == 0:
+            continue
+
         ee(master_files[FileNumber], parameters_mat, parameters_sk)
-        # break
     
-    # plot_ari_f1() 
+    plot_ari_f1() 
 
     

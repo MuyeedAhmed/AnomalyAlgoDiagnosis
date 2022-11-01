@@ -93,7 +93,7 @@ function runEE(filename_with_extension, X, y, params)
     p9 = params(9).default;
     
     outliersSet = [];
-%     try
+    try
         for z = 1:10
             if strcmp(p1, "fmcd") == 1
                 [sig,mu,mah,outliers] = robustcov(X, Method=p1, OutlierFraction=p2, NumTrials=p3, BiasCorrection=p4);
@@ -107,7 +107,7 @@ function runEE(filename_with_extension, X, y, params)
             outliersSet = [outliersSet;outliers'];
         end
         csvwrite(labelFile,outliersSet); 
-%     catch
-%         fprintf("-Failed")
-%     end
+    catch
+        fprintf("-Failed")
+    end
 end

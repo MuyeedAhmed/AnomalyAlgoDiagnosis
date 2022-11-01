@@ -146,50 +146,44 @@ def calculate_score(allFiles, parameter, parameter_values, all_parameters):
     return mwu_geomean, mwu_min
   
 
-from sklearn.linear_model import LinearRegression
-import statsmodels.api as sm
-import pandas as pd
-
-import LOF
-
-def lofrun(filename, parameters, parameter_iteration, parameter_rankings):
-    print(filename)
-    folderpath = datasetFolderDir
+# def lofrun(filename, parameters, parameter_iteration, parameter_rankings):
+#     print(filename)
+#     folderpath = datasetFolderDir
     
-    parameters_this_file = deepcopy(parameters)
+#     parameters_this_file = deepcopy(parameters)
     
-    if os.path.exists(folderpath+filename+".mat") == 1:
-        if os.path.getsize(folderpath+filename+".mat") > 200000: # 200KB
-            # print("Didn\'t run -> Too large - ", filename)    
-            return
-        try:
-            df = loadmat(folderpath+filename+".mat")
-        except NotImplementedError:
-            df = mat73.loadmat(folderpath+filename+".mat")
+#     if os.path.exists(folderpath+filename+".mat") == 1:
+#         if os.path.getsize(folderpath+filename+".mat") > 200000: # 200KB
+#             # print("Didn\'t run -> Too large - ", filename)    
+#             return
+#         try:
+#             df = loadmat(folderpath+filename+".mat")
+#         except NotImplementedError:
+#             df = mat73.loadmat(folderpath+filename+".mat")
 
-        gt=df["y"]
-        gt = gt.reshape((len(gt)))
-        X=df['X']
-        if np.isnan(X).any():
-            # print("Didn\'t run -> NaN - ", filename)
-            return
+#         gt=df["y"]
+#         gt = gt.reshape((len(gt)))
+#         X=df['X']
+#         if np.isnan(X).any():
+#             # print("Didn\'t run -> NaN - ", filename)
+#             return
         
-    elif os.path.exists(folderpath+filename+".csv") == 1:
-        if os.path.getsize(folderpath+filename+".csv") > 200000: # 200KB
-            print("Didn\'t run -> Too large - ", filename)    
-            return
-        X = pd.read_csv(folderpath+filename+".csv")
-        target=X["target"].to_numpy()
-        X=X.drop("target", axis=1)
-        gt = target
-        if X.isna().any().any() == 1:
-            print("Didn\'t run -> NaN value - ", filename)  
-            return
-    else:
-        print("File doesn't exist")
-        return
-    a , b = LOF(X, 20)
-    print(a, b)
+#     elif os.path.exists(folderpath+filename+".csv") == 1:
+#         if os.path.getsize(folderpath+filename+".csv") > 200000: # 200KB
+#             print("Didn\'t run -> Too large - ", filename)    
+#             return
+#         X = pd.read_csv(folderpath+filename+".csv")
+#         target=X["target"].to_numpy()
+#         X=X.drop("target", axis=1)
+#         gt = target
+#         if X.isna().any().any() == 1:
+#             print("Didn\'t run -> NaN value - ", filename)  
+#             return
+#     else:
+#         print("File doesn't exist")
+#         return
+#     a , b = LOF(X, 20)
+#     print(a, b)
 
 if __name__ == '__main__':
     folderpath = datasetFolderDir
@@ -200,8 +194,7 @@ if __name__ == '__main__':
         master_files[i] = master_files[i].split("/")[-1].split(".")[0]
     
     master_files.sort()
-    for i in master_files:
-        lofrun(i, [], 0, [])
+    
     
     # parameters = []
     
@@ -241,39 +234,39 @@ if __name__ == '__main__':
     # print(MWU_Store)
     # MWU_Store.to_csv("Stats/SkIF_MWU_Rank.csv")
 
-    # data = pd.read_csv("Stats/SkIF_Grouped_Median.csv")
-    # data["bootstrap"] = data["bootstrap"].astype(int)
-    # data["warm_start"] = data["warm_start"].astype(int)
+    data = pd.read_csv("Stats/SkIF_Grouped_Median.csv")
+    data["bootstrap"] = data["bootstrap"].astype(int)
+    data["warm_start"] = data["warm_start"].astype(int)
     
-    # y = data['ARI_Median']
+    y = data['ARI_Median']
     
-    # x = data[['n_estimators']]
-    # model = sm.OLS(y, x).fit()
-    # print(model.aic)
+    x = data[['n_estimators']]
+    model = sm.OLS(y, x).fit()
+    print('n_estimators', model.aic)
     
-    # x = data[['max_samples']]
-    # model = sm.OLS(y, x).fit()
-    # print(model.aic)
+    x = data[['max_samples']]
+    model = sm.OLS(y, x).fit()
+    print('max_samples', model.aic)
         
-    # x = data[['max_features']]
-    # model = sm.OLS(y, x).fit()
-    # print(model.aic)
+    x = data[['max_features']]
+    model = sm.OLS(y, x).fit()
+    print('max_features', model.aic)
     
-    # x = data[['bootstrap']]
-    # model = sm.OLS(y, x).fit()
-    # print(model.aic)
+    x = data[['bootstrap']]
+    model = sm.OLS(y, x).fit()
+    print('bootstrap', model.aic)
         
-    # x = data[['n_jobs']]
-    # model = sm.OLS(y, x).fit()
-    # print(model.aic)
+    x = data[['n_jobs']]
+    model = sm.OLS(y, x).fit()
+    print('n_jobs', model.aic)
         
-    # x = data[['warm_start']]
-    # model = sm.OLS(y, x).fit()
-    # print(model.aic)
+    x = data[['warm_start']]
+    model = sm.OLS(y, x).fit()
+    print('warm_start', model.aic)
         
-    # x = data[['F1_Range']]
-    # model = sm.OLS(y, x).fit()
-    # print(model.aic)
+    x = data[['ARI_Median']]
+    model = sm.OLS(y, x).fit()
+    print('ARI_Median', model.aic)
         
         
         

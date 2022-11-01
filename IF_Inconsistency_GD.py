@@ -106,29 +106,29 @@ def isolationforest(filename, parameters_r, parameters_mat, parameters_sk):
     
     
     blind_route_r, blind_route_mat, blind_route_sk = get_blind_route(X, gt, filename, deepcopy(mod_parameters_r), deepcopy(mod_parameters_mat), deepcopy(mod_parameters_sk))
-    informed_route_r, informed_route_mat, informed_route_sk = get_guided_route(X, gt, filename, deepcopy(mod_parameters_r), deepcopy(mod_parameters_mat), deepcopy(mod_parameters_sk))
+    # informed_route_r, informed_route_mat, informed_route_sk = get_guided_route(X, gt, filename, deepcopy(mod_parameters_r), deepcopy(mod_parameters_mat), deepcopy(mod_parameters_sk))
     print(blind_route_r)
     print(blind_route_mat)
     
     print(blind_route_sk)
     
-    UninformedARI = str(blind_route_r[-1][3][-1][1])
-    UninformedF1_r = str(blind_route_r[-1][3][-1][2])
-    UninformedF1_mat = str(blind_route_mat[-1][3][-1][3])
-    UninformedF1_sk = str(blind_route_sk[-1][3][-1][4])
+    # UninformedARI = str(blind_route_r[-1][3][-1][1])
+    # UninformedF1_r = str(blind_route_r[-1][3][-1][2])
+    # UninformedF1_mat = str(blind_route_mat[-1][3][-1][3])
+    # UninformedF1_sk = str(blind_route_sk[-1][3][-1][4])
     
-    InformedARI = str(informed_route_r[-1][3][-1][1])
-    InformedF1_r = str(informed_route_r[-1][3][-1][2])
-    InformedF1_mat = str(informed_route_mat[-1][3][-1][3])
-    InformedF1_sk = str(informed_route_sk[-1][3][-1][4])
+    # InformedARI = str(informed_route_r[-1][3][-1][1])
+    # InformedF1_r = str(informed_route_r[-1][3][-1][2])
+    # InformedF1_mat = str(informed_route_mat[-1][3][-1][3])
+    # InformedF1_sk = str(informed_route_sk[-1][3][-1][4])
     
-    # draw_graph(filename, blind_route_sk,informed_route_sk, 'R')
-    # draw_graph(filename, blind_route_mat,informed_route_mat, 'M')
-    # draw_graph(filename, blind_route_sk,informed_route_sk, 'S')
+    # # draw_graph(filename, blind_route_sk,informed_route_sk, 'R')
+    # # draw_graph(filename, blind_route_mat,informed_route_mat, 'M')
+    # # draw_graph(filename, blind_route_sk,informed_route_sk, 'S')
     
-    f_Route_Scores=open("Stats/IF_SvMvR_Route_Scores.csv", "a")
-    f_Route_Scores.write(filename+','+str(DefaultARI)+","+str(DefaultF1_r)+","+str(DefaultF1_mat)+","+str(DefaultF1_sk)+","+UninformedARI+","+UninformedF1_r+","+UninformedF1_mat+","+UninformedF1_sk+","+InformedARI+","+InformedF1_r+","+InformedF1_mat+","+InformedF1_sk+"\n")
-    f_Route_Scores.close()
+    # f_Route_Scores=open("Stats/IF_SvMvR_Route_Scores.csv", "a")
+    # f_Route_Scores.write(filename+','+str(DefaultARI)+","+str(DefaultF1_r)+","+str(DefaultF1_mat)+","+str(DefaultF1_sk)+","+UninformedARI+","+UninformedF1_r+","+UninformedF1_mat+","+UninformedF1_sk+","+InformedARI+","+InformedF1_r+","+InformedF1_mat+","+InformedF1_sk+"\n")
+    # f_Route_Scores.close()
     
 def draw_graph(filename, blind_route, informed_route, tool):
     ## Without F1 Score
@@ -254,7 +254,8 @@ def get_blind_route(X, gt, filename, paramaters_r_copy,paramaters_mat_copy, para
         passing_param_r = deepcopy(paramaters_r_copy)
 
         default_ari, default_f1_r, default_f1_mat, default_f1_sk, route_mat, route_sk = get_blind_route_mat(X, gt, filename, passing_param_r, paramaters_mat_copy, paramaters_sk_copy)
-
+        if default_ari == -1:
+            return [], [], []
         parameter_route_r.append([passing_param_r[p_r][1], default_ari, default_f1_r, default_f1_mat, default_f1_sk])
         ari_scores_r.append(default_ari)
         # blind_route_mat += route_mat
@@ -316,6 +317,8 @@ def get_blind_route_mat(X, gt, filename, passing_param_r, paramaters_mat_copy, p
         passing_param_mat = deepcopy(paramaters_mat_copy)
 
         default_ari, default_f1_r, default_f1_mat, default_f1_sk, route_sk = get_blind_route_sk(X, gt, filename, passing_param_r, passing_param_mat, paramaters_sk_copy)
+        if default_ari == -1:
+            return -1, -1, -1, -1, [], []
         blind_route_sk = route_sk
         parameter_route_mat.append([passing_param_mat[p][1], default_ari, default_f1_r, default_f1_mat, default_f1_sk])
         ari_scores_mat.append(default_ari)
@@ -367,7 +370,8 @@ def get_blind_route_sk(X, gt, filename, passing_param_r, passing_param_mat, para
         passing_param_sk = deepcopy(paramaters_sk_copy)
 
         default_ari, default_f1_r, default_f1_mat, default_f1_sk = runIF(filename, X, gt, passing_param_r, passing_param_mat, passing_param_sk)
-
+        if default_ari == -1:
+            return -1, -1, -1, -1, []
         parameter_route_sk.append([passing_param_sk[p][1], default_ari, default_f1_r, default_f1_mat, default_f1_sk])
         ari_scores_sk.append(default_ari)
         i_def = passing_param_sk[p][2].index(passing_param_sk[p][1])
@@ -424,7 +428,8 @@ def get_guided_route(X, gt, filename, paramaters_r_copy,paramaters_mat_copy, par
         passing_param_r = deepcopy(paramaters_r_copy)
 
         default_ari, default_f1_r, default_f1_mat, default_f1_sk, route_mat, route_sk = get_guided_route_mat(X, gt, filename, passing_param_r, paramaters_mat_copy, paramaters_sk_copy)
-
+        if default_ari == -1:
+            return [], [], []
         parameter_route_r.append([passing_param_r[p_r][1], default_ari, default_f1_r, default_f1_mat, default_f1_sk])
         ari_scores_r.append(default_ari)
         f1_scores_r.append(default_f1_r)
@@ -489,6 +494,8 @@ def get_guided_route_mat(X, gt, filename, passing_param_r, paramaters_mat_copy, 
         passing_param_mat = deepcopy(paramaters_mat_copy)
 
         default_ari, default_f1_r, default_f1_mat, default_f1_sk, route_sk = get_guided_route_sk(X, gt, filename, passing_param_r, passing_param_mat, paramaters_sk_copy)
+        if default_ari == -1:
+            return -1, -1, -1, -1, [], []
         guided_route_sk = route_sk
         parameter_route_mat.append([passing_param_mat[p][1], default_ari, default_f1_r, default_f1_mat, default_f1_sk])
         ari_scores_mat.append(default_ari)
@@ -543,7 +550,8 @@ def get_guided_route_sk(X, gt, filename, passing_param_r, passing_param_mat, par
         passing_param_sk = deepcopy(paramaters_sk_copy)
 
         default_ari, default_f1_r, default_f1_mat, default_f1_sk = runIF(filename, X, gt, passing_param_r, passing_param_mat, passing_param_sk)
-
+        if default_ari == -1:
+            return -1, -1, -1, -1, []
         parameter_route_sk.append([passing_param_sk[p][1], default_ari, default_f1_r, default_f1_mat, default_f1_sk])
         ari_scores_sk.append(default_ari)
         f1_scores_sk.append(default_f1_sk)
@@ -595,7 +603,7 @@ def runIF(filename, X, gt, param_r, param_mat, param_sk):
     labelFile_r = filename + "_" + str(param_r[0][1]) + "_" + str(param_r[1][1]) + "_" + str(param_r[2][1]) + "_" + str(param_r[3][1])
     labelFile_mat = filename + "_" + str(param_mat[0][1]) + "_" + str(param_mat[1][1]) + "_" + str(param_mat[2][1])
     labelFile_sk = filename + "_" + str(param_sk[0][1]) + "_" + str(param_sk[1][1]) + "_" + str(param_sk[2][1]) + "_" + str(param_sk[3][1]) + "_" + str(param_sk[4][1]) + "_" + str(param_sk[5][1]) + "_" + str(param_sk[6][1])
-    
+
     
     if os.path.exists("Labels/IF_R/"+labelFile_r+".csv") == 0:        
         frr=open("GD_ReRun/RIF.csv", "a")
@@ -668,7 +676,7 @@ def runIF(filename, X, gt, param_r, param_mat, param_sk):
     
     ari = []  
     ari = (ari_mvr + ari_rvs + ari_mvs)/3
-
+    
     return ari, get_r_f1(filename, param_r, X, gt), get_mat_f1(filename, param_mat, X, gt), get_sk_f1(filename, param_sk, X, gt)
 
 def get_sk_f1(filename, param_sk, X, gt):
@@ -1017,6 +1025,7 @@ if __name__ == '__main__':
         print(FileNumber, end=' ')
         isolationforest(master_files[FileNumber], parameters_r, parameters_mat, parameters_sk)
 
+    # isolationforest("KnuggetChase3", parameters_r, parameters_mat, parameters_sk)
     # plot_ari_f1() 
 
     

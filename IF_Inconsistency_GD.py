@@ -106,29 +106,29 @@ def isolationforest(filename, parameters_r, parameters_mat, parameters_sk):
     
     
     blind_route_r, blind_route_mat, blind_route_sk = get_blind_route(X, gt, filename, deepcopy(mod_parameters_r), deepcopy(mod_parameters_mat), deepcopy(mod_parameters_sk))
-    # informed_route_r, informed_route_mat, informed_route_sk = get_guided_route(X, gt, filename, deepcopy(mod_parameters_r), deepcopy(mod_parameters_mat), deepcopy(mod_parameters_sk))
+    informed_route_r, informed_route_mat, informed_route_sk = get_guided_route(X, gt, filename, deepcopy(mod_parameters_r), deepcopy(mod_parameters_mat), deepcopy(mod_parameters_sk))
     print(blind_route_r)
     print(blind_route_mat)
     
     print(blind_route_sk)
     
-    # UninformedARI = str(blind_route_r[-1][3][-1][1])
-    # UninformedF1_r = str(blind_route_r[-1][3][-1][2])
-    # UninformedF1_mat = str(blind_route_mat[-1][3][-1][3])
-    # UninformedF1_sk = str(blind_route_sk[-1][3][-1][4])
+    UninformedARI = str(blind_route_r[-1][3][-1][1])
+    UninformedF1_r = str(blind_route_r[-1][3][-1][2])
+    UninformedF1_mat = str(blind_route_mat[-1][3][-1][3])
+    UninformedF1_sk = str(blind_route_sk[-1][3][-1][4])
     
-    # InformedARI = str(informed_route_r[-1][3][-1][1])
-    # InformedF1_r = str(informed_route_r[-1][3][-1][2])
-    # InformedF1_mat = str(informed_route_mat[-1][3][-1][3])
-    # InformedF1_sk = str(informed_route_sk[-1][3][-1][4])
+    InformedARI = str(informed_route_r[-1][3][-1][1])
+    InformedF1_r = str(informed_route_r[-1][3][-1][2])
+    InformedF1_mat = str(informed_route_mat[-1][3][-1][3])
+    InformedF1_sk = str(informed_route_sk[-1][3][-1][4])
     
-    # # draw_graph(filename, blind_route_sk,informed_route_sk, 'R')
-    # # draw_graph(filename, blind_route_mat,informed_route_mat, 'M')
-    # # draw_graph(filename, blind_route_sk,informed_route_sk, 'S')
+    # draw_graph(filename, blind_route_sk,informed_route_sk, 'R')
+    # draw_graph(filename, blind_route_mat,informed_route_mat, 'M')
+    # draw_graph(filename, blind_route_sk,informed_route_sk, 'S')
     
-    # f_Route_Scores=open("Stats/IF_SvMvR_Route_Scores.csv", "a")
-    # f_Route_Scores.write(filename+','+str(DefaultARI)+","+str(DefaultF1_r)+","+str(DefaultF1_mat)+","+str(DefaultF1_sk)+","+UninformedARI+","+UninformedF1_r+","+UninformedF1_mat+","+UninformedF1_sk+","+InformedARI+","+InformedF1_r+","+InformedF1_mat+","+InformedF1_sk+"\n")
-    # f_Route_Scores.close()
+    f_Route_Scores=open("Stats/IF_SvMvR_Route_Scores.csv", "a")
+    f_Route_Scores.write(filename+','+str(DefaultARI)+","+str(DefaultF1_r)+","+str(DefaultF1_mat)+","+str(DefaultF1_sk)+","+UninformedARI+","+UninformedF1_r+","+UninformedF1_mat+","+UninformedF1_sk+","+InformedARI+","+InformedF1_r+","+InformedF1_mat+","+InformedF1_sk+"\n")
+    f_Route_Scores.close()
     
 def draw_graph(filename, blind_route, informed_route, tool):
     ## Without F1 Score

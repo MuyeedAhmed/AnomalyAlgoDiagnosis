@@ -936,7 +936,7 @@ def plot_ari_f1():
     print("- & ",ui_win_performance_r, " & ",i_win_performance_r)
     print("- & ",ui_lose_performance_r, " & 0 ")
     print("matlab")
-    print(Route_Scores['DefaultF1_mat'].mean(), " & ", Route_Scores['UninformedF1_mat'].mean(), " & ", Route_Scores['InformedF1_may'].mean())
+    print(Route_Scores['DefaultF1_mat'].mean(), " & ", Route_Scores['UninformedF1_mat'].mean(), " & ", Route_Scores['InformedF1_mat'].mean())
     print("- & ",ui_win_performance_mat, " & ",i_win_performance_mat)
     print("- & ",ui_lose_performance_mat, " & 0 ")
     print("Sklearn")
@@ -1025,7 +1025,7 @@ if __name__ == '__main__':
         print(FileNumber, end=' ')
         isolationforest(master_files[FileNumber], parameters_r, parameters_mat, parameters_sk)
 
-    # isolationforest("KnuggetChase3", parameters_r, parameters_mat, parameters_sk)
-    # plot_ari_f1() 
+    isolationforest("KnuggetChase3", parameters_r, parameters_mat, parameters_sk)
+    plot_ari_f1() 
 
     

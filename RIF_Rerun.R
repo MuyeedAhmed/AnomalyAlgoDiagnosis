@@ -13,10 +13,7 @@ library(mclust)
 library(isotree)
 
 
-
-
-
-datasetFolderDir = '/Users/muyeedahmed/Desktop/Gitcode/AnomalyAlgoDiagnosis/Dataset/'
+datasetFolderDir = 'Dataset/'
 isolationforest = function(filename, ntrees, standardize_data, sample_size, ncols_per_tree){
   print(filename)
   folderpath = datasetFolderDir
@@ -96,11 +93,11 @@ runif = function(filename,X,gt,p1, p2, p3, p4){
     
     labels_df = rbind(labels_df, data.frame(t(sapply(list_pred,c))))
   }
-  write.csv(labels_df,paste('/Users/muyeedahmed/Desktop/Gitcode/AnomalyAlgoDiagnosis/Labels/IF_R/',labelfile,".csv",sep=""))
+  write.csv(labels_df,paste('Labels/IF_R/',labelfile,".csv",sep=""))
   
   
 }
-df = read.csv(paste("/Users/muyeedahmed/Desktop/Gitcode/AnomalyAlgoDiagnosis/GD_ReRun/RIF.csv",sep = "")[1])
+df = read.csv(paste("GD_ReRun/RIF.csv",sep = "")[1])
 
 for (row in 1:nrow(df)) {
   print(row)

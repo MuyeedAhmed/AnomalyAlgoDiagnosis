@@ -224,7 +224,8 @@ def get_blind_route(X, gt, filename, paramaters_sk_copy,paramaters_mat_copy_pre)
         passing_param_sk = deepcopy(paramaters_sk_copy)
 
         default_ari, default_f1_sk, default_f1_mat, route_mat = get_blind_route_mat(X, gt, filename, passing_param_sk, paramaters_mat_copy_pre)
-
+        if default_ari == -1:
+            return [], []
         parameter_route_sk.append([passing_param_sk[p_sk][1], default_ari, default_f1_sk, default_f1_mat])
         ari_scores_sk.append(default_ari)
         blind_route_mat += route_mat
@@ -304,7 +305,8 @@ def get_blind_route_mat(X, gt, filename, passing_param_sk, paramaters_mat_copy):
         passing_param = deepcopy(paramaters_mat_copy)
 
         default_ari, default_f1_sk, default_f1_mat = runEE(filename, X, gt, passing_param_sk, passing_param)
-
+        if default_ari == -1:
+            return -1, -1, -1, []
         parameter_route.append([passing_param[p][1], default_ari, default_f1_sk, default_f1_mat])
         ari_scores.append(default_ari)
         i_def = passing_param[p][2].index(passing_param[p][1])
@@ -362,7 +364,8 @@ def get_informed_route(X, gt, filename, paramaters_sk_copy,paramaters_mat_copy_p
         passing_param_sk = deepcopy(paramaters_sk_copy)
 
         default_ari, default_f1_sk, default_f1_mat, route_mat = get_informed_route_mat(X, gt, filename, passing_param_sk, paramaters_mat_copy_pre)
-
+        if default_ari == -1:
+            return [], []
         parameter_route_sk.append([passing_param_sk[p_sk][1], default_ari, default_f1_sk, default_f1_mat])
         ari_scores_sk.append(default_ari)
         f1_scores_sk.append(default_f1_sk)
@@ -440,7 +443,8 @@ def get_informed_route_mat(X, gt, filename, passing_param_sk, paramaters_mat_cop
         passing_param = deepcopy(paramaters_mat_copy)
 
         default_ari, default_f1_sk, default_f1_mat = runEE(filename, X, gt, passing_param_sk, passing_param)
-
+        if default_ari == -1:
+            return -1, -1, -1, []
         parameter_route.append([passing_param[p][1], default_ari, default_f1_sk, default_f1_mat])
         ari_scores.append(default_ari)
         f1_scores.append(default_f1_mat)

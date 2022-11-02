@@ -48,9 +48,9 @@ def calculateAccuracy(filename, Algo):
         if X.isna().any().any() == 1:
             print("Didn\'t run -> NaN value - ", filename)  
             return
-    else:
-        print("File doesn't exist")
-        return
+    # else:
+    #     print("File doesn't exist")
+    #     return
     
     # if os.path.exists(folderpath+filename+".mat") == 0:
     #     print("File doesn't exist")
@@ -79,8 +79,8 @@ def calculateAccuracy(filename, Algo):
     
     
 def drawPlot(filename, Algo, tool1, tool2, x, y):
-    labelsPath1 = "../AnomalyAlgoDiagnosis_Labels/IF_Sk/Labels_Sk_IF_"+filename+"_100_auto_auto_1.0_False_None_False.csv"
-    labelsPath2 = "IF_Matlab/Labels_Mat_IF_"+filename+"_0.1_100_auto.csv"
+    labelsPath1 = "Labels//IF_Sk/Labels_Sk_IF_"+filename+"_100_auto_auto_1.0_False_None_False.csv"
+    labelsPath2 = "Labels/IF_Matlab/Labels_Mat_IF_"+filename+"_0.1_100_auto.csv"
     
     # labelsPath1 = "../AnomalyAlgoDiagnosis_Labels/IF_Sk/Labels_Sk_IF_"+filename+"_512_auto_auto_1.0_False_None_False.csv"
     # labelsPath2 = "IF_Matlab/Labels_Mat_IF_"+filename+"_IF_512_auto.csv"
@@ -107,51 +107,51 @@ def drawPlot(filename, Algo, tool1, tool2, x, y):
     l1 = labels1[min_i1]   
     l2 = labels2[min_i2]
     
-    fig = plt.figure()
-    plt.rcParams['figure.figsize'] = [10, 10]
+    # fig = plt.figure()
+    # plt.rcParams['figure.figsize'] = [10, 10]
     
     
-    plt.title(filename, fontsize=25)
+    # plt.title(filename, fontsize=25)
     
-    indicesToKeep = l1 == 0
-    plt0 = plt.scatter(x.loc[indicesToKeep,0]
-     ,x.loc[indicesToKeep,1]
-     ,s = 25, color='grey', rasterized=True)
+    # indicesToKeep = l1 == 0
+    # plt0 = plt.scatter(x.loc[indicesToKeep,0]
+    #  ,x.loc[indicesToKeep,1]
+    #  ,s = 25, color='grey', rasterized=True)
     
-    indicesToKeep = l1 == 1
-    plt1 = plt.scatter(x.loc[indicesToKeep,0]
-      ,x.loc[indicesToKeep,1]
-      ,s = 50, color='red', rasterized=True)
+    # indicesToKeep = l1 == 1
+    # plt1 = plt.scatter(x.loc[indicesToKeep,0]
+    #   ,x.loc[indicesToKeep,1]
+    #   ,s = 50, color='red', rasterized=True)
     
-    plt.legend([plt0, plt1],["Normal", "Anomaly"], prop={'size': 25})
-    plt.grid(False)
-    plt.xticks(fontsize = 25)
-    plt.yticks(fontsize = 25)
+    # plt.legend([plt0, plt1],["Normal", "Anomaly"], prop={'size': 25})
+    # plt.grid(False)
+    # plt.xticks(fontsize = 25)
+    # plt.yticks(fontsize = 25)
     
-    plt.savefig('Fig_InterTool_tsne/'+Algo+'_'+filename+'_matlab_default.pdf', dpi=fig.dpi, bbox_inches="tight", pad_inches=0)
+    # plt.savefig('Fig_InterTool_tsne/'+Algo+'_'+filename+'_matlab_default.pdf', dpi=fig.dpi, bbox_inches="tight", pad_inches=0)
     
-    fig = plt.figure()
-    plt.rcParams['figure.figsize'] = [10, 10]
+    # fig = plt.figure()
+    # plt.rcParams['figure.figsize'] = [10, 10]
     
     
-    plt.title(filename, fontsize=25)
+    # plt.title(filename, fontsize=25)
     
-    indicesToKeep = l2 == 0
-    plt0 = plt.scatter(x.loc[indicesToKeep,0]
-     ,x.loc[indicesToKeep,1]
-     ,s = 25, color='grey', rasterized=True)
+    # indicesToKeep = l2 == 0xs
+    # plt0 = plt.scatter(x.loc[indicesToKeep,0]
+    #  ,x.loc[indicesToKeep,1]
+    #  ,s = 25, color='grey', rasterized=True)
     
-    indicesToKeep = l2 == 1
-    plt1 = plt.scatter(x.loc[indicesToKeep,0]
-      ,x.loc[indicesToKeep,1]
-      ,s = 50, color='red', rasterized=True)
+    # indicesToKeep = l2 == 1
+    # plt1 = plt.scatter(x.loc[indicesToKeep,0]
+    #   ,x.loc[indicesToKeep,1]
+    #   ,s = 50, color='red', rasterized=True)
     
-    plt.legend([plt0, plt1],["Normal", "Anomaly"], prop={'size': 25})
-    plt.grid(False)
-    plt.xticks(fontsize = 25)
-    plt.yticks(fontsize = 25)
+    # plt.legend([plt0, plt1],["Normal", "Anomaly"], prop={'size': 25})
+    # plt.grid(False)
+    # plt.xticks(fontsize = 25)
+    # plt.yticks(fontsize = 25)
     
-    plt.savefig('Fig_InterTool_tsne/'+Algo+'_'+filename+'_sklearn_default.pdf', dpi=fig.dpi, bbox_inches="tight", pad_inches=0)
+    # plt.savefig('Fig_InterTool_tsne/'+Algo+'_'+filename+'_sklearn_default.pdf', dpi=fig.dpi, bbox_inches="tight", pad_inches=0)
 
     cat = [0] * len(y)
     for i in range(len(y)):
@@ -210,8 +210,8 @@ def drawPlot(filename, Algo, tool1, tool2, x, y):
 
 
 
-    labelsPath1 = "../AnomalyAlgoDiagnosis_Labels/IF_Sk/Labels_Sk_IF_"+filename+"_512_auto_auto_1.0_False_None_False.csv"
-    labelsPath2 = "IF_Matlab/Labels_Mat_IF_"+filename+"_IF_512_auto.csv"
+    labelsPath1 = "Labels/IF_Sk/Labels_Sk_IF_"+filename+"_512_auto_auto_1.0_False_None_False.csv"
+    labelsPath2 = "Labels/IF_Matlab/Labels_Mat_IF_"+filename+"_IF_512_auto.csv"
         
     if os.path.exists(labelsPath1) == 0 or os.path.exists(labelsPath2) == 0:
         print("File doesn't exist")
@@ -235,51 +235,51 @@ def drawPlot(filename, Algo, tool1, tool2, x, y):
     l1 = labels1[min_i1]   
     l2 = labels2[min_i2]
     
-    fig = plt.figure()
-    plt.rcParams['figure.figsize'] = [10, 10]
+    # fig = plt.figure()
+    # plt.rcParams['figure.figsize'] = [10, 10]
     
     
-    plt.title(filename, fontsize=25)
+    # plt.title(filename, fontsize=25)
     
-    indicesToKeep = l1 == 0
-    plt0 = plt.scatter(x.loc[indicesToKeep,0]
-     ,x.loc[indicesToKeep,1]
-     ,s = 25, color='grey', rasterized=True)
+    # indicesToKeep = l1 == 0
+    # plt0 = plt.scatter(x.loc[indicesToKeep,0]
+    #  ,x.loc[indicesToKeep,1]
+    #  ,s = 25, color='grey', rasterized=True)
     
-    indicesToKeep = l1 == 1
-    plt1 = plt.scatter(x.loc[indicesToKeep,0]
-      ,x.loc[indicesToKeep,1]
-      ,s = 50, color='red', rasterized=True)
+    # indicesToKeep = l1 == 1
+    # plt1 = plt.scatter(x.loc[indicesToKeep,0]
+    #   ,x.loc[indicesToKeep,1]
+    #   ,s = 50, color='red', rasterized=True)
     
-    plt.legend([plt0, plt1],["Normal", "Anomaly"], prop={'size': 25})
-    plt.grid(False)
-    plt.xticks(fontsize = 25)
-    plt.yticks(fontsize = 25)
+    # plt.legend([plt0, plt1],["Normal", "Anomaly"], prop={'size': 25})
+    # plt.grid(False)
+    # plt.xticks(fontsize = 25)
+    # plt.yticks(fontsize = 25)
     
-    plt.savefig('Fig_InterTool_tsne/'+Algo+'_'+filename+'_matlab_Mod.pdf', dpi=fig.dpi, bbox_inches="tight", pad_inches=0)
+    # plt.savefig('Fig_InterTool_tsne/'+Algo+'_'+filename+'_matlab_Mod.pdf', dpi=fig.dpi, bbox_inches="tight", pad_inches=0)
     
-    fig = plt.figure()
-    plt.rcParams['figure.figsize'] = [10, 10]
+    # fig = plt.figure()
+    # plt.rcParams['figure.figsize'] = [10, 10]
     
     
-    plt.title(filename, fontsize=25)
+    # plt.title(filename, fontsize=25)
     
-    indicesToKeep = l2 == 0
-    plt0 = plt.scatter(x.loc[indicesToKeep,0]
-     ,x.loc[indicesToKeep,1]
-     ,s = 25, color='grey', rasterized=True)
+    # indicesToKeep = l2 == 0
+    # plt0 = plt.scatter(x.loc[indicesToKeep,0]
+    #  ,x.loc[indicesToKeep,1]
+    #  ,s = 25, color='grey', rasterized=True)
     
-    indicesToKeep = l2 == 1
-    plt1 = plt.scatter(x.loc[indicesToKeep,0]
-      ,x.loc[indicesToKeep,1]
-      ,s = 50, color='red', rasterized=True)
+    # indicesToKeep = l2 == 1
+    # plt1 = plt.scatter(x.loc[indicesToKeep,0]
+    #   ,x.loc[indicesToKeep,1]
+    #   ,s = 50, color='red', rasterized=True)
     
-    plt.legend([plt0, plt1],["Normal", "Anomaly"], prop={'size': 25})
-    plt.grid(False)
-    plt.xticks(fontsize = 25)
-    plt.yticks(fontsize = 25)
+    # plt.legend([plt0, plt1],["Normal", "Anomaly"], prop={'size': 25})
+    # plt.grid(False)
+    # plt.xticks(fontsize = 25)
+    # plt.yticks(fontsize = 25)
     
-    plt.savefig('Fig_InterTool_tsne/'+Algo+'_'+filename+'_sklearn_Mod.pdf', dpi=fig.dpi, bbox_inches="tight", pad_inches=0)
+    # plt.savefig('Fig_InterTool_tsne/'+Algo+'_'+filename+'_sklearn_Mod.pdf', dpi=fig.dpi, bbox_inches="tight", pad_inches=0)
 
     cat = [0] * len(y)
     for i in range(len(y)):
@@ -341,9 +341,9 @@ if __name__ == '__main__':
     # for Algo in Algos:    
     #     for FileNumber in range(len(master_files)):
     #         calculateAccuracy(master_files[FileNumber], Algo)
-    calculateAccuracy("arsenic-male-lung", "IF")
+    # calculateAccuracy("arsenic-male-lung", "IF")
         
-    # calculateAccuracy("breastw", "IF")
+    calculateAccuracy("breastw", "IF")
         
 
 

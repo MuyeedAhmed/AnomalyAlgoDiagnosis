@@ -881,12 +881,15 @@ def plot_ari_f1():
     plt.plot(Route_Scores["UninformedF1"].mean(), Route_Scores["UninformedARI"].mean(), '.', color = 'green', marker = 'v', markersize = 12, markeredgecolor='black', markeredgewidth=1.5)
     plt.plot(Route_Scores["InformedF1"].mean(), Route_Scores["InformedARI"].mean(), '.', color = 'blue', marker = '^', markersize = 12, markeredgecolor='black', markeredgewidth=1.5)
     
-    plt.legend(['Default Setting', 'Uninformed Route', 'Informed Route'])
-    plt.title("Isolation Forest - Inconsistency")
-    plt.xlabel("Average Performance (F1 Score)")
-    plt.ylabel("Determinism (ARI)")
+    plt.legend(['Default Setting', 'Uninformed Route', 'Informed Route'], fontsize = 15)
+    plt.xticks(fontsize = 15)
+    plt.yticks(fontsize = 15)
+    plt.title("Isolation Forest - Inconsistency", fontsize = 15)
+    plt.xlabel("Average Performance (F1 Score)", fontsize = 15)
+    plt.ylabel("Consistency (Mean Mutual ARI)", fontsize = 15)
     plt.savefig("Fig/IF_SvMvR_GD_Comparison.pdf", bbox_inches="tight", pad_inches=0)
     plt.show()
+    
     
     # ## Calculate Percentage
     
@@ -973,60 +976,60 @@ if __name__ == '__main__':
     
     parameters_mat = []
     
-    ContaminationFraction = [0, 0.05, 0.1, 0.15, 0.2, 0.25];
-    NumLearners = [1, 2, 4, 8, 16, 32, 64, 100, 128, 256, 512];
-    NumObservationsPerLearner = [0.05, 0.1, 0.2, 0.5, 1];
+    # ContaminationFraction = [0, 0.05, 0.1, 0.15, 0.2, 0.25];
+    # NumLearners = [1, 2, 4, 8, 16, 32, 64, 100, 128, 256, 512];
+    # NumObservationsPerLearner = [0.05, 0.1, 0.2, 0.5, 1];
     
-    parameters_mat.append(["ContaminationFraction", 0.1, ContaminationFraction])
-    parameters_mat.append(["NumLearners", 100, NumLearners])
-    parameters_mat.append(["NumObservationsPerLearner", 'auto', NumObservationsPerLearner])
+    # parameters_mat.append(["ContaminationFraction", 0.1, ContaminationFraction])
+    # parameters_mat.append(["NumLearners", 100, NumLearners])
+    # parameters_mat.append(["NumObservationsPerLearner", 'auto', NumObservationsPerLearner])
     
     
-    parameters_sk = []
-    n_estimators = [2, 4, 8, 16, 32, 64, 100, 128, 256, 512]##
-    max_samples = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
-    contamination = ['auto'] 
-    max_features = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
-    bootstrap = [True, False]
-    n_jobs = [1, None] 
-    warm_start = [True, False]
+    # parameters_sk = []
+    # n_estimators = [2, 4, 8, 16, 32, 64, 100, 128, 256, 512]##
+    # max_samples = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+    # contamination = ['auto'] 
+    # max_features = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+    # bootstrap = [True, False]
+    # n_jobs = [1, None] 
+    # warm_start = [True, False]
     
-    parameters_sk.append(["n_estimators", 100, n_estimators])
-    parameters_sk.append(["max_samples", 'auto', max_samples])
-    parameters_sk.append(["contamination", 'auto', contamination])
-    parameters_sk.append(["max_features", 1.0, max_features])
-    parameters_sk.append(["bootstrap", False, bootstrap])
-    parameters_sk.append(["n_jobs", None, n_jobs])
-    parameters_sk.append(["warm_start", False, warm_start])
+    # parameters_sk.append(["n_estimators", 100, n_estimators])
+    # parameters_sk.append(["max_samples", 'auto', max_samples])
+    # parameters_sk.append(["contamination", 'auto', contamination])
+    # parameters_sk.append(["max_features", 1.0, max_features])
+    # parameters_sk.append(["bootstrap", False, bootstrap])
+    # parameters_sk.append(["n_jobs", None, n_jobs])
+    # parameters_sk.append(["warm_start", False, warm_start])
     
-    if os.path.exists("Stats/Inconsistency/IF_mvr.csv") == 0:
-        fmvr=open("Stats/Inconsistency/IF_mvr.csv", "w")
-        fmvr.write('Mat,R,ARI\n')
-        fmvr.close()
-    if os.path.exists("Stats/Inconsistency/IF_rvs.csv") == 0:
-        frvs=open("Stats/Inconsistency/IF_rvs.csv", "w")
-        frvs.write('R,Sk,ARI\n')
-        frvs.close()
-    if os.path.exists("Stats/Inconsistency/IF_mvs.csv") == 0:
-        fmvs=open("Stats/Inconsistency/IF_mvs.csv", "w")
-        fmvs.write('Mat,Sk,ARI\n')
-        fmvs.close()
+    # if os.path.exists("Stats/Inconsistency/IF_mvr.csv") == 0:
+    #     fmvr=open("Stats/Inconsistency/IF_mvr.csv", "w")
+    #     fmvr.write('Mat,R,ARI\n')
+    #     fmvr.close()
+    # if os.path.exists("Stats/Inconsistency/IF_rvs.csv") == 0:
+    #     frvs=open("Stats/Inconsistency/IF_rvs.csv", "w")
+    #     frvs.write('R,Sk,ARI\n')
+    #     frvs.close()
+    # if os.path.exists("Stats/Inconsistency/IF_mvs.csv") == 0:
+    #     fmvs=open("Stats/Inconsistency/IF_mvs.csv", "w")
+    #     fmvs.write('Mat,Sk,ARI\n')
+    #     fmvs.close()
     
-    f_Route_Scores=open("Stats/IF_SvMvR_Route_Scores.csv", "w")
-    f_Route_Scores.write('Filename,DefaultARI,DefaultF1_r,DefaultF1_mat,DefaultF1_sk,UninformedARI,UninformedF1_r,UninformedF1_mat,UninformedF1_sk,InformedARI,InformedF1_r,InformedF1_mat,InformedF1_sk\n')
-    f_Route_Scores.close()
+    # f_Route_Scores=open("Stats/IF_SvMvR_Route_Scores.csv", "w")
+    # f_Route_Scores.write('Filename,DefaultARI,DefaultF1_r,DefaultF1_mat,DefaultF1_sk,UninformedARI,UninformedF1_r,UninformedF1_mat,UninformedF1_sk,InformedARI,InformedF1_r,InformedF1_mat,InformedF1_sk\n')
+    # f_Route_Scores.close()
     
-    frr=open("GD_ReRun/RIF.csv", "w")
-    frr.write('Filename,ntrees,standardize_data,sample_size,ncols_per_tree\n')
-    frr.close()
+    # frr=open("GD_ReRun/RIF.csv", "w")
+    # frr.write('Filename,ntrees,standardize_data,sample_size,ncols_per_tree\n')
+    # frr.close()
     
-    frr=open("GD_ReRun/MatIF.csv", "w")
-    frr.write('Filename,ContaminationFraction,NumLearners,NumObservationsPerLearner\n')
-    frr.close()
+    # frr=open("GD_ReRun/MatIF.csv", "w")
+    # frr.write('Filename,ContaminationFraction,NumLearners,NumObservationsPerLearner\n')
+    # frr.close()
     
-    for FileNumber in range(len(master_files)):
-        print(FileNumber, end=' ')
-        isolationforest(master_files[FileNumber], parameters_r, parameters_mat, parameters_sk)
+    # for FileNumber in range(len(master_files)):
+    #     print(FileNumber, end=' ')
+    #     isolationforest(master_files[FileNumber], parameters_r, parameters_mat, parameters_sk)
 
     # isolationforest("KnuggetChase3", parameters_r, parameters_mat, parameters_sk)
     plot_ari_f1() 

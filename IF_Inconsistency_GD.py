@@ -810,7 +810,10 @@ def get_r_f1(filename, param_r, X, gt):
         i_sample_size=param_r[2][1]
         i_ncols_per_tree=param_r[3][1]
         
-        
+        if i_standardize_data == "TRUE":
+            i_standardize_data = True
+        else:
+            i_standardize_data = False
         dff1 =  pd.read_csv("Stats/RIF_F1.csv")
         f1 = dff1[(dff1['Filename']==filename)&
                     (dff1['ntrees']==i_ntrees)&

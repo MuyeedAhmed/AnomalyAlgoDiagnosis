@@ -73,22 +73,22 @@ def ocsvm(filename, parameters, parameter_iteration):
     
 def runOCSVM(filename, X, gt, params, parameter_iteration):
     # print(params)
-    if params[4][1] == 0.0:
-        params[4][1] = "0"
-    if params[4][1] == 0.0:
-        params[4][1] = "0"
+    # if params[4][1] == 0.0:
+    #     params[4][1] = "0"
+    # if params[4][1] == 0.0:
+    #     params[4][1] = "0"
     labelFile = filename + "_" + str(params[0][1]) + "_" + str(params[1][1]) + "_" + str(params[2][1]) + "_" + str(params[3][1]) + "_" + str(params[4][1]) + "_" + str(params[5][1]) + "_" + str(params[6][1]) + "_" + str(params[7][1]) + "_" + str(params[8][1])
 
-    if os.path.exists("OCSVM_R/"+labelFile+".csv") == 0:
+    if os.path.exists("Labels/OCSVM_R/"+labelFile+".csv") == 0:
         return
-    if os.path.exists("OCSVM_R_Done/"+labelFile+".csv"):
-        return
+    # if os.path.exists("Labels/OCSVM_R_Done/"+labelFile+".csv"):
+    #     return
     
     labels = []
     f1 = []
     
     
-    labels = pd.read_csv("OCSVM_R/"+labelFile+".csv").to_numpy()
+    labels = pd.read_csv("Labels/OCSVM_R/"+labelFile+".csv").to_numpy()
     # print(labels[0])
     labels = np.int64((labels[0][1:])*1)
     
@@ -96,7 +96,7 @@ def runOCSVM(filename, X, gt, params, parameter_iteration):
         
    
           
-    flabel_done=open("OCSVM_R_Done/"+labelFile+".csv", 'a')
+    flabel_done=open("Labels/OCSVM_R_Done/"+labelFile+".csv", 'a')
     flabel_done.write("Done")
     flabel_done.close()
     
@@ -124,7 +124,7 @@ if __name__ == '__main__':
     gamma = ['scale', 'auto']
     coef0 = [0, 0.1, 0.2, 0.3, 0.4]
     tolerance = [0.1, 0.01, 0.001, 0.0001, 0.00001]
-    nu = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    nu = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, "IF", "LOF"]
     shrinking = ["TRUE", "FALSE"]
     cachesize = [50, 100, 200, 400]
     epsilon = [0.1, 0.2, 0.01, 0.05]

@@ -1028,7 +1028,7 @@ if __name__ == '__main__':
         print(FileNumber, end=' ')
         isolationforest(master_files[FileNumber], parameters_r, parameters_mat, parameters_sk)
 
-    isolationforest("KnuggetChase3", parameters_r, parameters_mat, parameters_sk)
+    # isolationforest("KnuggetChase3", parameters_r, parameters_mat, parameters_sk)
     plot_ari_f1() 
 
     

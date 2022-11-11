@@ -406,20 +406,23 @@ def plot_ari_f1():
     
     fig = plt.Figure()
     
-    plt.plot(Route_Scores["DefaultF1"], Route_Scores["DefaultARI"], '.', color='red', marker = 'd', markersize = 4, alpha=.5)
-    plt.plot(Route_Scores["UninformedF1"], Route_Scores["UninformedARI"], '.', color = 'green', marker = 'v', markersize = 4, alpha=.5)
-    plt.plot(Route_Scores["InformedF1"], Route_Scores["InformedARI"], '.', color = 'blue', marker = '^', markersize = 4, alpha=.5)
+    plt.plot(Route_Scores["DefaultF1"], Route_Scores["DefaultARI"], '.', color='red', marker = 'd', markersize = 6, alpha=.5)
+    plt.plot(Route_Scores["UninformedF1"], Route_Scores["UninformedARI"], '.', color = 'green', marker = 'v', markersize = 6, alpha=.5)
+    plt.plot(Route_Scores["InformedF1"], Route_Scores["InformedARI"], '.', color = 'blue', marker = '^', markersize = 6, alpha=.5)
      
-    plt.plot(Route_Scores["DefaultF1"].mean(), Route_Scores["DefaultARI"].mean(), '.', color='red', marker = 'd', markersize = 12, markeredgecolor='black', markeredgewidth=1.5)
-    plt.plot(Route_Scores["UninformedF1"].mean(), Route_Scores["UninformedARI"].mean(), '.', color = 'green', marker = 'v', markersize = 12, markeredgecolor='black', markeredgewidth=1.5)
-    plt.plot(Route_Scores["InformedF1"].mean(), Route_Scores["InformedARI"].mean(), '.', color = 'blue', marker = '^', markersize = 12, markeredgecolor='black', markeredgewidth=1.5)
+    plt.plot(Route_Scores["DefaultF1"].mean(), Route_Scores["DefaultARI"].mean(), '.', color='red', marker = 'd', markersize = 18, markeredgecolor='black', markeredgewidth=1.5)
+    plt.plot(Route_Scores["UninformedF1"].mean(), Route_Scores["UninformedARI"].mean(), '.', color = 'green', marker = 'v', markersize = 18, markeredgecolor='black', markeredgewidth=1.5)
+    plt.plot(Route_Scores["InformedF1"].mean(), Route_Scores["InformedARI"].mean(), '.', color = 'blue', marker = '^', markersize = 18, markeredgecolor='black', markeredgewidth=1.5)
     
-    plt.legend(['Default Setting', 'Uninformed Route', 'Informed Route'])
-    plt.title("Matlab - Isolation Forest")
-    plt.xlabel("Performance (F1 Score)")
-    plt.ylabel("Determinism (ARI)")
+    plt.legend(['Default Setting', 'Univariate Search', 'Bivariate Search'], fontsize=18)
+    plt.title("Matlab - Isolation Forest", fontsize=18)
+    plt.xlabel("Performance (F1 Score)", fontsize=18)
+    plt.ylabel("Determinism (ARI)", fontsize=18)
+    plt.xticks(fontsize=15)
+    plt.yticks(fontsize=15)
     plt.savefig("Fig/MatIF_GD_Comparison.pdf", bbox_inches="tight", pad_inches=0)
     plt.show()
+    
     
     # ## Calculate Percentage
     
@@ -460,36 +463,36 @@ if __name__ == '__main__':
     
     master_files.sort()
     
-    parameters = []
+    # parameters = []
     
-    ContaminationFraction = [0, 0.05, 0.1, 0.15, 0.2, 0.25];
-    NumLearners = [1, 2, 4, 8, 16, 32, 64, 100, 128, 256, 512];
-    NumObservationsPerLearner = [0.05, 0.1, 0.2, 0.5, 1];
+    # ContaminationFraction = [0, 0.05, 0.1, 0.15, 0.2, 0.25];
+    # NumLearners = [1, 2, 4, 8, 16, 32, 64, 100, 128, 256, 512];
+    # NumObservationsPerLearner = [0.05, 0.1, 0.2, 0.5, 1];
     
-    parameters.append(["ContaminationFraction", 0.1, ContaminationFraction])
-    parameters.append(["NumLearners", 100, NumLearners])
-    parameters.append(["NumObservationsPerLearner", 'auto', NumObservationsPerLearner])
+    # parameters.append(["ContaminationFraction", 0.1, ContaminationFraction])
+    # parameters.append(["NumLearners", 100, NumLearners])
+    # parameters.append(["NumObservationsPerLearner", 'auto', NumObservationsPerLearner])
     
     
-    f_Route_Scores=open("Stats/MatIF_Route_Scores.csv", "w")
-    f_Route_Scores.write('Filename,DefaultARI,DefaultF1,UninformedARI,UninformedF1,InformedARI,InformedF1\n')
-    f_Route_Scores.close()
+    # f_Route_Scores=open("Stats/MatIF_Route_Scores.csv", "w")
+    # f_Route_Scores.write('Filename,DefaultARI,DefaultF1,UninformedARI,UninformedF1,InformedARI,InformedF1\n')
+    # f_Route_Scores.close()
     
-    frr=open("GD_ReRun/MatIF.csv", "w")
-    frr.write('Filename,ContaminationFraction,NumLearners,NumObservationsPerLearner\n')
-    frr.close()
+    # frr=open("GD_ReRun/MatIF.csv", "w")
+    # frr.write('Filename,ContaminationFraction,NumLearners,NumObservationsPerLearner\n')
+    # frr.close()
     
-    ## Ranking
-    parameter_rankings = pd.read_csv("Mann–Whitney U test/MWU_MatIF_Ranking.csv")
-    parameter_rankings["Ranking"] = (ss.rankdata(parameter_rankings["MWU_Score"])-1)
-    for i in range(len(parameters)):
-        param_rank = parameter_rankings[parameter_rankings["ParameterName"] == parameters[i][0]]["Ranking"].to_numpy()
-        parameters[i].append(int(param_rank[0]))
-    ##
+    # ## Ranking
+    # parameter_rankings = pd.read_csv("Mann–Whitney U test/MWU_MatIF_Ranking.csv")
+    # parameter_rankings["Ranking"] = (ss.rankdata(parameter_rankings["MWU_Score"])-1)
+    # for i in range(len(parameters)):
+    #     param_rank = parameter_rankings[parameter_rankings["ParameterName"] == parameters[i][0]]["Ranking"].to_numpy()
+    #     parameters[i].append(int(param_rank[0]))
+    # ##
         
-    for FileNumber in range(len(master_files)):
-        print(FileNumber, end=' ')
-        isolationforest(master_files[FileNumber], parameters, 0, parameter_rankings["Ranking"].to_numpy())
+    # for FileNumber in range(len(master_files)):
+    #     print(FileNumber, end=' ')
+    #     isolationforest(master_files[FileNumber], parameters, 0, parameter_rankings["Ranking"].to_numpy())
         
     plot_ari_f1() 
         

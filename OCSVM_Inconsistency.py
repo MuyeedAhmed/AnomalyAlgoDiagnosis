@@ -34,13 +34,13 @@ def get_ari_sk_mat(filename, param_sk, param_mat):
     labelFile_sk = filename + "_" + str(param_sk[0][1]) + "_" + str(param_sk[1][1]) + "_" + str(param_sk[2][1]) + "_" + str(param_sk[3][1]) + "_" + str(param_sk[4][1]) + "_" + str(param_sk[5][1]) + "_" + str(param_sk[6][1]) + "_" + str(param_sk[7][1]) + "_" + str(param_sk[8][1])
     labelFile_mat = filename + "_" + str(param_mat[0][1]) + "_" + str(param_mat[1][1]) + "_" + str(param_mat[2][1]) + "_" + str(param_mat[3][1]) + "_" + str(param_mat[4][1]) + "_" + str(param_mat[5][1]) + "_" + str(param_mat[6][1]) + "_" + str(param_mat[7][1])
 
-    if os.path.exists("../AnomalyAlgoDiagnosis_Labels/OCSVM_Sk/Labels_Sk_OCSVM_"+labelFile_sk+".csv") == 0:
+    if os.path.exists("Labels/OCSVM_Sk/Labels_Sk_OCSVM_"+labelFile_sk+".csv") == 0:
         # print(labelFile_sk)
         return 0
 
-    labels_sk =  pd.read_csv("../AnomalyAlgoDiagnosis_Labels/OCSVM_Sk/Labels_Sk_OCSVM_"+labelFile_sk+".csv", header=None).to_numpy()
+    labels_sk =  pd.read_csv("Labels/OCSVM_Sk/Labels_Sk_OCSVM_"+labelFile_sk+".csv", header=None).to_numpy()
 
-    labels_mat =  pd.read_csv("OCSVM_Matlab/Labels_Mat_OCSVM_"+labelFile_mat+".csv", header=None).to_numpy()
+    labels_mat =  pd.read_csv("Labels/OCSVM_Matlab/Labels_Mat_OCSVM_"+labelFile_mat+".csv", header=None).to_numpy()
     
     ari = []
     
@@ -54,14 +54,14 @@ def get_ari_sk_r(filename, param_sk, param_r):
     labelFile_sk = filename + "_" + str(param_sk[0][1]) + "_" + str(param_sk[1][1]) + "_" + str(param_sk[2][1]) + "_" + str(param_sk[3][1]) + "_" + str(param_sk[4][1]) + "_" + str(param_sk[5][1]) + "_" + str(param_sk[6][1]) + "_" + str(param_sk[7][1]) + "_" + str(param_sk[8][1])
     labelFile_r = filename + "_" + str(param_r[0][1]) + "_" + str(param_r[1][1]) + "_" + str(param_r[2][1]) + "_" + str(param_r[3][1]) + "_" + str(param_r[4][1]) + "_" + str(param_r[5][1]) + "_" + str(param_r[6][1]) + "_" + str(param_r[7][1]) + "_" + str(param_r[8][1])
 
-    if os.path.exists("../AnomalyAlgoDiagnosis_Labels/OCSVM_Sk/Labels_Sk_OCSVM_"+labelFile_sk+".csv") == 0:
+    if os.path.exists("Labels/OCSVM_Sk/Labels_Sk_OCSVM_"+labelFile_sk+".csv") == 0:
         # print(labelFile_sk)
         return 0
     
 
-    labels_sk =  pd.read_csv("../AnomalyAlgoDiagnosis_Labels/OCSVM_Sk/Labels_Sk_OCSVM_"+labelFile_sk+".csv", header=None).to_numpy()    
+    labels_sk =  pd.read_csv("Labels/OCSVM_Sk/Labels_Sk_OCSVM_"+labelFile_sk+".csv", header=None).to_numpy()    
     
-    labels_r = pd.read_csv("OCSVM_R/"+labelFile_r+".csv").to_numpy()
+    labels_r = pd.read_csv("Labels/OCSVM_R/"+labelFile_r+".csv").to_numpy()
     labels_r = np.int64((labels_r[0][1:])*1)
     
     
@@ -73,17 +73,17 @@ def get_ari_r_mat(filename, param_mat, param_r):
     labelFile_r = filename + "_" + str(param_r[0][1]) + "_" + str(param_r[1][1]) + "_" + str(param_r[2][1]) + "_" + str(param_r[3][1]) + "_" + str(param_r[4][1]) + "_" + str(param_r[5][1]) + "_" + str(param_r[6][1]) + "_" + str(param_r[7][1]) + "_" + str(param_r[8][1])
     labelFile_mat = filename + "_" + str(param_mat[0][1]) + "_" + str(param_mat[1][1]) + "_" + str(param_mat[2][1]) + "_" + str(param_mat[3][1]) + "_" + str(param_mat[4][1]) + "_" + str(param_mat[5][1]) + "_" + str(param_mat[6][1]) + "_" + str(param_mat[7][1])
 
-    if os.path.exists("OCSVM_Matlab/Labels_Mat_OCSVM_"+labelFile_mat+".csv") == 0:
+    if os.path.exists("Labels/OCSVM_Matlab/Labels_Mat_OCSVM_"+labelFile_mat+".csv") == 0:
         # print(labelFile_sk)
         return 0
-    if os.path.exists("OCSVM_R/"+labelFile_r+".csv") == 0:
+    if os.path.exists("Labels/OCSVM_R/"+labelFile_r+".csv") == 0:
         # print(labelFile_sk)
         return 0
 
-    labels_r = pd.read_csv("OCSVM_R/"+labelFile_r+".csv").to_numpy()
+    labels_r = pd.read_csv("Labels/OCSVM_R/"+labelFile_r+".csv").to_numpy()
     labels_r = np.int64((labels_r[0][1:])*1)
 
-    labels_mat =  pd.read_csv("OCSVM_Matlab/Labels_Mat_OCSVM_"+labelFile_mat+".csv", header=None).to_numpy()
+    labels_mat =  pd.read_csv("Labels/OCSVM_Matlab/Labels_Mat_OCSVM_"+labelFile_mat+".csv", header=None).to_numpy()
     
     ari = []
     
@@ -217,7 +217,7 @@ def run_mat_r():
     plt.title("One Class SVM - Matlab VS R")
     plt.savefig("Fig/BoxPlot/OCSVM_MatR_MeanARI.pdf", bbox_inches="tight", pad_inches=0)
     plt.clf()
-    
+    df.to_csv("Stats/OCSVM_MvR.csv")
     fig = plt.Figure()
     axmin = sns.boxplot(x="Configuration", y="Min ARI", data=df)
     axmin.set(xlabel=None)
@@ -355,6 +355,7 @@ def run_sk_r():
     plt.savefig("Fig/BoxPlot/OCSVM_SkR_MeanARI.pdf", bbox_inches="tight", pad_inches=0)
     plt.clf()
     
+    df.to_csv("Stats/OCSVM_SvR.csv")
     
 def run_sk_mat():
     folderpath = datasetFolderDir
@@ -493,7 +494,7 @@ def run_sk_mat():
     plt.title("One Class SVM - Scikit-learn VS Matlab")
     plt.savefig("Fig/BoxPlot/OCSVM_SkMat_MeanARI.pdf", bbox_inches="tight", pad_inches=0)
     plt.clf()
-    
+    df.to_csv("Stats/OCSVM_SvM.csv")
     fig = plt.Figure()
     axmin = sns.boxplot(x="Configuration", y="Min ARI", data=df)
     axmin.set(xlabel=None)
@@ -503,6 +504,6 @@ def run_sk_mat():
     
 
 if __name__ == '__main__':
-    # run_sk_mat()
-    # run_sk_r()
+    run_sk_mat()
+    run_sk_r()
     run_mat_r()

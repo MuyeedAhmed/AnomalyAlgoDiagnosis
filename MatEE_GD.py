@@ -151,8 +151,12 @@ def get_blind_route(X, gt, filename, parameters_this_file, parameter_iteration, 
                 else:
                     i_pv -= 1
         # print()
-        max_index = ari_scores.index(max(ari_scores))
-        default_index = ari_scores.index(default_ari)
+        ari_scores = np.array(ari_scores)
+        max_index = np.where(ari_scores == max(ari_scores))[0][-1]
+        default_index = np.where(ari_scores == default_ari)[0][0]
+        
+        # max_index = ari_scores.index(max(ari_scores))
+        # default_index = ari_scores.index(default_ari)
         parameters_this_file[p][1] = parameter_route[max_index][0]
         blind_route.append([parameters_this_file[p][0], max_index, default_index, parameter_route])
     print(blind_route)
@@ -284,8 +288,10 @@ def get_guided_route(X, gt, filename, parameters_this_file, parameter_iteration,
                     i_pv += 1
                 else:
                     i_pv -= 1
-        max_index = ari_scores.index(max(ari_scores))
-        default_index = ari_scores.index(default_ari)
+        
+        ari_scores = np.array(ari_scores)
+        max_index = np.where(ari_scores == max(ari_scores))[0][-1]
+        default_index = np.where(ari_scores == default_ari)[0][0]
         parameters_this_file[p][1] = parameter_route[max_index][0]
         guided_route.append([parameters_this_file[p][0], max_index, default_index, parameter_route])
     print(guided_route)

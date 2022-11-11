@@ -85,6 +85,8 @@ def ee(filename, parameters_mat, parameters_sk):
     mod_parameters_sk[3][2][mod_parameters_sk[3][2].index(if_cont)] = 'IF'
     # ##
     
+    mod_parameters_mat[1][1] = 0.1
+    
     blind_route_sk, blind_route_mat = get_blind_route(X, gt, filename, deepcopy(mod_parameters_sk), deepcopy(mod_parameters_mat))
     informed_route_sk, informed_route_mat = get_informed_route(X, gt, filename, deepcopy(mod_parameters_sk), deepcopy(mod_parameters_mat))
     
@@ -661,25 +663,27 @@ def get_mat_f1(filename, param_mat, X, gt):
 
 def plot_ari_f1():
     Route_Scores = pd.read_csv("Stats/EE_SvM_Route_Scores.csv")
-    
+    print(Route_Scores)
     Route_Scores['DefaultF1'] = Route_Scores[['DefaultF1_sk', 'DefaultF1_mat']].mean(axis=1)
     Route_Scores['UninformedF1'] = Route_Scores[['UninformedF1_sk', 'UninformedF1_mat']].mean(axis=1)
     Route_Scores['InformedF1'] = Route_Scores[['InformedF1_sk', 'InformedF1_mat']].mean(axis=1)
     
     fig = plt.Figure()
-    
-    plt.plot(Route_Scores["DefaultF1"], Route_Scores["DefaultARI"], '.', color='red', marker = 'd', markersize = 4, alpha=.5)
-    plt.plot(Route_Scores["UninformedF1"], Route_Scores["UninformedARI"], '.', color = 'green', marker = 'v', markersize = 4, alpha=.5)
-    plt.plot(Route_Scores["InformedF1"], Route_Scores["InformedARI"], '.', color = 'blue', marker = '^', markersize = 4, alpha=.5)
+    plt.rcParams["figure.figsize"] = (10,6)
+    plt.plot(Route_Scores["DefaultF1"], Route_Scores["DefaultARI"], '.', color='red', marker = 'd', markersize = 6, alpha=.5)
+    plt.plot(Route_Scores["UninformedF1"], Route_Scores["UninformedARI"], '.', color = 'green', marker = 'v', markersize = 6, alpha=.5)
+    plt.plot(Route_Scores["InformedF1"], Route_Scores["InformedARI"], '.', color = 'blue', marker = '^', markersize = 6, alpha=.5)
      
-    plt.plot(Route_Scores["DefaultF1"].mean(), Route_Scores["DefaultARI"].mean(), '.', color='red', marker = 'd', markersize = 12, markeredgecolor='black', markeredgewidth=1.5)
-    plt.plot(Route_Scores["UninformedF1"].mean(), Route_Scores["UninformedARI"].mean(), '.', color = 'green', marker = 'v', markersize = 12, markeredgecolor='black', markeredgewidth=1.5)
-    plt.plot(Route_Scores["InformedF1"].mean(), Route_Scores["InformedARI"].mean(), '.', color = 'blue', marker = '^', markersize = 12, markeredgecolor='black', markeredgewidth=1.5)
+    plt.plot(Route_Scores["DefaultF1"].mean(), Route_Scores["DefaultARI"].mean(), '.', color='red', marker = 'd', markersize = 18, markeredgecolor='black', markeredgewidth=1.5)
+    plt.plot(Route_Scores["UninformedF1"].mean(), Route_Scores["UninformedARI"].mean(), '.', color = 'green', marker = 'v', markersize = 18, markeredgecolor='black', markeredgewidth=1.5)
+    plt.plot(Route_Scores["InformedF1"].mean(), Route_Scores["InformedARI"].mean(), '.', color = 'blue', marker = '^', markersize = 18, markeredgecolor='black', markeredgewidth=1.5)
     
-    plt.legend(['Default Setting', 'Uninformed Route', 'Informed Route'])
-    plt.title("Robust Covariance - Inconsistency")
-    plt.xlabel("Average Performance (F1 Score)")
-    plt.ylabel("Determinism (ARI)")
+    plt.legend(['Default Setting', 'Univariate Search', 'Bivariate Search'], fontsize=18)
+    plt.title("Robust Covariance - Inconsistency", fontsize=18)
+    plt.xlabel("Average Performance (F1 Score)", fontsize=18)
+    plt.ylabel("Consistency (ARI)", fontsize=18)
+    plt.xticks(fontsize=15)
+    plt.yticks(fontsize=15)
     plt.savefig("Fig/EE_SvM_GD_Comparison.pdf", bbox_inches="tight", pad_inches=0)
     plt.show()
     
@@ -735,63 +739,63 @@ if __name__ == '__main__':
     
     parameters_mat = []
 
-    Method = ["olivehawkins", "fmcd", "ogk"];
-    OutlierFraction = [0.05, 0.1, 0.2, 0.25, 0.3, 0.4, 0.5];
-    NumTrials = [2, 5, 10, 25, 50, 100, 250, 500, 750, 1000];
-    BiasCorrection = [1, 0];
-    NumOGKIterations = [1, 2, 3];
-    UnivariateEstimator = ["tauscale", "qn"];
-    ReweightingMethod = ["rfch", "rmvn"];
-    NumConcentrationSteps = [2, 5, 10, 15, 20];
-    StartMethod = ["elemental","classical", "medianball"];    
+    # Method = ["olivehawkins", "fmcd", "ogk"];
+    # OutlierFraction = [0.05, 0.1, 0.2, 0.25, 0.3, 0.4, 0.5];
+    # NumTrials = [2, 5, 10, 25, 50, 100, 250, 500, 750, 1000];
+    # BiasCorrection = [1, 0];
+    # NumOGKIterations = [1, 2, 3];
+    # UnivariateEstimator = ["tauscale", "qn"];
+    # ReweightingMethod = ["rfch", "rmvn"];
+    # NumConcentrationSteps = [2, 5, 10, 15, 20];
+    # StartMethod = ["elemental","classical", "medianball"];    
     
-    parameters_mat.append(["Method", "fmcd", Method])
-    parameters_mat.append(["OutlierFraction", 0.5, OutlierFraction])
-    parameters_mat.append(["NumTrials", 500, NumTrials])
-    parameters_mat.append(["BiasCorrection", 1, BiasCorrection])
-    parameters_mat.append(["NumOGKIterations", 2, NumOGKIterations])
-    parameters_mat.append(["UnivariateEstimator", "tauscale", UnivariateEstimator])
-    parameters_mat.append(["ReweightingMethod", "rfch", ReweightingMethod])
-    parameters_mat.append(["NumConcentrationSteps", 10, NumConcentrationSteps])
-    parameters_mat.append(["StartMethod", "classical", StartMethod])
+    # parameters_mat.append(["Method", "fmcd", Method])
+    # parameters_mat.append(["OutlierFraction", 0.5, OutlierFraction])
+    # parameters_mat.append(["NumTrials", 500, NumTrials])
+    # parameters_mat.append(["BiasCorrection", 1, BiasCorrection])
+    # parameters_mat.append(["NumOGKIterations", 2, NumOGKIterations])
+    # parameters_mat.append(["UnivariateEstimator", "tauscale", UnivariateEstimator])
+    # parameters_mat.append(["ReweightingMethod", "rfch", ReweightingMethod])
+    # parameters_mat.append(["NumConcentrationSteps", 10, NumConcentrationSteps])
+    # parameters_mat.append(["StartMethod", "classical", StartMethod])
     
     
-    parameters_sk = []
-    store_precision = [True, False]
-    assume_centered = [True, False]
-    support_fraction = [None, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
-    contamination = [0.1, 0.2, 0.3, 0.4, 0.5]
+    # parameters_sk = []
+    # store_precision = [True, False]
+    # assume_centered = [True, False]
+    # support_fraction = [None, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    # contamination = [0.1, 0.2, 0.3, 0.4, 0.5]
     
-    parameters_sk.append(["store_precision", True, store_precision])
-    parameters_sk.append(["assume_centered", False, assume_centered])
-    parameters_sk.append(["support_fraction", None, support_fraction])
-    parameters_sk.append(["contamination", 0.1, contamination])
+    # parameters_sk.append(["store_precision", True, store_precision])
+    # parameters_sk.append(["assume_centered", False, assume_centered])
+    # parameters_sk.append(["support_fraction", None, support_fraction])
+    # parameters_sk.append(["contamination", 0.1, contamination])
     
     
         
-    # f_Route_Scores=open("Stats/MatEE_Route_Scores.csv", "w")
-    # f_Route_Scores.write('Filename,DefaultARI,DefaultF1,UninformedARI,UninformedF1,InformedARI,InformedF1\n')
+    # # f_Route_Scores=open("Stats/MatEE_Route_Scores.csv", "w")
+    # # f_Route_Scores.write('Filename,DefaultARI,DefaultF1,UninformedARI,UninformedF1,InformedARI,InformedF1\n')
+    # # f_Route_Scores.close()
+    # f_Route_Scores=open("Stats/EE_SvM_Route_Scores.csv", "a")
+    # f_Route_Scores.write('Filename,DefaultARI,DefaultF1_sk,DefaultF1_mat,UninformedARI,UninformedF1_sk,UninformedF1_mat,InformedARI,InformedF1_sk,InformedF1_mat\n')
     # f_Route_Scores.close()
-    f_Route_Scores=open("Stats/EE_SvM_Route_Scores.csv", "w")
-    f_Route_Scores.write('Filename,DefaultARI,DefaultF1_sk,DefaultF1_mat,UninformedARI,UninformedF1_sk,UninformedF1_mat,InformedARI,InformedF1_sk,InformedF1_mat\n')
-    f_Route_Scores.close()
     
     
-    frr=open("GD_ReRun/MatEE.csv", "w")
-    frr.write('Filename,Method,OutlierFraction,NumTrials,BiasCorrection,NumOGKIterations,UnivariateEstimator,ReweightingMethod,NumConcentrationSteps,StartMethod\n')
-    frr.close()
+    # frr=open("GD_ReRun/MatEE.csv", "w")
+    # frr.write('Filename,Method,OutlierFraction,NumTrials,BiasCorrection,NumOGKIterations,UnivariateEstimator,ReweightingMethod,NumConcentrationSteps,StartMethod\n')
+    # frr.close()
     
-    for FileNumber in range(len(master_files)):
-        print(FileNumber, end=' ')
-        MatEE_Route_Scores = pd.read_csv("Stats/MatEE_Route_Scores.csv")
-        fileroute = MatEE_Route_Scores[MatEE_Route_Scores["Filename"] == master_files[FileNumber]]
+    # for FileNumber in range(17,len(master_files)):
+    #     print(FileNumber, end=' ')
+    #     # MatEE_Route_Scores = pd.read_csv("Stats/MatEE_Route_Scores.csv")
+    #     # fileroute = MatEE_Route_Scores[MatEE_Route_Scores["Filename"] == master_files[FileNumber]]
         
-        if fileroute.empty:
-            continue
-        if fileroute["UninformedF1"].values[0] == 0 and fileroute["InformedF1"].values[0] == 0:
-            continue
+    #     # if fileroute.empty:
+    #     #     continue
+    #     # if fileroute["UninformedF1"].values[0] == 0 and fileroute["InformedF1"].values[0] == 0:
+    #     #     continue
 
-        ee(master_files[FileNumber], parameters_mat, parameters_sk)
+    #     ee(master_files[FileNumber], parameters_mat, parameters_sk)
     
     plot_ari_f1() 
 

@@ -414,21 +414,26 @@ def plot_ari_f1():
     Route_Scores = pd.read_csv("Stats/MatOCSVM_Route_Scores.csv")
     
     fig = plt.Figure()
-    
-    plt.plot(Route_Scores["DefaultF1"], Route_Scores["DefaultARI"], '.', color='red', marker = 'd', markersize = 4, alpha=.5)
-    plt.plot(Route_Scores["UninformedF1"], Route_Scores["UninformedARI"], '.', color = 'green', marker = 'v', markersize = 4, alpha=.5)
-    plt.plot(Route_Scores["InformedF1"], Route_Scores["InformedARI"], '.', color = 'blue', marker = '^', markersize = 4, alpha=.5)
+    plt.rcParams["figure.figsize"] = (10,6)
+    plt.plot(Route_Scores["DefaultF1"], Route_Scores["DefaultARI"], '.', color='red', marker = 'd', markersize = 6, alpha=.5)
+    plt.plot(Route_Scores["UninformedF1"], Route_Scores["UninformedARI"], '.', color = 'green', marker = 'v', markersize = 6, alpha=.5)
+    plt.plot(Route_Scores["InformedF1"], Route_Scores["InformedARI"], '.', color = 'blue', marker = '^', markersize = 6, alpha=.5)
      
-    plt.plot(Route_Scores["DefaultF1"].mean(), Route_Scores["DefaultARI"].mean(), '.', color='red', marker = 'd', markersize = 12, markeredgecolor='black', markeredgewidth=1.5)
-    plt.plot(Route_Scores["UninformedF1"].mean(), Route_Scores["UninformedARI"].mean(), '.', color = 'green', marker = 'v', markersize = 12, markeredgecolor='black', markeredgewidth=1.5)
-    plt.plot(Route_Scores["InformedF1"].mean(), Route_Scores["InformedARI"].mean(), '.', color = 'blue', marker = '^', markersize = 12, markeredgecolor='black', markeredgewidth=1.5)
+    plt.plot(Route_Scores["DefaultF1"].mean(), Route_Scores["DefaultARI"].mean(), '.', color='red', marker = 'd', markersize = 18, markeredgecolor='black', markeredgewidth=1.5)
+    plt.plot(Route_Scores["UninformedF1"].mean(), Route_Scores["UninformedARI"].mean(), '.', color = 'green', marker = 'v', markersize = 18, markeredgecolor='black', markeredgewidth=1.5)
+    plt.plot(Route_Scores["InformedF1"].mean(), Route_Scores["InformedARI"].mean(), '.', color = 'blue', marker = '^', markersize = 18, markeredgecolor='black', markeredgewidth=1.5)
     
-    plt.legend(['Default Setting', 'Uninformed Route', 'Informed Route'])
-    plt.title("Matlab - One Class SVM")
-    plt.xlabel("Performance (F1 Score)")
-    plt.ylabel("Determinism (ARI)")
+    plt.legend(['Default Setting', 'Univariate Search', 'Bivariate Search'], fontsize=18)
+    plt.title("Matlab - One Class SVM", fontsize=18)
+    plt.xlabel("Performance (F1 Score)", fontsize=18)
+    plt.ylabel("Determinism (ARI)", fontsize=18)
+    plt.xticks(fontsize=15)
+    plt.yticks(fontsize=15)
     plt.savefig("Fig/MatOCSVM_GD_Comparison.pdf", bbox_inches="tight", pad_inches=0)
     plt.show()
+    
+    #
+    
     
     # ## Calculate Percentage
     
@@ -469,46 +474,46 @@ if __name__ == '__main__':
     
     master_files.sort()
     
-    parameters = []
+    # parameters = []
 
-    ContaminationFraction = [0.05, 0.1, 0.15, 0.2, 0.25];
-    KernelScale = [1, "auto", 0.01, 0.05, 0.1, 0.2, 0.5, 1, 2, 5];
-    Lambda = ["auto", 0.01, 0.05, 0.1, 0.2, 0.5, 1, 2, 5];
-    NumExpansionDimensions = ["auto", 2^12, 2^15, 2^17, 2^19];
-    StandardizeData = [0, 1];
-    BetaTolerance = [1e-2, 1e-3, 1e-4, 1e-5];
-    GradientTolerance = [1e-3, 1e-4, 1e-5, 1e-6];
-    IterationLimit = [100, 200, 500, 1000, 2000];
+    # ContaminationFraction = [0.05, 0.1, 0.15, 0.2, 0.25];
+    # KernelScale = [1, "auto", 0.01, 0.05, 0.1, 0.2, 0.5, 1, 2, 5];
+    # Lambda = ["auto", 0.01, 0.05, 0.1, 0.2, 0.5, 1, 2, 5];
+    # NumExpansionDimensions = ["auto", 2^12, 2^15, 2^17, 2^19];
+    # StandardizeData = [0, 1];
+    # BetaTolerance = [1e-2, 1e-3, 1e-4, 1e-5];
+    # GradientTolerance = [1e-3, 1e-4, 1e-5, 1e-6];
+    # IterationLimit = [100, 200, 500, 1000, 2000];
     
-    parameters.append(["ContaminationFraction", 0.1, ContaminationFraction])
-    parameters.append(["KernelScale", 1, KernelScale])
-    parameters.append(["Lambda", 'auto', Lambda])
-    parameters.append(["NumExpansionDimensions", 'auto', NumExpansionDimensions])
-    parameters.append(["StandardizeData", 0, StandardizeData])
-    parameters.append(["BetaTolerance", 1e-4, BetaTolerance])
-    parameters.append(["GradientTolerance", 1e-4, GradientTolerance])
-    parameters.append(["IterationLimit", 1000, IterationLimit])
+    # parameters.append(["ContaminationFraction", 0.1, ContaminationFraction])
+    # parameters.append(["KernelScale", 1, KernelScale])
+    # parameters.append(["Lambda", 'auto', Lambda])
+    # parameters.append(["NumExpansionDimensions", 'auto', NumExpansionDimensions])
+    # parameters.append(["StandardizeData", 0, StandardizeData])
+    # parameters.append(["BetaTolerance", 1e-4, BetaTolerance])
+    # parameters.append(["GradientTolerance", 1e-4, GradientTolerance])
+    # parameters.append(["IterationLimit", 1000, IterationLimit])
     
     
-    f_Route_Scores=open("Stats/MatOCSVM_Route_Scores.csv", "w")
-    f_Route_Scores.write('Filename,DefaultARI,DefaultF1,UninformedARI,UninformedF1,InformedARI,InformedF1\n')
-    f_Route_Scores.close()
+    # f_Route_Scores=open("Stats/MatOCSVM_Route_Scores.csv", "w")
+    # f_Route_Scores.write('Filename,DefaultARI,DefaultF1,UninformedARI,UninformedF1,InformedARI,InformedF1\n')
+    # f_Route_Scores.close()
     
-    frr=open("GD_ReRun/MatOCSVM.csv", "w")
-    frr.write('Filename,ContaminationFraction,KernelScale,Lambda,NumExpansionDimensions,StandardizeData,BetaTolerance,BetaTolerance,GradientTolerance,IterationLimit\n')
-    frr.close()
+    # frr=open("GD_ReRun/MatOCSVM.csv", "w")
+    # frr.write('Filename,ContaminationFraction,KernelScale,Lambda,NumExpansionDimensions,StandardizeData,BetaTolerance,BetaTolerance,GradientTolerance,IterationLimit\n')
+    # frr.close()
     
-    ## Ranking
-    parameter_rankings = pd.read_csv("Mann–Whitney U test/MWU_MatOCSVM_Ranking.csv")
-    parameter_rankings["Ranking"] = (ss.rankdata(parameter_rankings["MWU_Score"])-1)
-    for i in range(len(parameters)):
-        param_rank = parameter_rankings[parameter_rankings["ParameterName"] == parameters[i][0]]["Ranking"].to_numpy()
-        parameters[i].append(int(param_rank[0]))
-    ##
+    # ## Ranking
+    # parameter_rankings = pd.read_csv("Mann–Whitney U test/MWU_MatOCSVM_Ranking.csv")
+    # parameter_rankings["Ranking"] = (ss.rankdata(parameter_rankings["MWU_Score"])-1)
+    # for i in range(len(parameters)):
+    #     param_rank = parameter_rankings[parameter_rankings["ParameterName"] == parameters[i][0]]["Ranking"].to_numpy()
+    #     parameters[i].append(int(param_rank[0]))
+    # ##
     
-    for FileNumber in range(len(master_files)):
-        print(FileNumber, end=' ')
-        ocsvm(master_files[FileNumber], parameters, 0, parameter_rankings["Ranking"].to_numpy())
+    # for FileNumber in range(len(master_files)):
+    #     print(FileNumber, end=' ')
+    #     ocsvm(master_files[FileNumber], parameters, 0, parameter_rankings["Ranking"].to_numpy())
         
     plot_ari_f1() 
         

@@ -872,21 +872,21 @@ def plot_ari_f1():
     Route_Scores['InformedF1'] = Route_Scores[['InformedF1_r', 'InformedF1_mat', 'InformedF1_sk']].mean(axis=1)
     
     fig = plt.Figure()
-    
-    plt.plot(Route_Scores["DefaultF1"], Route_Scores["DefaultARI"], '.', color='red', marker = 'd', markersize = 4, alpha=.5)
-    plt.plot(Route_Scores["UninformedF1"], Route_Scores["UninformedARI"], '.', color = 'green', marker = 'v', markersize = 4, alpha=.5)
-    plt.plot(Route_Scores["InformedF1"], Route_Scores["InformedARI"], '.', color = 'blue', marker = '^', markersize = 4, alpha=.5)
+    plt.rcParams["figure.figsize"] = (10,6)
+    plt.plot(Route_Scores["DefaultF1"], Route_Scores["DefaultARI"], '.', color='red', marker = 'd', markersize = 6, alpha=.5)
+    plt.plot(Route_Scores["UninformedF1"], Route_Scores["UninformedARI"], '.', color = 'green', marker = 'v', markersize = 6, alpha=.5)
+    plt.plot(Route_Scores["InformedF1"], Route_Scores["InformedARI"], '.', color = 'blue', marker = '^', markersize = 6, alpha=.5)
      
-    plt.plot(Route_Scores["DefaultF1"].mean(), Route_Scores["DefaultARI"].mean(), '.', color='red', marker = 'd', markersize = 12, markeredgecolor='black', markeredgewidth=1.5)
-    plt.plot(Route_Scores["UninformedF1"].mean(), Route_Scores["UninformedARI"].mean(), '.', color = 'green', marker = 'v', markersize = 12, markeredgecolor='black', markeredgewidth=1.5)
-    plt.plot(Route_Scores["InformedF1"].mean(), Route_Scores["InformedARI"].mean(), '.', color = 'blue', marker = '^', markersize = 12, markeredgecolor='black', markeredgewidth=1.5)
+    plt.plot(Route_Scores["DefaultF1"].mean(), Route_Scores["DefaultARI"].mean(), '.', color='red', marker = 'd', markersize = 18, markeredgecolor='black', markeredgewidth=1.5)
+    plt.plot(Route_Scores["UninformedF1"].mean(), Route_Scores["UninformedARI"].mean(), '.', color = 'green', marker = 'v', markersize = 18, markeredgecolor='black', markeredgewidth=1.5)
+    plt.plot(Route_Scores["InformedF1"].mean(), Route_Scores["InformedARI"].mean(), '.', color = 'blue', marker = '^', markersize = 18, markeredgecolor='black', markeredgewidth=1.5)
     
-    plt.legend(['Default Setting', 'Uninformed Route', 'Informed Route'], fontsize = 15)
+    plt.legend(['Default Setting', 'Univariate Search', 'Bivariate Search'], fontsize=18)   
     plt.xticks(fontsize = 15)
     plt.yticks(fontsize = 15)
-    plt.title("Isolation Forest - Inconsistency", fontsize = 15)
-    plt.xlabel("Average Performance (F1 Score)", fontsize = 15)
-    plt.ylabel("Consistency (Mean Mutual ARI)", fontsize = 15)
+    plt.title("Isolation Forest - Inconsistency", fontsize = 18)
+    plt.xlabel("Average Performance (F1 Score)", fontsize = 18)
+    plt.ylabel("Consistency (Mean Mutual ARI)", fontsize = 18)
     plt.savefig("Fig/IF_SvMvR_GD_Comparison.pdf", bbox_inches="tight", pad_inches=0)
     plt.show()
     

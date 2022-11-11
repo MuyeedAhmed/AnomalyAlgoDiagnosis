@@ -100,6 +100,15 @@ def ocsvm(filename, parameters_r, parameters_mat, parameters_sk):
     mod_parameters_r[5][2][mod_parameters_r[5][2].index(if_cont)] = 'IF'
     # ##
     
+    #Shortcut
+    mod_parameters_r[5][1] = "IF"
+    mod_parameters_r[2][1] = "auto"
+    
+    mod_parameters_mat[0][1] = "IF"
+    mod_parameters_mat[1][1] = "auto"
+    
+    mod_parameters_sk[5][1] = "IF"
+    # print(mod_parameters_r)
     blind_route_r, blind_route_mat, blind_route_sk = get_blind_route(X, gt, filename, deepcopy(mod_parameters_r), deepcopy(mod_parameters_mat), deepcopy(mod_parameters_sk))
     informed_route_r, informed_route_mat, informed_route_sk = get_guided_route(X, gt, filename, deepcopy(mod_parameters_r), deepcopy(mod_parameters_mat), deepcopy(mod_parameters_sk))
     # print(blind_route_r)
@@ -619,59 +628,28 @@ def runOCSVM(filename, X, gt, param_r, param_mat, param_sk):
         if skf1 == -1:
             return -1, -1, -1, -1
     ##
-    dfmvr = pd.read_csv("Stats/Inconsistency/OCSVM_mvr.csv")
-    dfmvr = dfmvr[(dfmvr['Mat']==labelFile_mat)&
-                    (dfmvr['R']==labelFile_r)]
-    if dfmvr.empty:
-        labels_r = pd.read_csv("Labels/OCSVM_R/"+labelFile_r+".csv").to_numpy()
-        labels_mat = pd.read_csv("Labels/OCSVM_Matlab/Labels_Mat_OCSVM_"+labelFile_mat+".csv", header=None).to_numpy()
-        
-        ari_mvr = []
-        for i in range(len(labels_r)):
-            for j in range(len(labels_mat)):
-                ari_mvr.append(adjusted_rand_score(np.int64((labels_r[i][1:])*1), labels_mat[j]))
-        ari_mvr = np.mean(ari_mvr)
-        fmvr=open("Stats/Inconsistency/OCSVM_mvr.csv", "a")
-        fmvr.write(labelFile_mat+','+labelFile_r+ ','+ str(ari_mvr) + '\n')
-        fmvr.close()
-    else:
-        ari_mvr = dfmvr['ARI'].to_numpy()[0]
-    ##
-    dfrvs = pd.read_csv("Stats/Inconsistency/OCSVM_rvs.csv")
-    dfrvs = dfrvs[(dfrvs['R']==labelFile_r)&
-                    (dfrvs['Sk']==labelFile_sk)]
-    if dfrvs.empty:
-        labels_sk = pd.read_csv("Labels/OCSVM_Sk/Labels_Sk_OCSVM_"+labelFile_sk+".csv", header=None).to_numpy()
-        labels_r = pd.read_csv("Labels/OCSVM_R/"+labelFile_r+".csv").to_numpy()
+    
+    labels_r = pd.read_csv("Labels/OCSVM_R/"+labelFile_r+".csv").to_numpy()
+    labels_mat = pd.read_csv("Labels/OCSVM_Matlab/Labels_Mat_OCSVM_"+labelFile_mat+".csv", header=None).to_numpy()
+    labels_sk = pd.read_csv("Labels/OCSVM_Sk/Labels_Sk_OCSVM_"+labelFile_sk+".csv", header=None).to_numpy()
+    
+    ari_mvr = []
+    for i in range(len(labels_r)):
+        for j in range(len(labels_mat)):
+            ari_mvr.append(adjusted_rand_score(np.int64((labels_r[i][1:])*1), labels_mat[j]))
+    ari_mvr = np.mean(ari_mvr)
 
-        ari_rvs = []
-        for i in range(len(labels_r)):
-            for j in range(len(labels_sk)):
-                ari_rvs.append(adjusted_rand_score(np.int64((labels_r[i][1:])*1), labels_sk[j]))
-        ari_rvs = np.mean(ari_rvs)
-        frvs=open("Stats/Inconsistency/OCSVM_rvs.csv", "a")
-        frvs.write(labelFile_r+','+labelFile_sk + ','+ str(ari_rvs) + '\n')
-        frvs.close()
-    else:
-        ari_rvs = dfrvs['ARI'].to_numpy()[0]
-    ##
-    dfmvs = pd.read_csv("Stats/Inconsistency/OCSVM_mvs.csv")
-    dfmvs = dfmvs[(dfmvs['Mat']==labelFile_mat)&
-                    (dfmvs['Sk']==labelFile_sk)]
-    if dfmvs.empty:
-        labels_sk = pd.read_csv("Labels/OCSVM_Sk/Labels_Sk_OCSVM_"+labelFile_sk+".csv", header=None).to_numpy()
-        labels_mat = pd.read_csv("Labels/OCSVM_Matlab/Labels_Mat_OCSVM_"+labelFile_mat+".csv", header=None).to_numpy()
-        
-        ari_mvs = []
-        for i in range(len(labels_sk)):
-            for j in range(len(labels_mat)):
-                ari_mvs.append(adjusted_rand_score(labels_sk[i], labels_mat[j]))
-        ari_mvs = np.mean(ari_mvs) 
-        fmvs=open("Stats/Inconsistency/OCSVM_mvs.csv", "a")
-        fmvs.write(labelFile_mat+','+labelFile_sk + ','+ str(ari_mvs) + '\n')
-        fmvs.close()
-    else:
-        ari_mvs = dfmvs['ARI'].to_numpy()[0]
+    ari_rvs = []
+    for i in range(len(labels_r)):
+        for j in range(len(labels_sk)):
+            ari_rvs.append(adjusted_rand_score(np.int64((labels_r[i][1:])*1), labels_sk[j]))
+    ari_rvs = np.mean(ari_rvs)
+    
+    ari_mvs = []
+    for i in range(len(labels_sk)):
+        for j in range(len(labels_mat)):
+            ari_mvs.append(adjusted_rand_score(labels_sk[i], labels_mat[j]))
+    ari_mvs = np.mean(ari_mvs) 
     
     ari = []  
     ari = (ari_mvr + ari_rvs + ari_mvs)/3
@@ -682,31 +660,35 @@ def get_sk_f1(filename, param_sk, X, gt):
     labelFile = filename + "_" + str(param_sk[0][1]) + "_" + str(param_sk[1][1]) + "_" + str(param_sk[2][1]) + "_" + str(param_sk[3][1]) + "_" + str(param_sk[4][1]) + "_" + str(param_sk[5][1]) + "_" + str(param_sk[6][1]) + "_" + str(param_sk[7][1]) + "_" + str(param_sk[8][1])
     
     if os.path.exists("Labels/OCSVM_Sk_Done/Labels_Sk_OCSVM_"+labelFile+".csv") == 1:
-        i_kernel=param_sk[0][1]
-        i_degree=param_sk[1][1]
-        i_gamma=param_sk[2][1]
-        i_coef0=param_sk[3][1]
-        i_tol=param_sk[4][1]
-        i_nu=param_sk[5][1]
-        i_shrinking=param_sk[6][1]
-        i_cache_size=param_sk[7][1]
-        i_max_iter=param_sk[8][1]
+        labels =  pd.read_csv("Labels/OCSVM_Sk/Labels_Sk_OCSVM_"+labelFile+".csv", header=None).to_numpy()
+        # print(labels)
+        # print(gt)
+        return metrics.f1_score(gt, labels[0])
+        # i_kernel=param_sk[0][1]
+        # i_degree=param_sk[1][1]
+        # i_gamma=param_sk[2][1]
+        # i_coef0=param_sk[3][1]
+        # i_tol=param_sk[4][1]
+        # i_nu=param_sk[5][1]
+        # i_shrinking=param_sk[6][1]
+        # i_cache_size=param_sk[7][1]
+        # i_max_iter=param_sk[8][1]
         
-        dff1 =  pd.read_csv("Stats/SkOCSVM_F1.csv")
-        f1 = dff1[(dff1['Filename']==filename)&
-                    (dff1['kernel']==i_kernel)&
-                    (dff1['degree']==i_degree)&
-                    (dff1['gamma']==i_gamma)&
-                    (dff1['coef0']==i_coef0)&
-                    (dff1['tol']==i_tol)&
-                    (dff1['nu']==str(i_nu))&
-                    (dff1['shrinking']==i_shrinking)&
-                    (dff1['cache_size']==i_cache_size)&
-                    (dff1['max_iter']==i_max_iter)]
-        if f1.empty == 0:
-            run_f1_values = f1["R"].to_numpy()
+        # dff1 =  pd.read_csv("Stats/SkOCSVM_F1.csv")
+        # f1 = dff1[(dff1['Filename']==filename)&
+        #             (dff1['kernel']==i_kernel)&
+        #             (dff1['degree']==i_degree)&
+        #             (dff1['gamma']==i_gamma)&
+        #             (dff1['coef0']==i_coef0)&
+        #             (dff1['tol']==i_tol)&
+        #             (dff1['nu']==str(i_nu))&
+        #             (dff1['shrinking']==i_shrinking)&
+        #             (dff1['cache_size']==i_cache_size)&
+        #             (dff1['max_iter']==i_max_iter)]
+        # if f1.empty == 0:
+        #     run_f1_values = f1["R"].to_numpy()
             
-            return np.mean(run_f1_values)
+            # return np.mean(run_f1_values)
   
     labels = []
     f1 = []
@@ -746,7 +728,7 @@ def get_sk_f1(filename, param_sk, X, gt):
     return np.mean(f1)
 
 def get_mat_f1(filename, param_mat, X, gt):
-    labelFile = filename + "_" + str(param_mat[0][1]) + "_" + str(param_mat[1][1]) + "_" + str(param_mat[2][1])
+    labelFile = filename + "_" + str(param_mat[0][1]) + "_" + str(param_mat[1][1]) + "_" + str(param_mat[2][1]) + "_" + str(param_mat[3][1]) + "_" + str(param_mat[4][1]) + "_" + str(param_mat[5][1]) + "_" + str(param_mat[6][1]) + "_" + str(param_mat[7][1])
     
     if os.path.exists("Labels/OCSVM_Matlab_Done/Labels_Mat_OCSVM_"+labelFile+".csv") == 1:
         i_ContaminationFraction = param_mat[0][1]
@@ -777,6 +759,7 @@ def get_mat_f1(filename, param_mat, X, gt):
             
             return np.mean(np.mean(run_f1_values))
         else:
+            
             print(f1)
             print(labelFile)
     if os.path.exists("Labels/OCSVM_Matlab/Labels_Mat_OCSVM_"+labelFile+".csv") == 0:        
@@ -1062,7 +1045,7 @@ if __name__ == '__main__':
     frr.write('Filename,ContaminationFraction,KernelScale,Lambda,NumExpansionDimensions,StandardizeData,BetaTolerance,BetaTolerance,GradientTolerance,IterationLimit\n')
     frr.close()
     
-    for FileNumber in range(len(master_files)):
+    for FileNumber in range(55, len(master_files)):
         print(FileNumber, end=' ')
         ocsvm(master_files[FileNumber], parameters_r, parameters_mat, parameters_sk)
 

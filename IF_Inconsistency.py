@@ -33,14 +33,14 @@ def get_ari_sk_mat(filename, param_sk, param_mat):
     labelFile_sk = filename + "_" + str(param_sk[0][1]) + "_" + str(param_sk[1][1]) + "_" + str(param_sk[2][1]) + "_" + str(param_sk[3][1]) + "_" + str(param_sk[4][1]) + "_" + str(param_sk[5][1]) + "_" + str(param_sk[6][1])
     labelFile_mat = filename + "_" + str(param_mat[0][1]) + "_" + str(param_mat[1][1]) + "_" + str(param_mat[2][1])
 
-    if os.path.exists("../AnomalyAlgoDiagnosis_Labels/IF_Sk/Labels_Sk_IF_"+labelFile_sk+".csv") == 0:
+    if os.path.exists("Labels/IF_Sk/Labels_Sk_IF_"+labelFile_sk+".csv") == 0:
         # print(labelFile_sk)
         return 0
 
-    labels_sk =  pd.read_csv("../AnomalyAlgoDiagnosis_Labels/IF_Sk/Labels_Sk_IF_"+labelFile_sk+".csv", header=None).to_numpy()
+    labels_sk =  pd.read_csv("Labels/IF_Sk/Labels_Sk_IF_"+labelFile_sk+".csv", header=None).to_numpy()
 
 
-    labels_mat =  pd.read_csv("IF_Matlab/Labels_Mat_IF_"+labelFile_mat+".csv", header=None).to_numpy()
+    labels_mat =  pd.read_csv("Labels/IF_Matlab/Labels_Mat_IF_"+labelFile_mat+".csv", header=None).to_numpy()
     
     ari = []
     
@@ -462,7 +462,7 @@ def run_sk_mat():
     plt.title("Isolation Forest - Scikit-learn VS Matlab")
     plt.savefig("Fig/BoxPlot/IF_SkMat_MeanARI.pdf", bbox_inches="tight", pad_inches=0)
     plt.clf()
-    
+    df.to_csv("Stats/IF_SvM.csv")
     fig = plt.Figure()
     axmin = sns.boxplot(x="Configuration", y="Min ARI", data=df)
     axmin.set(xlabel=None)
@@ -471,6 +471,6 @@ def run_sk_mat():
     plt.clf()
     
 if __name__ == '__main__':
-    # run_sk_mat()
+    run_sk_mat()
     # run_mat_r()
-    run_sk_r()
+    # run_sk_r()

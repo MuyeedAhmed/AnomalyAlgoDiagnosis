@@ -1,15 +1,15 @@
 #importing libraries
-library(tidyverse)
-library(rmatio)
-library(dbscan)
-library(MLmetrics)
-library(rio)
-#library(raveio)
-library(rlang)
-library(e1071)
-library(pdfCluster)
-library(comprehenr)
-library(mclust)
+suppressMessages(library(tidyverse)) 
+suppressMessages(library(rmatio))
+suppressMessages(library(dbscan))
+suppressMessages(library(MLmetrics))
+suppressMessages(library(rio))
+#library(raveio))
+suppressMessages(library(rlang))
+suppressMessages(library(e1071))
+suppressMessages(library(pdfCluster))
+suppressMessages(library(comprehenr))
+suppressMessages(library(mclust))
 
 
 datasetFolderDir = 'Dataset/'
@@ -85,12 +85,14 @@ runOCSVM = function(filename,X,gt,p1, p2, p3, p4, p5, p6, p7, p8, p9){
   f1score = F1_Score(gt,list_pred)
   f1 = c(f1,f1score)
   labels_df = rbind(labels_df, data.frame(t(sapply(l,c))))
-  
+  print(labelfile)
   write.csv(labels_df,paste('Labels/OCSVM_R/',labelfile,".csv",sep=""))
   
   
 }
 df = read.csv(paste("GD_ReRun/ROCSVM.csv",sep = "")[1])
+
+options(scipen=9999) #############
 
 for (row in 1:nrow(df)) {
   print(row)
@@ -103,6 +105,7 @@ for (row in 1:nrow(df)) {
   shrinking <- df[row, "shrinking"]
   cachesize <- df[row, "cachesize"]
   epsilon <- df[row, "epsilon"]
+  print(tolerance)
   ocsvm_(df[row, "Filename"], kernel, degree, gamma, coef0,tolerance,nu,shrinking,cachesize,epsilon)
 }
 

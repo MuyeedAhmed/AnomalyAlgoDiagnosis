@@ -125,25 +125,27 @@ def ocsvm(filename, parameters_r, parameters_mat, parameters_sk):
     
     mod_parameters_sk[5][1] = "IF"
 
-    # print(mod_parameters_r)
+    # print(mod_parameters_mat)
     
     
     tools = ['R', 'Matlab', 'Sklearn']
     
-    param_r, param_mat, param_sk = deepcopy(mod_parameters_r), deepcopy(mod_parameters_mat), deepcopy(mod_parameters_sk)
-    ari_score, f1_score_r, f1_score_mat, f1_score_sk = get_blind_route(X, gt, filename, param_r, param_mat, param_sk, tools)
+    param_r_b, param_mat_b, param_sk_b = deepcopy(mod_parameters_r), deepcopy(mod_parameters_mat), deepcopy(mod_parameters_sk)
+    ari_score, f1_score_r, f1_score_mat, f1_score_sk = get_blind_route(X, gt, filename, param_r_b, param_mat_b, param_sk_b, tools)
     print(ari_score, f1_score_r, f1_score_mat, f1_score_sk)
-    print('\nR:\n', param_r, '\nMat:\n', param_mat, '\nSk:\n', param_sk)
+    
+    
+    
     
     UninformedARI = str(ari_score)
     UninformedF1_r = str(f1_score_r)
     UninformedF1_mat = str(f1_score_mat)
     UninformedF1_sk = str(f1_score_sk)
     
-    param_r, param_mat, param_sk = deepcopy(mod_parameters_r), deepcopy(mod_parameters_mat), deepcopy(mod_parameters_sk)
-    ari_score, f1_score_r, f1_score_mat, f1_score_sk = get_guided_route(X, gt, filename, param_r, param_mat, param_sk, tools)    
+    param_r_u, param_mat_u, param_sk_u = deepcopy(mod_parameters_r), deepcopy(mod_parameters_mat), deepcopy(mod_parameters_sk)
+    ari_score, f1_score_r, f1_score_mat, f1_score_sk = get_guided_route(X, gt, filename, param_r_u, param_mat_u, param_sk_u, tools)    
     print(ari_score, f1_score_r, f1_score_mat, f1_score_sk)
-    print('\nR:\n', param_r, '\nMat:\n', param_mat, '\nSk:\n', param_sk)
+    
 
     InformedARI = str(ari_score)
     InformedF1_r = str(f1_score_r)
@@ -155,6 +157,9 @@ def ocsvm(filename, parameters_r, parameters_mat, parameters_sk):
     f_Route_Scores.write(filename+','+str(DefaultARI)+","+str(DefaultF1_r)+","+str(DefaultF1_mat)+","+str(DefaultF1_sk)+","+UninformedARI+","+UninformedF1_r+","+UninformedF1_mat+","+UninformedF1_sk+","+InformedARI+","+InformedF1_r+","+InformedF1_mat+","+InformedF1_sk+"\n")
     f_Route_Scores.close()
     
+    f_param=open("Stats/OCSVM_SvMvR_Winner_Parameters.csv", "a")
+    f_param.write(filename+','+str(param_r_b)+","+str(param_mat_b)+","+str(param_sk_b)+","+str(param_r_u)+","+str(param_mat_u)+","+str(param_sk_u)+"\n")
+    f_param.close()
 
 def get_blind_route(X, gt, filename, parameters_r_copy,parameters_mat_copy, parameters_sk_copy, tools):
     # blind_route_r = []
@@ -488,10 +493,16 @@ def get_mat_f1(filename, param_mat, X, gt):
             run_f1_values = f1[runs_f1].to_numpy()
             
             return np.mean(np.mean(run_f1_values))
-        else:
-            
-            print(f1)
-            print(labelFile)
+        # else:
+            # print(dff1)
+            # # print(dff1.dtypes)
+            # print(labelFile)
+            # f1 = dff1[(dff1['Filename']==filename)&
+            #         (dff1['ContaminationFraction']==str(i_ContaminationFraction))]
+            # print(f1)
+            # f1 = dff1[(dff1['Filename']==filename)&
+            #         (dff1['KernelScale']==str(i_KernelScale))]
+            # print(f1)
     if os.path.exists("Labels/OCSVM_Matlab/Labels_Mat_OCSVM_"+labelFile+".csv") == 0:        
         frr=open("GD_ReRun/MatOCSVM.csv", "a")
         frr.write(filename+","+str(param_mat[0][1])+","+str(param_mat[1][1])+","+str(param_mat[2][1])+","+str(param_mat[3][1])+","+str(param_mat[4][1])+","+str(param_mat[5][1])+","+str(param_mat[6][1])+","+str(param_mat[7][1])+'\n')
@@ -759,10 +770,14 @@ if __name__ == '__main__':
     #     fmvs=open("Stats/Inconsistency/OCSVM_mvs.csv", "w")
     #     fmvs.write('Mat,Sk,ARI\n')
     #     fmvs.close()
-    
-    f_Route_Scores=open("Stats/OCSVM_SvMvR_Route_Scores.csv", "w")
-    f_Route_Scores.write('Filename,DefaultARI,DefaultF1_r,DefaultF1_mat,DefaultF1_sk,UninformedARI,UninformedF1_r,UninformedF1_mat,UninformedF1_sk,InformedARI,InformedF1_r,InformedF1_mat,InformedF1_sk\n')
-    f_Route_Scores.close()
+    if os.path.exists("Stats/OCSVM_SvMvR_Route_Scores.csv") == 0:  
+        f_Route_Scores=open("Stats/OCSVM_SvMvR_Route_Scores.csv", "w")
+        f_Route_Scores.write('Filename,DefaultARI,DefaultF1_r,DefaultF1_mat,DefaultF1_sk,UninformedARI,UninformedF1_r,UninformedF1_mat,UninformedF1_sk,InformedARI,InformedF1_r,InformedF1_mat,InformedF1_sk\n')
+        f_Route_Scores.close()
+    if os.path.exists("Stats/OCSVM_SvMvR_Winner_Parameters.csv") == 0:
+        f_param=open("Stats/OCSVM_SvMvR_Winner_Parameters.csv", "w")
+        f_param.write("Filename,R_Uni,Mat_Uni,Sk_Uni,R_Bi,Mat_Bi,Sk_Bi\n")
+        f_param.close()
     
     frr=open("GD_ReRun/ROCSVM.csv", "w")
     frr.write('Filename,kernel,degree,gamma,coef0,tolerance,nu,shrinking,cachesize,epsilon\n')
@@ -772,6 +787,8 @@ if __name__ == '__main__':
     frr.write('Filename,ContaminationFraction,KernelScale,Lambda,NumExpansionDimensions,StandardizeData,BetaTolerance,BetaTolerance,GradientTolerance,IterationLimit\n')
     frr.close()
     
+    
+    
     total_r = pd.read_csv("Stats/ROCSVM_F1.csv")       
     total_mat = pd.read_csv("Stats/MatOCSVM_F1.csv")       
     total_sk = pd.read_csv("Stats/SkOCSVM_F1.csv")       
@@ -779,16 +796,14 @@ if __name__ == '__main__':
     for FileNumber in range(len(master_files)):
         broken_r = total_r[(total_r['Filename']==master_files[FileNumber])]
         broken_r.to_csv("Stats/BrokenDown/ROCSVM_F1_"+master_files[FileNumber]+".csv", index=False)
-        print(broken_r)
-        print(total_r)
         broken_mat = total_mat[(total_mat['Filename']==master_files[FileNumber])]
         broken_mat.to_csv("Stats/BrokenDown/MatOCSVM_F1_"+master_files[FileNumber]+".csv", index=False)
         
         broken_sk = total_sk[(total_sk['Filename']==master_files[FileNumber])]
         broken_sk.to_csv("Stats/BrokenDown/SkOCSVM_F1_"+master_files[FileNumber]+".csv", index=False)
         
-        # print(FileNumber, end=' ')
-        # ocsvm(master_files[FileNumber], parameters_r, parameters_mat, parameters_sk)
+        print(FileNumber, end=' ')
+        ocsvm(master_files[FileNumber], parameters_r, parameters_mat, parameters_sk)
         
         broken_r = pd.read_csv("Stats/BrokenDown/ROCSVM_F1_"+master_files[FileNumber]+".csv")
         total_r = pd.merge(total_r, broken_r, how='outer')

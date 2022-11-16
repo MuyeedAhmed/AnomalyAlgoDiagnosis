@@ -32,6 +32,10 @@ import math
 import scipy.stats as ss
 import bisect 
 
+import subprocess
+import matlab.engine
+eng = matlab.engine.start_matlab()
+
 datasetFolderDir = 'Dataset/'
 
 '''
@@ -122,31 +126,34 @@ def ocsvm(filename, parameters_r, parameters_mat, parameters_sk):
     mod_parameters_sk[5][1] = "IF"
 
     # print(mod_parameters_r)
+    
+    
     tools = ['R', 'Matlab', 'Sklearn']
+    
     param_r, param_mat, param_sk = deepcopy(mod_parameters_r), deepcopy(mod_parameters_mat), deepcopy(mod_parameters_sk)
     ari_score, f1_score_r, f1_score_mat, f1_score_sk = get_blind_route(X, gt, filename, param_r, param_mat, param_sk, tools)
     print(ari_score, f1_score_r, f1_score_mat, f1_score_sk)
     print('\nR:\n', param_r, '\nMat:\n', param_mat, '\nSk:\n', param_sk)
-    # informed_route_r, informed_route_mat, informed_route_sk = get_guided_route(X, gt, filename, deepcopy(mod_parameters_r), deepcopy(mod_parameters_mat), deepcopy(mod_parameters_sk))
-    # print(blind_route_r)
-    # print(blind_route_mat)
     
-    # print(blind_route_sk)
+    UninformedARI = str(ari_score)
+    UninformedF1_r = str(f1_score_r)
+    UninformedF1_mat = str(f1_score_mat)
+    UninformedF1_sk = str(f1_score_sk)
     
-    # UninformedARI = str(blind_route_r[-1][3][-1][1])
-    # UninformedF1_r = str(blind_route_r[-1][3][-1][2])
-    # UninformedF1_mat = str(blind_route_mat[-1][3][-1][3])
-    # UninformedF1_sk = str(blind_route_sk[-1][3][-1][4])
+    param_r, param_mat, param_sk = deepcopy(mod_parameters_r), deepcopy(mod_parameters_mat), deepcopy(mod_parameters_sk)
+    ari_score, f1_score_r, f1_score_mat, f1_score_sk = get_guided_route(X, gt, filename, param_r, param_mat, param_sk, tools)    
+    print(ari_score, f1_score_r, f1_score_mat, f1_score_sk)
+    print('\nR:\n', param_r, '\nMat:\n', param_mat, '\nSk:\n', param_sk)
+
+    InformedARI = str(ari_score)
+    InformedF1_r = str(f1_score_r)
+    InformedF1_mat = str(f1_score_mat)
+    InformedF1_sk = str(f1_score_sk)
     
-    # InformedARI = str(informed_route_r[-1][3][-1][1])
-    # InformedF1_r = str(informed_route_r[-1][3][-1][2])
-    # InformedF1_mat = str(informed_route_mat[-1][3][-1][3])
-    # InformedF1_sk = str(informed_route_sk[-1][3][-1][4])
     
-    
-    # f_Route_Scores=open("Stats/OCSVM_SvMvR_Route_Scores.csv", "a")
-    # f_Route_Scores.write(filename+','+str(DefaultARI)+","+str(DefaultF1_r)+","+str(DefaultF1_mat)+","+str(DefaultF1_sk)+","+UninformedARI+","+UninformedF1_r+","+UninformedF1_mat+","+UninformedF1_sk+","+InformedARI+","+InformedF1_r+","+InformedF1_mat+","+InformedF1_sk+"\n")
-    # f_Route_Scores.close()
+    f_Route_Scores=open("Stats/OCSVM_SvMvR_Route_Scores.csv", "a")
+    f_Route_Scores.write(filename+','+str(DefaultARI)+","+str(DefaultF1_r)+","+str(DefaultF1_mat)+","+str(DefaultF1_sk)+","+UninformedARI+","+UninformedF1_r+","+UninformedF1_mat+","+UninformedF1_sk+","+InformedARI+","+InformedF1_r+","+InformedF1_mat+","+InformedF1_sk+"\n")
+    f_Route_Scores.close()
     
 
 def get_blind_route(X, gt, filename, parameters_r_copy,parameters_mat_copy, parameters_sk_copy, tools):
@@ -156,8 +163,8 @@ def get_blind_route(X, gt, filename, parameters_r_copy,parameters_mat_copy, para
     if tools == []:
         ari_score, f1_score_r, f1_score_mat, f1_score_sk = runOCSVM(filename, X, gt, parameters_r_copy, parameters_mat_copy, parameters_sk_copy)
         return ari_score, f1_score_r, f1_score_mat, f1_score_sk
-    else:
-        print()
+    # else:
+    #     print()
     current_tool = tools[0]
     
     print(current_tool, end=' - ')
@@ -172,7 +179,7 @@ def get_blind_route(X, gt, filename, parameters_r_copy,parameters_mat_copy, para
             
     
     for p_c in range(len(parameters_copy)):
-        print(p_c, end=', ')
+        # print(p_c, end=', ')
         parameter_route_c = []
         ari_scores_c = []
         # ari_scores_c.append(max_M_ARI)
@@ -235,193 +242,77 @@ def get_blind_route(X, gt, filename, parameters_r_copy,parameters_mat_copy, para
         parameters_copy[p_c][1] = parameter_route_c[max_index][0]
         # blind_route_c.append([parameters_copy[p_c][0], max_index, parameter_route_c])
     return parameter_route_c[-1][1], parameter_route_c[-1][2], parameter_route_c[-1][3], parameter_route_c[-1][4]
+
+def get_guided_route(X, gt, filename, parameters_r_copy,parameters_mat_copy, parameters_sk_copy, tools):
+    if tools == []:
+        ari_score, f1_score_r, f1_score_mat, f1_score_sk = runOCSVM(filename, X, gt, parameters_r_copy, parameters_mat_copy, parameters_sk_copy)
+        return ari_score, f1_score_r, f1_score_mat, f1_score_sk
+    # else:
+    #     print()
+    current_tool = tools[0]
     
-
-def get_guided_route(X, gt, filename, paramaters_r_copy,paramaters_mat_copy, paramaters_sk_copy):
-    guided_route_r = []
-    guided_route_mat = []
-    guided_route_sk = []
-    # route_temp = []
-    print("R - ", end='')
-    for p_r in range(len(paramaters_r_copy)):
-        print(p_r)
-        parameter_route_r = []
-        ari_scores_r = []
-        f1_scores_r = []
-        passing_param_r = deepcopy(paramaters_r_copy)
-
-        default_ari, default_f1_r, default_f1_mat, default_f1_sk, route_mat, route_sk = get_guided_route_mat(X, gt, filename, passing_param_r, paramaters_mat_copy, paramaters_sk_copy)
-        if default_ari == -1:
-            return [], [], []
-        parameter_route_r.append([passing_param_r[p_r][1], default_ari, default_f1_r, default_f1_mat, default_f1_sk])
-        ari_scores_r.append(default_ari)
-        f1_scores_r.append(default_f1_r)
-        # guided_route_mat += route_mat
-        guided_route_mat = route_mat
-        guided_route_sk = route_sk
-        i_def = passing_param_r[p_r][2].index(passing_param_r[p_r][1])
-        if i_def+1 == len(passing_param_r[p_r][2]):
-            i_pv_r = i_def-1    
-        else:
-            i_pv_r = i_def+1
-        
-        while True:
-            if i_pv_r >= len(paramaters_r_copy[p_r][2]):
-                break
-            if i_pv_r < 0:
-                break
-
-            passing_param_r[p_r][1] = paramaters_r_copy[p_r][2][i_pv_r]
+    print(current_tool, end=' - ')
+    
+    parameters_copy = []
+    if current_tool == 'Sklearn':
+        parameters_copy = parameters_sk_copy
+    elif current_tool == 'Matlab':
+        parameters_copy = parameters_mat_copy
+    else:
+        parameters_copy = parameters_r_copy
             
-            ari_score, f1_score_r, f1_score_mat, f1_score_sk, route_mat, route_sk = get_guided_route_mat(X, gt, filename, passing_param_r, paramaters_mat_copy, paramaters_sk_copy)
-            # route_temp += route_mat
-            if ari_score >= np.max(ari_scores_r) and f1_score_r > np.max(f1_scores_r):
-                parameter_route_r.append([passing_param_r[p_r][1], ari_score, f1_score_r, f1_score_mat, f1_score_sk])
-                ari_scores_r.append(ari_score)
-                f1_scores_r.append(f1_score_r)
-                # guided_route_mat += route_temp
-                guided_route_mat = route_mat
-                guided_route_sk = route_sk
-                route_temp = []
-            if ari_score != np.max(ari_scores_r):
-                
-                if i_pv_r - 1 > i_def:
-                    break
-                elif i_pv_r - 1 == i_def:
-                    i_pv_r = i_def - 1
-                else:
-                    break
-            else:
-                if i_pv_r > i_def:
-                    i_pv_r += 1
-                else:
-                    i_pv_r -= 1
-        ari_scores_r = np.array(ari_scores_r)
-        max_index = np.where(ari_scores_r == max(ari_scores_r))[0][-1]
-        
-        default_index = np.where(ari_scores_r == default_ari)[0][0]
-        paramaters_r_copy[p_r][1] = parameter_route_r[max_index][0]
-        guided_route_r.append([paramaters_r_copy[p_r][0], max_index, default_index, parameter_route_r])
-    return guided_route_r, guided_route_mat, guided_route_sk
     
-    
-def get_guided_route_mat(X, gt, filename, passing_param_r, paramaters_mat_copy, paramaters_sk_copy):
-    guided_route_mat = []
-    guided_route_sk = []
-    print("mat - ", end='')
-    for p in range(len(paramaters_mat_copy)):
-        print(p)
-        parameter_route_mat = []
-        ari_scores_mat = []
-        f1_scores_mat = []
-        passing_param_mat = deepcopy(paramaters_mat_copy)
+    for p_c in range(len(parameters_copy)):
+        # print(p_c, end=', ')
+        parameter_route_c = []
+        ari_scores_c = []
+        f1_scores_c = []
+        passing_param_c = parameters_copy
 
-        default_ari, default_f1_r, default_f1_mat, default_f1_sk, route_sk = get_guided_route_sk(X, gt, filename, passing_param_r, passing_param_mat, paramaters_sk_copy)
+        default_ari, default_f1_r, default_f1_mat, default_f1_sk = get_guided_route(X, gt, filename, parameters_r_copy, parameters_mat_copy, parameters_sk_copy, tools[1:])
         if default_ari == -1:
-            return -1, -1, -1, -1, [], []
-        guided_route_sk = route_sk
-        parameter_route_mat.append([passing_param_mat[p][1], default_ari, default_f1_r, default_f1_mat, default_f1_sk])
-        ari_scores_mat.append(default_ari)
-        f1_scores_mat.append(default_f1_mat)
-        i_def = passing_param_mat[p][2].index(passing_param_mat[p][1])
-        if i_def+1 == len(paramaters_mat_copy[p][2]):
-            i_pv = i_def-1    
+            return -1, -1, -1, -1
+        parameter_route_c.append([passing_param_c[p_c][1], default_ari, default_f1_r, default_f1_mat, default_f1_sk])
+        ari_scores_c.append(default_ari)
+        f1_scores_c.append((default_f1_r+ default_f1_mat+ default_f1_sk)/3)
+        
+        i_def = passing_param_c[p_c][2].index(passing_param_c[p_c][1])
+        if i_def+1 == len(passing_param_c[p_c][2]):
+            i_pv_c = i_def-1
         else:
-            i_pv = i_def+1
+            i_pv_c = i_def+1
         
         while True:
-            if i_pv >= len(paramaters_mat_copy[p][2]):
+            if i_pv_c >= len(parameters_copy[p_c][2]):
                 break
-            if i_pv < 0:
-                break
-
-            passing_param_mat[p][1] = paramaters_mat_copy[p][2][i_pv]
-            ari_score, f1_score_r, f1_score_mat, f1_score_sk, route_sk = get_guided_route_sk(X, gt, filename, passing_param_r, passing_param_mat, paramaters_sk_copy)
-            if ari_score >= np.max(ari_scores_mat) and f1_score_mat >= np.max(f1_scores_mat):
-                parameter_route_mat.append([passing_param_mat[p][1], ari_score, f1_score_r, f1_score_mat, f1_score_sk])
-                ari_scores_mat.append(ari_score)
-                f1_scores_mat.append(f1_score_mat)
-                guided_route_sk = route_sk
-            if np.max(ari_scores_mat) == 1:
-                break
-            if ari_score != np.max(ari_scores_mat):
-                if i_pv - 1 > i_def:
-                    break
-                elif i_pv - 1 == i_def:
-                    i_pv = i_def - 1
-                else:
-                    break
-            else:
-                if i_pv > i_def:
-                    i_pv += 1
-                else:
-                    i_pv -= 1
-        ari_scores_mat = np.array(ari_scores_mat)
-        max_index = np.where(ari_scores_mat == max(ari_scores_mat))[0][-1]
-        default_index = np.where(ari_scores_mat == default_ari)[0][0]
-        paramaters_mat_copy[p][1] = parameter_route_mat[max_index][0]
-        guided_route_mat.append([paramaters_mat_copy[p][0], max_index, default_index, parameter_route_mat])
-    return guided_route_mat[-1][3][-1][1], guided_route_mat[-1][3][-1][2], guided_route_mat[-1][3][-1][3], guided_route_mat[-1][3][-1][4], guided_route_mat, guided_route_sk
-
-def get_guided_route_sk(X, gt, filename, passing_param_r, passing_param_mat, paramaters_sk_copy):
-    guided_route_sk = []
-
-    for p in range(len(paramaters_sk_copy)):
-        parameter_route_sk = []
-        ari_scores_sk = []
-        f1_scores_sk = []
-        passing_param_sk = deepcopy(paramaters_sk_copy)
-
-        default_ari, default_f1_r, default_f1_mat, default_f1_sk = runOCSVM(filename, X, gt, passing_param_r, passing_param_mat, passing_param_sk)
-        if default_ari == -1:
-            return -1, -1, -1, -1, []
-        parameter_route_sk.append([passing_param_sk[p][1], default_ari, default_f1_r, default_f1_mat, default_f1_sk])
-        ari_scores_sk.append(default_ari)
-        f1_scores_sk.append(default_f1_sk)
-        i_def = passing_param_sk[p][2].index(passing_param_sk[p][1])
-        if i_def+1 == len(paramaters_sk_copy[p][2]):
-            i_pv = i_def-1    
-        else:
-            i_pv = i_def+1
-        
-        while True:
-            if i_pv >= len(paramaters_sk_copy[p][2]):
-                break
-            if i_pv < 0:
+            if i_pv_c < 0:
                 break
 
-            passing_param_sk[p][1] = paramaters_sk_copy[p][2][i_pv]
-            ari_score, f1_score_r, f1_score_mat, f1_score_sk = runOCSVM(filename, X, gt, passing_param_r, passing_param_mat, passing_param_sk)
-            if ari_score >= np.max(ari_scores_sk) and f1_score_sk >= np.max(f1_scores_sk):
-                parameter_route_sk.append([passing_param_sk[p][1], ari_score, f1_score_r, f1_score_mat, f1_score_sk])
-                ari_scores_sk.append(ari_score)
-                f1_scores_sk.append(f1_score_sk)
+            passing_param_c[p_c][1] = parameters_copy[p_c][2][i_pv_c]
+            
+            ari_score, f1_score_r, f1_score_mat, f1_score_sk = get_guided_route(X, gt, filename, parameters_r_copy, parameters_mat_copy, parameters_sk_copy, tools[1:])
+            if ari_score >= np.max(ari_scores_c) and f1_score_r > np.max(f1_scores_c):
+                parameter_route_c.append([passing_param_c[p_c][1], ari_score, f1_score_r, f1_score_mat, f1_score_sk])
+                ari_scores_c.append(ari_score)
+                f1_scores_c.append((f1_score_r+ f1_score_mat+ f1_score_sk)/3)
 
-            if np.max(ari_scores_sk) == 1:
-                break
-            if ari_score != np.max(ari_scores_sk):
+            if ari_score != np.max(ari_scores_c):
                 
-                if i_pv - 1 > i_def:
+                if i_pv_c - 1 > i_def:
                     break
-                elif i_pv - 1 == i_def:
-                    i_pv = i_def - 1
+                elif i_pv_c - 1 == i_def:
+                    i_pv_c = i_def - 1
                 else:
                     break
             else:
-                if i_pv > i_def:
-                    i_pv += 1
+                if i_pv_c > i_def:
+                    i_pv_c += 1
                 else:
-                    i_pv -= 1
-        ari_scores_sk = np.array(ari_scores_sk)
-        max_index = np.where(ari_scores_sk == max(ari_scores_sk))[0][-1]
-        default_index = np.where(ari_scores_sk == default_ari)[0][0]
-        paramaters_sk_copy[p][1] = parameter_route_sk[max_index][0]
-        guided_route_sk.append([paramaters_sk_copy[p][0], max_index, default_index, parameter_route_sk])
-        
-    return guided_route_sk[-1][3][-1][1], guided_route_sk[-1][3][-1][2], guided_route_sk[-1][3][-1][3], guided_route_sk[-1][3][-1][4], guided_route_sk
-
-
-import subprocess
+                    i_pv_c -= 1
+        ari_scores_c = np.array(ari_scores_c)
+        max_index = np.where(ari_scores_c == max(ari_scores_c))[0][-1]
+        parameters_copy[p_c][1] = parameter_route_c[max_index][0]
+    return parameter_route_c[-1][1], parameter_route_c[-1][2], parameter_route_c[-1][3], parameter_route_c[-1][4]
 
 
 def runOCSVM(filename, X, gt, param_r, param_mat, param_sk):
@@ -431,27 +322,36 @@ def runOCSVM(filename, X, gt, param_r, param_mat, param_sk):
     
     
     if os.path.exists("Labels/OCSVM_R/"+labelFile_r+".csv") == 0:
+        frr=open("GD_ReRun/ROCSVM.csv", "a")
+        frr.write(filename+","+str(param_r[0][1])+","+str(param_r[1][1])+","+str(param_r[2][1])+","+str(param_r[3][1])+","+str(param_r[4][1])+","+str(param_r[5][1])+","+str(param_r[6][1])+","+str(param_r[7][1])+","+str(param_r[8][1])+'\n')
+        frr.close()
         try:
             print(param_r[4][1])
-            frr=open("GD_ReRun/ROCSVM.csv", "a")
-            frr.write(filename+","+str(param_r[0][1])+","+str(param_r[1][1])+","+str(param_r[2][1])+","+str(param_r[3][1])+","+str(param_r[4][1])+","+str(param_r[5][1])+","+str(param_r[6][1])+","+str(param_r[7][1])+","+str(param_r[8][1])+'\n')
-            frr.close()
             subprocess.call((["/usr/local/bin/Rscript", "--vanilla", "ROCSVM_Rerun.r"]))
-            # frr=open("GD_ReRun/ROCSVM.csv", "w")
-            # frr.write('Filename,kernel,degree,gamma,coef0,tolerance,nu,shrinking,cachesize,epsilon\n')
-            # frr.close()
-            # print("\nTry R\n")
-        except:
-            frr=open("GD_ReRun/ROCSVM.csv", "a")
-            frr.write(filename+","+str(param_r[0][1])+","+str(param_r[1][1])+","+str(param_r[2][1])+","+str(param_r[3][1])+","+str(param_r[4][1])+","+str(param_r[5][1])+","+str(param_r[6][1])+","+str(param_r[7][1])+","+str(param_r[8][1])+'\n')
+            frr=open("GD_ReRun/ROCSVM.csv", "w")
+            frr.write('Filename,kernel,degree,gamma,coef0,tolerance,nu,shrinking,cachesize,epsilon\n')
             frr.close()
-            print("\nDid not work\n")
+            if os.path.exists("Labels/OCSVM_R/"+labelFile_r+".csv") == 0: 
+                print("-Did not work-")
+                return -1, -1, -1, -1
+        except:
+            print("\nDid not work-r-\n")
             return -1, -1, -1, -1
     if os.path.exists("Labels/OCSVM_Matlab/Labels_Mat_OCSVM_"+labelFile_mat+".csv") == 0:        
         frr=open("GD_ReRun/MatOCSVM.csv", "a")
         frr.write(filename+","+str(param_mat[0][1])+","+str(param_mat[1][1])+","+str(param_mat[2][1])+","+str(param_mat[3][1])+","+str(param_mat[4][1])+","+str(param_mat[5][1])+","+str(param_mat[6][1])+","+str(param_mat[7][1])+'\n')
         frr.close()
-        return -1, -1, -1, -1
+        try:
+            eng.MatOCSVM_Rerun(nargout=0)
+            frr=open("GD_ReRun/MatOCSVM.csv", "w")
+            frr.write('Filename,ContaminationFraction,KernelScale,Lambda,NumExpansionDimensions,StandardizeData,BetaTolerance,BetaTolerance,GradientTolerance,IterationLimit\n')
+            frr.close()
+            if os.path.exists("Labels/OCSVM_Matlab/Labels_Mat_OCSVM_"+labelFile_mat+".csv") == 0: 
+                print("-Did not work-m-")
+                return -1, -1, -1, -1
+        except:
+            print("\nDid not work\n")
+            return -1, -1, -1, -1
     if os.path.exists("Labels/OCSVM_Sk/Labels_Sk_OCSVM_"+labelFile_sk+".csv") == 0:
         skf1 = get_sk_f1(filename, param_sk, X, gt)
         if skf1 == -1:
@@ -489,35 +389,35 @@ def get_sk_f1(filename, param_sk, X, gt):
     labelFile = filename + "_" + str(param_sk[0][1]) + "_" + str(param_sk[1][1]) + "_" + str(param_sk[2][1]) + "_" + str(param_sk[3][1]) + "_" + str(param_sk[4][1]) + "_" + str(param_sk[5][1]) + "_" + str(param_sk[6][1]) + "_" + str(param_sk[7][1]) + "_" + str(param_sk[8][1])
     
     if os.path.exists("Labels/OCSVM_Sk_Done/Labels_Sk_OCSVM_"+labelFile+".csv") == 1:
-        labels =  pd.read_csv("Labels/OCSVM_Sk/Labels_Sk_OCSVM_"+labelFile+".csv", header=None).to_numpy()
-        # print(labels)
-        # print(gt)
-        return metrics.f1_score(gt, labels[0])
-        # i_kernel=param_sk[0][1]
-        # i_degree=param_sk[1][1]
-        # i_gamma=param_sk[2][1]
-        # i_coef0=param_sk[3][1]
-        # i_tol=param_sk[4][1]
-        # i_nu=param_sk[5][1]
-        # i_shrinking=param_sk[6][1]
-        # i_cache_size=param_sk[7][1]
-        # i_max_iter=param_sk[8][1]
+        # labels =  pd.read_csv("Labels/OCSVM_Sk/Labels_Sk_OCSVM_"+labelFile+".csv", header=None).to_numpy()
+        # # print(labels)
+        # # print(gt)
+        # return metrics.f1_score(gt, labels[0])
+        i_kernel=param_sk[0][1]
+        i_degree=param_sk[1][1]
+        i_gamma=param_sk[2][1]
+        i_coef0=param_sk[3][1]
+        i_tol=param_sk[4][1]
+        i_nu=param_sk[5][1]
+        i_shrinking=param_sk[6][1]
+        i_cache_size=param_sk[7][1]
+        i_max_iter=param_sk[8][1]
         
-        # dff1 =  pd.read_csv("Stats/SkOCSVM_F1.csv")
-        # f1 = dff1[(dff1['Filename']==filename)&
-        #             (dff1['kernel']==i_kernel)&
-        #             (dff1['degree']==i_degree)&
-        #             (dff1['gamma']==i_gamma)&
-        #             (dff1['coef0']==i_coef0)&
-        #             (dff1['tol']==i_tol)&
-        #             (dff1['nu']==str(i_nu))&
-        #             (dff1['shrinking']==i_shrinking)&
-        #             (dff1['cache_size']==i_cache_size)&
-        #             (dff1['max_iter']==i_max_iter)]
-        # if f1.empty == 0:
-        #     run_f1_values = f1["R"].to_numpy()
+        dff1 =  pd.read_csv("Stats/BrokenDown/SkOCSVM_F1_"+filename+".csv")
+        f1 = dff1[(dff1['Filename']==filename)&
+                    (dff1['kernel']==i_kernel)&
+                    (dff1['degree']==i_degree)&
+                    (dff1['gamma']==i_gamma)&
+                    (dff1['coef0']==i_coef0)&
+                    (dff1['tol']==i_tol)&
+                    (dff1['nu']==str(i_nu))&
+                    (dff1['shrinking']==i_shrinking)&
+                    (dff1['cache_size']==i_cache_size)&
+                    (dff1['max_iter']==i_max_iter)]
+        if f1.empty == 0:
+            run_f1_values = f1["R"].to_numpy()
             
-            # return np.mean(run_f1_values)
+            return np.mean(run_f1_values)
   
     labels = []
     f1 = []
@@ -549,7 +449,8 @@ def get_sk_f1(filename, param_sk, X, gt):
     flabel_done.write("Done")
     flabel_done.close()
     
-    fstat_f1=open("Stats/SkOCSVM_F1.csv", "a")
+    
+    fstat_f1=open("Stats/BrokenDown/SkOCSVM_F1_"+filename+".csv", "a")
     fstat_f1.write(filename+','+ str(param_sk[0][1]) + ','+ str(param_sk[1][1]) + ',' + str(param_sk[2][1]) + ',' + str(param_sk[3][1]) + ',' + str(param_sk[4][1]) + ',' + str(param_sk[5][1]) + ',' + str(param_sk[6][1]) + ',' + str(param_sk[7][1]) + ',' + str(param_sk[8][1]) + ',0,')
     fstat_f1.write(','.join(str(s) for s in f1) + '\n')
     fstat_f1.close()
@@ -569,7 +470,7 @@ def get_mat_f1(filename, param_mat, X, gt):
         i_GradientTolerance = param_mat[6][1]
         i_IterationLimit = param_mat[7][1]
         
-        dff1 =  pd.read_csv("Stats/MatOCSVM_F1.csv")
+        dff1 =  pd.read_csv("Stats/BrokenDown/MatOCSVM_F1_"+filename+".csv")
         f1 = dff1[(dff1['Filename']==filename)&
                     (dff1['ContaminationFraction']==str(i_ContaminationFraction))&
                     (dff1['KernelScale']==str(i_KernelScale))&
@@ -613,7 +514,7 @@ def get_mat_f1(filename, param_mat, X, gt):
     flabel_done.write("Done")
     flabel_done.close()
     
-    fstat_f1=open("Stats/MatOCSVM_F1.csv", "a")
+    fstat_f1=open("Stats/BrokenDown/MatOCSVM_F1_"+filename+".csv", "a")
     fstat_f1.write(filename+','+ str(param_mat[0][1]) + ','+ str(param_mat[1][1]) + ',' + str(param_mat[2][1]) + ',' + str(param_mat[3][1]) + ',' + str(param_mat[4][1]) + ',' + str(param_mat[5][1]) + ',' + str(param_mat[6][1]) + ',' + str(param_mat[7][1]) + ',0,')
     fstat_f1.write(','.join(str(s) for s in f1) + '\n')
     fstat_f1.close()
@@ -627,10 +528,7 @@ def get_mat_f1(filename, param_mat, X, gt):
 
 def get_r_f1(filename, param_r, X, gt):
     labelFile = filename + "_" + str(param_r[0][1]) + "_" + str(param_r[1][1]) + "_" + str(param_r[2][1]) + "_" + str(param_r[3][1]) + "_" + str(param_r[4][1]) + "_" + str(param_r[5][1]) + "_" + str(param_r[6][1]) + "_" + str(param_r[7][1]) + "_" + str(param_r[8][1])
-    if os.path.exists("Stats/ROCSVM_F1.csv") == 0: 
-        fstat_f1=open("Stats/ROCSVM_F1.csv", "w")
-        fstat_f1.write("Filename,kernel,degree,gamma,coef0,tolerance,nu,shrinking,cachesize,epsilon,Parameter_Iteration,R\n")
-        fstat_f1.close()
+    
     if os.path.exists("Labels/OCSVM_R_Done/"+labelFile+".csv") == 1:
         i_kernel = param_r[0][1]
         i_degree = param_r[1][1]
@@ -642,7 +540,7 @@ def get_r_f1(filename, param_r, X, gt):
         i_cachesize = param_r[7][1]
         i_epsilon = param_r[8][1]
         
-        dff1 =  pd.read_csv("Stats/ROCSVM_F1.csv")
+        dff1 =  pd.read_csv("Stats/BrokenDown/ROCSVM_F1_"+filename+".csv")
         if i_shrinking == "TRUE":
             i_shrinking = True
         else:
@@ -679,7 +577,7 @@ def get_r_f1(filename, param_r, X, gt):
     flabel_done.write("Done")
     flabel_done.close()
     
-    fstat_f1=open("Stats/ROCSVM_F1.csv", "a")
+    fstat_f1=open("Stats/BrokenDown/ROCSVM_F1_"+filename+".csv", "a")
     fstat_f1.write(filename+','+ str(param_r[0][1]) + ','+ str(param_r[1][1]) + ',' + str(param_r[2][1]) + ',' + str(param_r[3][1]) + ',' + str(param_r[4][1]) + ',' + str(param_r[5][1]) + ',' + str(param_r[6][1]) + ',' + str(param_r[7][1]) + ',' + str(param_r[8][1]) + ',0,')
     fstat_f1.write(','.join(str(s) for s in f1) + '\n')
     fstat_f1.close()
@@ -777,8 +675,12 @@ if __name__ == '__main__':
     for i in range(len(master_files)):
         master_files[i] = master_files[i].split("/")[-1].split(".")[0]
     
+    if os.path.exists("Stats/OCSVM_SvMvR_Route_Scores.csv"):
+        done_files = pd.read_csv("Stats/OCSVM_SvMvR_Route_Scores.csv")
+        done_files = done_files["Filename"].to_numpy()
+        print(done_files)
+    master_files = [x for x in master_files if x not in done_files]
     master_files.sort()
-    
     
     parameters_r = []
     
@@ -845,22 +747,22 @@ if __name__ == '__main__':
     parameters_sk.append(["cache_size", 200, cache_size])
     parameters_sk.append(["max_iter", -1, max_iter])
     
-    if os.path.exists("Stats/Inconsistency/OCSVM_mvr.csv") == 0:
-        fmvr=open("Stats/Inconsistency/OCSVM_mvr.csv", "w")
-        fmvr.write('Mat,R,ARI\n')
-        fmvr.close()
-    if os.path.exists("Stats/Inconsistency/OCSVM_rvs.csv") == 0:
-        frvs=open("Stats/Inconsistency/OCSVM_rvs.csv", "w")
-        frvs.write('R,Sk,ARI\n')
-        frvs.close()
-    if os.path.exists("Stats/Inconsistency/OCSVM_mvs.csv") == 0:
-        fmvs=open("Stats/Inconsistency/OCSVM_mvs.csv", "w")
-        fmvs.write('Mat,Sk,ARI\n')
-        fmvs.close()
+    # if os.path.exists("Stats/Inconsistency/OCSVM_mvr.csv") == 0:
+    #     fmvr=open("Stats/Inconsistency/OCSVM_mvr.csv", "w")
+    #     fmvr.write('Mat,R,ARI\n')
+    #     fmvr.close()
+    # if os.path.exists("Stats/Inconsistency/OCSVM_rvs.csv") == 0:
+    #     frvs=open("Stats/Inconsistency/OCSVM_rvs.csv", "w")
+    #     frvs.write('R,Sk,ARI\n')
+    #     frvs.close()
+    # if os.path.exists("Stats/Inconsistency/OCSVM_mvs.csv") == 0:
+    #     fmvs=open("Stats/Inconsistency/OCSVM_mvs.csv", "w")
+    #     fmvs.write('Mat,Sk,ARI\n')
+    #     fmvs.close()
     
-    # f_Route_Scores=open("Stats/OCSVM_SvMvR_Route_Scores.csv", "w")
-    # f_Route_Scores.write('Filename,DefaultARI,DefaultF1_r,DefaultF1_mat,DefaultF1_sk,UninformedARI,UninformedF1_r,UninformedF1_mat,UninformedF1_sk,InformedARI,InformedF1_r,InformedF1_mat,InformedF1_sk\n')
-    # f_Route_Scores.close()
+    f_Route_Scores=open("Stats/OCSVM_SvMvR_Route_Scores.csv", "w")
+    f_Route_Scores.write('Filename,DefaultARI,DefaultF1_r,DefaultF1_mat,DefaultF1_sk,UninformedARI,UninformedF1_r,UninformedF1_mat,UninformedF1_sk,InformedARI,InformedF1_r,InformedF1_mat,InformedF1_sk\n')
+    f_Route_Scores.close()
     
     frr=open("GD_ReRun/ROCSVM.csv", "w")
     frr.write('Filename,kernel,degree,gamma,coef0,tolerance,nu,shrinking,cachesize,epsilon\n')
@@ -870,11 +772,36 @@ if __name__ == '__main__':
     frr.write('Filename,ContaminationFraction,KernelScale,Lambda,NumExpansionDimensions,StandardizeData,BetaTolerance,BetaTolerance,GradientTolerance,IterationLimit\n')
     frr.close()
     
-    # for FileNumber in range(55, len(master_files)):
-    #     print(FileNumber, end=' ')
-    #     ocsvm(master_files[FileNumber], parameters_r, parameters_mat, parameters_sk)
-
-    ocsvm("KnuggetChase3", parameters_r, parameters_mat, parameters_sk)
+    total_r = pd.read_csv("Stats/ROCSVM_F1.csv")       
+    total_mat = pd.read_csv("Stats/MatOCSVM_F1.csv")       
+    total_sk = pd.read_csv("Stats/SkOCSVM_F1.csv")       
+    
+    for FileNumber in range(len(master_files)):
+        broken_r = total_r[(total_r['Filename']==master_files[FileNumber])]
+        broken_r.to_csv("Stats/BrokenDown/ROCSVM_F1_"+master_files[FileNumber]+".csv", index=False)
+        print(broken_r)
+        print(total_r)
+        broken_mat = total_mat[(total_mat['Filename']==master_files[FileNumber])]
+        broken_mat.to_csv("Stats/BrokenDown/MatOCSVM_F1_"+master_files[FileNumber]+".csv", index=False)
+        
+        broken_sk = total_sk[(total_sk['Filename']==master_files[FileNumber])]
+        broken_sk.to_csv("Stats/BrokenDown/SkOCSVM_F1_"+master_files[FileNumber]+".csv", index=False)
+        
+        # print(FileNumber, end=' ')
+        # ocsvm(master_files[FileNumber], parameters_r, parameters_mat, parameters_sk)
+        
+        broken_r = pd.read_csv("Stats/BrokenDown/ROCSVM_F1_"+master_files[FileNumber]+".csv")
+        total_r = pd.merge(total_r, broken_r, how='outer')
+        broken_mat = pd.read_csv("Stats/BrokenDown/MatOCSVM_F1_"+master_files[FileNumber]+".csv")
+        total_mat = pd.merge(total_mat, broken_mat, how='outer')
+        broken_sk = pd.read_csv("Stats/BrokenDown/SkOCSVM_F1_"+master_files[FileNumber]+".csv")
+        total_sk = pd.merge(total_sk, broken_sk, how='outer')
+        
+    total_r.to_csv("Stats/ROCSVM_F1.csv", index=False)       
+    total_mat.to_csv("Stats/MatOCSVM_F1.csv", index=False)       
+    total_sk.to_csv("Stats/SkOCSVM_F1.csv", index=False)      
+    
+    # ocsvm("KnuggetChase3", parameters_r, parameters_mat, parameters_sk)
     # plot_ari_f1() 
 
     

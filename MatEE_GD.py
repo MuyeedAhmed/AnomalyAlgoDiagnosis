@@ -400,6 +400,9 @@ def runEE(filename, X, gt, params, parameter_iteration):
         frr=open("GD_ReRun/MatEE.csv", "a")
         frr.write(filename+","+str(params[0][1])+","+str(params[1][1])+","+str(params[2][1])+","+str(params[3][1])+","+str(params[4][1])+","+str(params[5][1])+","+str(params[6][1])+","+str(params[7][1])+","+str(params[8][1])+'\n')
         frr.close()
+        
+        #
+        
         return 0, 0
     
     

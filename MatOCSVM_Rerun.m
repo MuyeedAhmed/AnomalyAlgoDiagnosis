@@ -10,7 +10,7 @@ function main_function()
     T = readtable(filename,opts);
     T = table2array(T);
     for i = 1:size(T,1)
-        fprintf("%d\n", i)
+%         fprintf("%d\n", i)
         parameters = [];
         ContaminationFraction.name = "ContaminationFraction";
         ContaminationFraction.default = cell2mat(T(i,2));

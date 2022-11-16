@@ -1,8 +1,1 @@
 Filename,kernel,degree,gamma,coef0,tolerance,nu,shrinking,cachesize,epsilon
-KnuggetChase3,radial,6,auto,0.4,0.0001,0.2,TRUE,200,0.1
-KnuggetChase3,radial,6,auto,0.4,0.0001,0.3,TRUE,200,0.1
-KnuggetChase3,radial,6,auto,0.4,0.0001,0.2,FALSE,200,0.1
-KnuggetChase3,radial,6,auto,0.4,0.0001,0.2,FALSE,400,0.1
-KnuggetChase3,radial,6,auto,0.4,0.0001,0.2,FALSE,400,0.2
-KnuggetChase3,radial,6,auto,0.4,0.0001,0.2,FALSE,400,0.01
-KnuggetChase3,radial,6,auto,0.4,0.0001,0.2,FALSE,400,0.05

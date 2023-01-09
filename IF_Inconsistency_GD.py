@@ -886,7 +886,7 @@ def plot_ari_f1():
     plt.yticks(fontsize = 15)
     plt.title("Isolation Forest - Inconsistency", fontsize = 18)
     plt.xlabel("Average Performance (F1 Score)", fontsize = 18)
-    plt.ylabel("Consistency (Mean Mutual ARI)", fontsize = 18)
+    plt.ylabel("Consistency (Mean Cross-toolkit ARI)", fontsize = 18)
     plt.savefig("Fig/IF_SvMvR_GD_Comparison.pdf", bbox_inches="tight", pad_inches=0)
     plt.show()
     

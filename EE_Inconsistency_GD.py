@@ -101,9 +101,9 @@ def ee(filename, parameters_mat, parameters_sk):
     draw_graph(filename, blind_route_sk,informed_route_sk, 'S')
     draw_graph(filename, blind_route_mat,informed_route_mat, 'M')
     
-    f_Route_Scores=open("Stats/EE_SvM_Route_Scores.csv", "a")
-    f_Route_Scores.write(filename+','+str(DefaultARI)+","+str(DefaultF1_sk)+","+str(DefaultF1_mat)+","+UninformedARI+","+UninformedF1_sk+","+UninformedF1_mat+","+InformedARI+","+InformedF1_sk+","+InformedF1_mat+"\n")
-    f_Route_Scores.close()
+    # f_Route_Scores=open("Stats/EE_SvM_Route_Scores.csv", "a")
+    # f_Route_Scores.write(filename+','+str(DefaultARI)+","+str(DefaultF1_sk)+","+str(DefaultF1_mat)+","+UninformedARI+","+UninformedF1_sk+","+UninformedF1_mat+","+InformedARI+","+InformedF1_sk+","+InformedF1_mat+"\n")
+    # f_Route_Scores.close()
     
 def draw_graph(filename, blind_route, informed_route, tool):
     ## Without F1 Score
@@ -739,37 +739,37 @@ if __name__ == '__main__':
     
     parameters_mat = []
 
-    # Method = ["olivehawkins", "fmcd", "ogk"];
-    # OutlierFraction = [0.05, 0.1, 0.2, 0.25, 0.3, 0.4, 0.5];
-    # NumTrials = [2, 5, 10, 25, 50, 100, 250, 500, 750, 1000];
-    # BiasCorrection = [1, 0];
-    # NumOGKIterations = [1, 2, 3];
-    # UnivariateEstimator = ["tauscale", "qn"];
-    # ReweightingMethod = ["rfch", "rmvn"];
-    # NumConcentrationSteps = [2, 5, 10, 15, 20];
-    # StartMethod = ["elemental","classical", "medianball"];    
+    Method = ["olivehawkins", "fmcd", "ogk"];
+    OutlierFraction = [0.05, 0.1, 0.2, 0.25, 0.3, 0.4, 0.5];
+    NumTrials = [2, 5, 10, 25, 50, 100, 250, 500, 750, 1000];
+    BiasCorrection = [1, 0];
+    NumOGKIterations = [1, 2, 3];
+    UnivariateEstimator = ["tauscale", "qn"];
+    ReweightingMethod = ["rfch", "rmvn"];
+    NumConcentrationSteps = [2, 5, 10, 15, 20];
+    StartMethod = ["elemental","classical", "medianball"];    
     
-    # parameters_mat.append(["Method", "fmcd", Method])
-    # parameters_mat.append(["OutlierFraction", 0.5, OutlierFraction])
-    # parameters_mat.append(["NumTrials", 500, NumTrials])
-    # parameters_mat.append(["BiasCorrection", 1, BiasCorrection])
-    # parameters_mat.append(["NumOGKIterations", 2, NumOGKIterations])
-    # parameters_mat.append(["UnivariateEstimator", "tauscale", UnivariateEstimator])
-    # parameters_mat.append(["ReweightingMethod", "rfch", ReweightingMethod])
-    # parameters_mat.append(["NumConcentrationSteps", 10, NumConcentrationSteps])
-    # parameters_mat.append(["StartMethod", "classical", StartMethod])
+    parameters_mat.append(["Method", "fmcd", Method])
+    parameters_mat.append(["OutlierFraction", 0.5, OutlierFraction])
+    parameters_mat.append(["NumTrials", 500, NumTrials])
+    parameters_mat.append(["BiasCorrection", 1, BiasCorrection])
+    parameters_mat.append(["NumOGKIterations", 2, NumOGKIterations])
+    parameters_mat.append(["UnivariateEstimator", "tauscale", UnivariateEstimator])
+    parameters_mat.append(["ReweightingMethod", "rfch", ReweightingMethod])
+    parameters_mat.append(["NumConcentrationSteps", 10, NumConcentrationSteps])
+    parameters_mat.append(["StartMethod", "classical", StartMethod])
     
     
-    # parameters_sk = []
-    # store_precision = [True, False]
-    # assume_centered = [True, False]
-    # support_fraction = [None, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
-    # contamination = [0.1, 0.2, 0.3, 0.4, 0.5]
+    parameters_sk = []
+    store_precision = [True, False]
+    assume_centered = [True, False]
+    support_fraction = [None, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    contamination = [0.1, 0.2, 0.3, 0.4, 0.5]
     
-    # parameters_sk.append(["store_precision", True, store_precision])
-    # parameters_sk.append(["assume_centered", False, assume_centered])
-    # parameters_sk.append(["support_fraction", None, support_fraction])
-    # parameters_sk.append(["contamination", 0.1, contamination])
+    parameters_sk.append(["store_precision", True, store_precision])
+    parameters_sk.append(["assume_centered", False, assume_centered])
+    parameters_sk.append(["support_fraction", None, support_fraction])
+    parameters_sk.append(["contamination", 0.1, contamination])
     
     
         
@@ -781,9 +781,9 @@ if __name__ == '__main__':
     # f_Route_Scores.close()
     
     
-    # frr=open("GD_ReRun/MatEE.csv", "w")
-    # frr.write('Filename,Method,OutlierFraction,NumTrials,BiasCorrection,NumOGKIterations,UnivariateEstimator,ReweightingMethod,NumConcentrationSteps,StartMethod\n')
-    # frr.close()
+    frr=open("GD_ReRun/MatEE.csv", "w")
+    frr.write('Filename,Method,OutlierFraction,NumTrials,BiasCorrection,NumOGKIterations,UnivariateEstimator,ReweightingMethod,NumConcentrationSteps,StartMethod\n')
+    frr.close()
     
     # for FileNumber in range(17,len(master_files)):
     #     print(FileNumber, end=' ')
@@ -796,7 +796,7 @@ if __name__ == '__main__':
     #     #     continue
 
     #     ee(master_files[FileNumber], parameters_mat, parameters_sk)
-    
-    plot_ari_f1() 
+    ee('vertebral', parameters_mat, parameters_sk)
+    # plot_ari_f1() 
 
     

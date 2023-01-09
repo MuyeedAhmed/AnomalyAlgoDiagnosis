@@ -86,6 +86,7 @@ def runALGO(filename, X, gt):
     labels_ocsvm = clustering.predict(X)
     _, counts_ocsvm = np.unique(labels_ocsvm, return_counts=True)
     ocsvm_per = min(counts_ocsvm)/(len(gt))
+    breakpoint()
     print(nu_s, ocsvm_per)
     # if if_per == 1:
     #     if_per = 0
@@ -116,6 +117,7 @@ if __name__ == '__main__':
         
     
     for FileNumber in range(len(master_files)):
+        breakpoint()
         algo(master_files[FileNumber])
         
         

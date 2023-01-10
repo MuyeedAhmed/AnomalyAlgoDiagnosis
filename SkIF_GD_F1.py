@@ -75,18 +75,18 @@ def isolationforest(filename, parameters, parameter_iteration, parameter_ranking
     mod_parameters[1][2][mod_parameters[1][2].index(auto_1)] = 'auto'
     ##
     
-    blind_route = get_blind_route(X, gt, filename, deepcopy(mod_parameters), parameter_iteration, parameter_rankings)
+    # blind_route = get_blind_route(X, gt, filename, deepcopy(mod_parameters), parameter_iteration, parameter_rankings)
     guided_route = get_guided_route(X, gt, filename, deepcopy(mod_parameters), parameter_iteration, parameter_rankings)
-    print(blind_route)
+    # print(blind_route)
     print(guided_route)
-    DefaultARI = str(blind_route[0][3][0][1])
-    DefaultF1 = str(blind_route[0][3][0][2])
+    # DefaultARI = str(blind_route[0][3][0][1])
+    # DefaultF1 = str(blind_route[0][3][0][2])
     
-    UninformedARI = str(blind_route[-1][3][-1][1])
-    UninformedF1 = str(blind_route[-1][3][-1][2])
+    # UninformedARI = str(blind_route[-1][3][-1][1])
+    # UninformedF1 = str(blind_route[-1][3][-1][2])
     
-    InformedARI = str(guided_route[-1][3][-1][1])
-    InformedF1 = str(guided_route[-1][3][-1][2])
+    # InformedARI = str(guided_route[-1][3][-1][1])
+    # InformedF1 = str(guided_route[-1][3][-1][2])
     
     # f_Route_Scores=open("Stats/SkIF_Route_Scores.csv", "a")
     # f_Route_Scores.write(filename+','+DefaultARI+","+DefaultF1+","+UninformedARI+","+UninformedF1+","+InformedARI+","+InformedF1+"\n")
@@ -157,67 +157,67 @@ def get_blind_route(X, gt, filename, parameters_this_file, parameter_iteration, 
     # for i in range(len(blind_route)):
     #     param_names.append(blind_route[i][0])
     
-    ## Without F1 Score
-    fig = plt.Figure()
-    start = end = 0
-    for i in range(len(blind_route)):
-        default = blind_route[i][2]
-        start = end
-        end = blind_route[i][1] - (default-start)
+    # ## Without F1 Score
+    # fig = plt.Figure()
+    # start = end = 0
+    # for i in range(len(blind_route)):
+    #     default = blind_route[i][2]
+    #     start = end
+    #     end = blind_route[i][1] - (default-start)
         
-        ari_p = blind_route[i][3]
-        # print()
-        ari_scores = []
-        ari_x = []
-        for j in range(len(ari_p)):
-            ari_scores.append(ari_p[j][1])
-            ari_x.append(j-(default-start))
-        for k in range(len(ari_scores)-1):
-            plt.plot(ari_x[k+1], ari_scores[k+1], marker=(3, 0, get_angle(ari_x[k+1], ari_scores[k+1], ari_x[k], ari_scores[k])), color='black')
-        plt.plot(ari_x, ari_scores, '-')
+    #     ari_p = blind_route[i][3]
+    #     # print()
+    #     ari_scores = []
+    #     ari_x = []
+    #     for j in range(len(ari_p)):
+    #         ari_scores.append(ari_p[j][1])
+    #         ari_x.append(j-(default-start))
+    #     for k in range(len(ari_scores)-1):
+    #         plt.plot(ari_x[k+1], ari_scores[k+1], marker=(3, 0, get_angle(ari_x[k+1], ari_scores[k+1], ari_x[k], ari_scores[k])), color='black')
+    #     plt.plot(ari_x, ari_scores, '-')
         
-        if i == 0:
-            plt.annotate(blind_route[i][0]+" = "+str(blind_route[i][3][blind_route[i][2]][0]), (0.1, blind_route[i][3][blind_route[i][2]][1]), ha='left')
+    #     if i == 0:
+    #         plt.annotate(blind_route[i][0]+" = "+str(blind_route[i][3][blind_route[i][2]][0]), (0.1, blind_route[i][3][blind_route[i][2]][1]), ha='left')
 
-        if start != end:
-            plt.annotate(blind_route[i][0]+" = "+str(blind_route[i][3][blind_route[i][1]][0]), (end+0.1, blind_route[i][3][blind_route[i][1]][1]), ha='left')
-    # plt.legend(param_names)
-    plt.ylabel("Cross-run ARI")
-    plt.xticks(ticks= [])
-    plt.title(filename)
-    plt.savefig("Fig/GD/SkIF_"+filename+"_Trajectory.pdf", bbox_inches="tight", pad_inches=0)
-    plt.show()
+    #     if start != end:
+    #         plt.annotate(blind_route[i][0]+" = "+str(blind_route[i][3][blind_route[i][1]][0]), (end+0.1, blind_route[i][3][blind_route[i][1]][1]), ha='left')
+    # # plt.legend(param_names)
+    # plt.ylabel("Cross-run ARI")
+    # plt.xticks(ticks= [])
+    # plt.title(filename)
+    # plt.savefig("Fig/GD/SkIF_"+filename+"_Trajectory.pdf", bbox_inches="tight", pad_inches=0)
+    # plt.show()
     
-    ## With F1 Score
-    fig = plt.Figure()
-    start = end = 0
-    for i in range(len(blind_route)):
-        default = blind_route[i][2]
-        start = end
-        end = blind_route[i][1] - (default-start)
+    # ## With F1 Score
+    # fig = plt.Figure()
+    # start = end = 0
+    # for i in range(len(blind_route)):
+    #     default = blind_route[i][2]
+    #     start = end
+    #     end = blind_route[i][1] - (default-start)
         
-        ari_p = blind_route[i][3]
-        ari_scores = []
-        ari_x = []
-        for j in range(len(ari_p)):
-            ari_scores.append(ari_p[j][1])
-            ari_x.append(ari_p[j][2])
-        for k in range(len(ari_scores)-1):
-            plt.plot(ari_x[k+1], ari_scores[k+1], marker=(3, 0, get_angle(ari_x[k+1], ari_scores[k+1], ari_x[k], ari_scores[k])), color='black')
-        plt.plot(ari_x, ari_scores, '-')
+    #     ari_p = blind_route[i][3]
+    #     ari_scores = []
+    #     ari_x = []
+    #     for j in range(len(ari_p)):
+    #         ari_scores.append(ari_p[j][1])
+    #         ari_x.append(ari_p[j][2])
+    #     for k in range(len(ari_scores)-1):
+    #         plt.plot(ari_x[k+1], ari_scores[k+1], marker=(3, 0, get_angle(ari_x[k+1], ari_scores[k+1], ari_x[k], ari_scores[k])), color='black')
+    #     plt.plot(ari_x, ari_scores, '-')
         
-        if i == 0:
-            plt.annotate(blind_route[i][0]+" = "+str(blind_route[i][3][blind_route[i][2]][0]), (blind_route[i][3][blind_route[i][2]][2], blind_route[i][3][blind_route[i][2]][1]), ha='left')
+    #     if i == 0:
+    #         plt.annotate(blind_route[i][0]+" = "+str(blind_route[i][3][blind_route[i][2]][0]), (blind_route[i][3][blind_route[i][2]][2], blind_route[i][3][blind_route[i][2]][1]), ha='left')
 
-        if start != end:
-            plt.annotate(blind_route[i][0]+" = "+str(blind_route[i][3][blind_route[i][1]][0]), (blind_route[i][3][blind_route[i][1]][2], blind_route[i][3][blind_route[i][1]][1]), ha='left')
-    # plt.legend(param_names)
-    plt.ylabel("Cross-run ARI")
-    plt.xlabel("F1 Score")
+    #     if start != end:
+    #         plt.annotate(blind_route[i][0]+" = "+str(blind_route[i][3][blind_route[i][1]][0]), (blind_route[i][3][blind_route[i][1]][2], blind_route[i][3][blind_route[i][1]][1]), ha='left')
+    # # plt.legend(param_names)
+    # plt.ylabel("Cross-run ARI")
+    # plt.xlabel("F1 Score")
     
-    plt.title(filename)
-    plt.savefig("Fig/GD/SkIF_"+filename+"_Trajectory_W_F1.pdf", bbox_inches="tight", pad_inches=0)
-    plt.show()
+    # plt.title(filename)
+    # plt.savefig("Fig/GD/SkIF_"+filename+"_Trajectory_W_F1.pdf", bbox_inches="tight", pad_inches=0)
+    # plt.show()
     return blind_route
     
 def get_guided_route(X, gt, filename, parameters_this_file, parameter_iteration, parameter_rankings):
@@ -254,7 +254,7 @@ def get_guided_route(X, gt, filename, parameters_this_file, parameter_iteration,
             passing_param[p][1] = parameters_this_file[p][2][i_pv]
             f1_score, ari_score = runIF(filename, X, gt, passing_param, parameter_iteration)
 
-            if ari_score > np.max(ari_scores) and f1_score > np.max(f1_scores):
+            if f1_score > np.max(f1_scores):
                 # if i_pv > i_def:
                 parameter_route.append([passing_param[p][1], ari_score, f1_score])
                 ari_scores.append(ari_score)
@@ -263,7 +263,7 @@ def get_guided_route(X, gt, filename, parameters_this_file, parameter_iteration,
                 #     parameter_route.insert(0, [passing_param[p][1], ari_score])
                 #     ari_scores.insert(0, ari_score)
             
-            if ari_score != np.max(ari_scores) and f1_score != np.max(f1_scores):
+            if f1_score != np.max(f1_scores):
                 
                 if i_pv - 1 > i_def:
                     break
@@ -277,54 +277,54 @@ def get_guided_route(X, gt, filename, parameters_this_file, parameter_iteration,
                 else:
                     i_pv -= 1
         # print()
-        max_index = ari_scores.index(max(ari_scores))
-        default_index = ari_scores.index(default_ari)
+        max_index = f1_scores.index(max(f1_scores))
+        default_index = f1_scores.index(default_f1)
         parameters_this_file[p][1] = parameter_route[max_index][0]
         guided_route.append([parameters_this_file[p][0], max_index, default_index, parameter_route])
-    print(guided_route)
-    print(guided_route[-1][3][-1][1], guided_route[-1][3][-1][2])
-    ## With F1 Score
-    fig = plt.Figure()
-    start = end = 0
-    for i in range(len(guided_route)):
-        default = guided_route[i][2]
-        start = end
-        end = guided_route[i][1] - (default-start)
+    # print(guided_route)
+    # print(guided_route[-1][3][-1][1], guided_route[-1][3][-1][2])
+    # ## With F1 Score
+    # fig = plt.Figure()
+    # start = end = 0
+    # for i in range(len(guided_route)):
+    #     default = guided_route[i][2]
+    #     start = end
+    #     end = guided_route[i][1] - (default-start)
         
-        ari_p = guided_route[i][3]
-        ari_scores = []
-        ari_x = []
-        for j in range(len(ari_p)):
-            ari_scores.append(ari_p[j][1])
-            ari_x.append(ari_p[j][2])
-        for k in range(len(ari_scores)-1):
-            plt.plot(ari_x[k+1], ari_scores[k+1], marker=(3, 0, get_angle(ari_x[k+1], ari_scores[k+1], ari_x[k], ari_scores[k])), color='black')
-        plt.plot(ari_x, ari_scores, '-')
+    #     ari_p = guided_route[i][3]
+    #     ari_scores = []
+    #     ari_x = []
+    #     for j in range(len(ari_p)):
+    #         ari_scores.append(ari_p[j][1])
+    #         ari_x.append(ari_p[j][2])
+    #     for k in range(len(ari_scores)-1):
+    #         plt.plot(ari_x[k+1], ari_scores[k+1], marker=(3, 0, get_angle(ari_x[k+1], ari_scores[k+1], ari_x[k], ari_scores[k])), color='black')
+    #     plt.plot(ari_x, ari_scores, '-')
         
-        if i == 0:
-            plt.annotate(guided_route[i][0]+" = "+str(guided_route[i][3][guided_route[i][2]][0]), (guided_route[i][3][guided_route[i][2]][2], guided_route[i][3][guided_route[i][2]][1]), ha='left')
+    #     if i == 0:
+    #         plt.annotate(guided_route[i][0]+" = "+str(guided_route[i][3][guided_route[i][2]][0]), (guided_route[i][3][guided_route[i][2]][2], guided_route[i][3][guided_route[i][2]][1]), ha='left')
 
-        if start != end:
-            plt.annotate(guided_route[i][0]+" = "+str(guided_route[i][3][guided_route[i][1]][0]), (guided_route[i][3][guided_route[i][1]][2], guided_route[i][3][guided_route[i][1]][1]), ha='left')
-    # plt.legend(param_names)
-    plt.ylabel("Cross-run ARI")
-    plt.xlabel("F1 Score")
+    #     if start != end:
+    #         plt.annotate(guided_route[i][0]+" = "+str(guided_route[i][3][guided_route[i][1]][0]), (guided_route[i][3][guided_route[i][1]][2], guided_route[i][3][guided_route[i][1]][1]), ha='left')
+    # # plt.legend(param_names)
+    # plt.ylabel("Cross-run ARI")
+    # plt.xlabel("F1 Score")
     
-    plt.title(filename)
-    plt.savefig("Fig/GD/SkIF_"+filename+"_Guided_Trajectory_W_F1.pdf", bbox_inches="tight", pad_inches=0)
-    plt.show()    
+    # plt.title(filename)
+    # plt.savefig("Fig/GD/SkIF_"+filename+"_Guided_Trajectory_W_F1.pdf", bbox_inches="tight", pad_inches=0)
+    # plt.show()    
     
     return guided_route
     
-def get_angle(p1x, p1y, p2x, p2y):
-    """Get the angle of this line with the horizontal axis."""
-    dx = p2x - p1x
-    dy = p2y - p1y
-    theta = math.atan2(dy, dx)
-    angle = math.degrees(theta)  # angle is in (-180, 180]
-    if angle < 0:
-        angle = 360 + angle
-    return angle
+# def get_angle(p1x, p1y, p2x, p2y):
+#     """Get the angle of this line with the horizontal axis."""
+#     dx = p2x - p1x
+#     dy = p2y - p1y
+#     theta = math.atan2(dy, dx)
+#     angle = math.degrees(theta)  # angle is in (-180, 180]
+#     if angle < 0:
+#         angle = 360 + angle
+#     return angle
 
 def runIF(filename, X, gt, params, parameter_iteration):
 
@@ -412,22 +412,22 @@ def runIF(filename, X, gt, params, parameter_iteration):
 def plot_ari_f1():
     SkIF_Route_Scores = pd.read_csv("Stats/SkIF_Route_Scores.csv")
     
-    # fig = plt.Figure()
+    fig = plt.Figure()
     
-    # plt.plot(SkIF_Route_Scores["DefaultF1"], SkIF_Route_Scores["DefaultARI"], '.', color='red', marker = 'd', markersize = 4, alpha=.5)
-    # plt.plot(SkIF_Route_Scores["UninformedF1"], SkIF_Route_Scores["UninformedARI"], '.', color = 'green', marker = 'v', markersize = 4, alpha=.5)
-    # plt.plot(SkIF_Route_Scores["InformedF1"], SkIF_Route_Scores["InformedARI"], '.', color = 'blue', marker = '^', markersize = 4, alpha=.5)
+    plt.plot(SkIF_Route_Scores["DefaultF1"], SkIF_Route_Scores["DefaultARI"], '.', color='red', marker = 'd', markersize = 4, alpha=.5)
+    plt.plot(SkIF_Route_Scores["UninformedF1"], SkIF_Route_Scores["UninformedARI"], '.', color = 'green', marker = 'v', markersize = 4, alpha=.5)
+    plt.plot(SkIF_Route_Scores["InformedF1"], SkIF_Route_Scores["InformedARI"], '.', color = 'blue', marker = '^', markersize = 4, alpha=.5)
      
-    # plt.plot(SkIF_Route_Scores["DefaultF1"].mean(), SkIF_Route_Scores["DefaultARI"].mean(), '.', color='red', marker = 'd', markersize = 12, markeredgecolor='black', markeredgewidth=1.5)
-    # plt.plot(SkIF_Route_Scores["UninformedF1"].mean(), SkIF_Route_Scores["UninformedARI"].mean(), '.', color = 'green', marker = 'v', markersize = 12, markeredgecolor='black', markeredgewidth=1.5)
-    # plt.plot(SkIF_Route_Scores["InformedF1"].mean(), SkIF_Route_Scores["InformedARI"].mean(), '.', color = 'blue', marker = '^', markersize = 12, markeredgecolor='black', markeredgewidth=1.5)
+    plt.plot(SkIF_Route_Scores["DefaultF1"].mean(), SkIF_Route_Scores["DefaultARI"].mean(), '.', color='red', marker = 'd', markersize = 12, markeredgecolor='black', markeredgewidth=1.5)
+    plt.plot(SkIF_Route_Scores["UninformedF1"].mean(), SkIF_Route_Scores["UninformedARI"].mean(), '.', color = 'green', marker = 'v', markersize = 12, markeredgecolor='black', markeredgewidth=1.5)
+    plt.plot(SkIF_Route_Scores["InformedF1"].mean(), SkIF_Route_Scores["InformedARI"].mean(), '.', color = 'blue', marker = '^', markersize = 12, markeredgecolor='black', markeredgewidth=1.5)
     
-    # plt.legend(['Default Setting', 'Uninformed Route', 'Informed Route'])
-    # plt.title("Scikit-learn - Isolation Forest")
-    # plt.xlabel("Performance (F1 Score)")
-    # plt.ylabel("Determinism (ARI)")
+    plt.legend(['Default Setting', 'Uninformed Route', 'Informed Route'])
+    plt.title("Scikit-learn - Isolation Forest")
+    plt.xlabel("Performance (F1 Score)")
+    plt.ylabel("Determinism (ARI)")
     # plt.savefig("Fig/SkIF_GD_Comparison.pdf", bbox_inches="tight", pad_inches=0)
-    # plt.show()
+    plt.show()
     
     # ## Calculate Percentage
     
@@ -519,11 +519,12 @@ if __name__ == '__main__':
         parameters[i].append(int(param_rank[0]))
     ##
         
-    for FileNumber in range(len(master_files)):
-        print(FileNumber, end=' ')
-        isolationforest(master_files[FileNumber], parameters, 0, parameter_rankings["Ranking"].to_numpy())
+    # for FileNumber in range(len(master_files)):
+    #     print(FileNumber, end=' ')
+    #     isolationforest(master_files[FileNumber], parameters, 0, parameter_rankings["Ranking"].to_numpy())
+    isolationforest('breastw', parameters, 0, parameter_rankings["Ranking"].to_numpy())
 
-    plot_ari_f1() 
+    # plot_ari_f1() 
         
         
         
